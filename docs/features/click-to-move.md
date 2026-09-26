@@ -55,5 +55,6 @@ If a road-following leg falls back to a straight line (OSRM backend/profile ladd
 ## Edge Cases
 
 - New walk-here cancels the previous one.
+- Moving the joystick stick cancels a walk (running, paused, or still looking up its road route) and steers from the current position (@docs/features/joystick.md, "Manual takeover").
 - Walk-here while route replay is active → show confirmation dialog to stop replay before proceeding.
 - "Add next point" while in roaming mode → no-op (only valid during walk-to or active ephemeral replay).

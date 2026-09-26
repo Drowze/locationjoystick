@@ -10,6 +10,9 @@ package com.locationjoystick.core.model
  * 3. **Playing** roam owns the tick over joystick. **Paused** roam yields to the joystick
  *    (mode stays `ROAMING`). Roam pause is [isRoamingPaused], not [MockLocationState.PAUSED].
  * 4. Walk-to and follower own the tick over joystick even when paused.
+ *
+ * Those rules only gate the joystick's own ticks (e.g. a retained locked-stick direction). A new
+ * touch that moves the stick past the dead zone takes over instead: see [shouldJoystickTakeOver].
  */
 fun isRoutePlaying(
     mode: MockMode,
@@ -32,3 +35,17 @@ fun shouldIgnoreJoystickInput(
         MockMode.ROAMING -> !isRoamingPaused
         MockMode.WALK_TO, MockMode.FOLLOWER -> true
     }
+
+private val AUTOMATED_MODES = setOf(MockMode.WALK_TO, MockMode.ROUTE_REPLAY, MockMode.ROAMING, MockMode.FOLLOWER)
+
+/**
+ * True when intentional stick movement must cancel automation and hand control to the joystick
+ * (issue #96): any walk-to, route replay, roaming or follower session — playing or paused — or a
+ * road route still being planned for a walk or route start.
+ */
+fun shouldJoystickTakeOver(
+    mode: MockMode,
+    isRoaming: Boolean,
+    hasWalkTarget: Boolean,
+    isRoadRouteFetchInFlight: Boolean,
+): Boolean = mode in AUTOMATED_MODES || isRoaming || hasWalkTarget || isRoadRouteFetchInFlight

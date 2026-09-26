@@ -56,4 +56,24 @@ class MovementPriorityTest {
         assertTrue(shouldIgnoreJoystickInput(MockMode.FOLLOWER, MockLocationState.RUNNING))
         assertTrue(shouldIgnoreJoystickInput(MockMode.WALK_TO, MockLocationState.PAUSED))
     }
+
+    @Test
+    fun `joystick takes over every automated mode, playing or paused`() {
+        for (mode in listOf(MockMode.WALK_TO, MockMode.ROUTE_REPLAY, MockMode.ROAMING, MockMode.FOLLOWER)) {
+            assertTrue(mode.name, shouldJoystickTakeOver(mode, false, false, false))
+        }
+    }
+
+    @Test
+    fun `joystick takes over a roam, walk or road route still being set up`() {
+        assertTrue(shouldJoystickTakeOver(MockMode.TELEPORT, isRoaming = true, false, false))
+        assertTrue(shouldJoystickTakeOver(MockMode.TELEPORT, false, hasWalkTarget = true, false))
+        assertTrue(shouldJoystickTakeOver(MockMode.TELEPORT, false, false, isRoadRouteFetchInFlight = true))
+    }
+
+    @Test
+    fun `plain joystick or teleport has nothing to take over`() {
+        assertFalse(shouldJoystickTakeOver(MockMode.JOYSTICK, false, false, false))
+        assertFalse(shouldJoystickTakeOver(MockMode.TELEPORT, false, false, false))
+    }
 }

@@ -60,7 +60,7 @@ class TeleportUseCase
         ) {
             try {
                 if (resetMovement) {
-                    resetActiveRouteAndRoaming()
+                    stopAutomatedMovement()
                 }
                 val intent =
                     Intent().apply {
@@ -88,7 +88,12 @@ class TeleportUseCase
             }
         }
 
-        private suspend fun resetActiveRouteAndRoaming() {
+        /**
+         * Stops any walk-to, roaming or route session (playing, paused, or still planning) and
+         * leaves the service in [MockMode.TELEPORT] at the current position. Shared by teleports
+         * and the joystick's manual takeover (issue #96).
+         */
+        suspend fun stopAutomatedMovement() {
             walkCoordinator.cancel()
             if (locationRepository.currentMode.value == MockMode.ROAMING || roamingRepository.isRoaming.value) {
                 roamingRepository.stopRoaming()

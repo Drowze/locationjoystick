@@ -512,6 +512,17 @@ class MapController
             _sharedState.update { it.copy(walkMode = WalkMode.Idle, isWalkPaused = false, routeTrace = null) }
         }
 
+        /**
+         * Manual joystick takeover (issue #96): cancels walk-to (including a pending road lookup
+         * and ephemeral "add next point" replay), roaming and route replay — playing, paused or
+         * still planning — so nothing competes with the stick. Reuses the same stops as
+         * [stopWalk] and a teleport; saved routes and preferences are untouched.
+         */
+        suspend fun stopAutomatedMovement() {
+            stopWalk()
+            teleportUseCase.stopAutomatedMovement()
+        }
+
         fun addEphemeralWaypoint(
             position: LatLng,
             followRoads: Boolean = false,

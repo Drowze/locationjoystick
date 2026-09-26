@@ -206,7 +206,7 @@ class TeleportUseCaseTest {
             useCase.execute(LatLng(10.0, 20.0))
 
             // Stub android.jar Intents do not retain action/extras; count is the signal.
-            // STOP is first, UPDATE is second (see resetActiveRouteAndRoaming).
+            // STOP is first, UPDATE is second (see stopAutomatedMovement).
             assertEquals(2, startedIntents.size)
         }
 

@@ -19,6 +19,7 @@ import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.core.routing.OsrmClient
 import com.locationjoystick.core.routing.RoutingErrorReporter
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -182,11 +183,37 @@ class MapControllerWalkCancellationTest {
             assertFalse(harness.mapController.sharedState.value.walkMode is WalkMode.Walking)
         }
 
+    // Issue #96: moving the joystick cancels a walk still waiting on its road route, and stops
+    // any route/roam session through the same path a teleport uses.
+    @Test
+    fun `joystick takeover drops a pending walk-via-roads and stops route and roam`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val routeResult = CompletableDeferred<Result<List<LatLng>>>()
+            val osrmClient =
+                mockk<OsrmClient>(relaxed = true).also {
+                    coEvery { it.getRoute(any(), any()) } coAnswers { routeResult.await() }
+                }
+            val harness = buildHarness(backgroundScope, osrmClient)
+            val start = LatLng(48.8566, 2.3522)
+            harness.locationRepository.setPositionInternal(start)
+
+            harness.mapController.walkViaRoads(LatLng(48.9000, 2.3522))
+            harness.mapController.stopAutomatedMovement()
+            routeResult.complete(Result.success(listOf(start, LatLng(48.9000, 2.3522))))
+
+            assertNull(harness.locationRepository.walkTarget.value)
+            assertNotEquals(MockMode.WALK_TO, harness.locationRepository.currentMode.value)
+            assertEquals(WalkMode.Idle, harness.mapController.sharedState.value.walkMode)
+            assertEquals(start, harness.locationRepository.currentPosition.value)
+            coVerify(exactly = 1) { harness.teleportUseCase.stopAutomatedMovement() }
+        }
+
     private class Harness(
         val locationRepository: LocationRepository,
         val walkCoordinator: WalkCoordinator,
         val ephemeralController: EphemeralReplayController,
         val mapController: MapController,
+        val teleportUseCase: TeleportUseCase,
     )
 
     private fun buildHarness(
@@ -253,6 +280,6 @@ class MapControllerWalkCancellationTest {
                 routingErrorReporter = routingErrorReporter,
                 appScope = scope,
             )
-        return Harness(locationRepository, walkCoordinator, ephemeralController, mapController)
+        return Harness(locationRepository, walkCoordinator, ephemeralController, mapController, teleportUseCase)
     }
 }
