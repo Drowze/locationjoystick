@@ -1,0 +1,7 @@
+{
+  "version": "0.24.1",
+  "date": "2026-09-26",
+  "entries": [
+    { "category": "fix", "scope": "Click-to-Move / Teleport", "summary": "Teleporting while walking somewhere now always stops that walk. Before, a walk along roads that was still looking up its path could start anyway after the teleport and head back toward the old spot." }
+  ]
+}

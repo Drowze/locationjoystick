@@ -403,33 +403,52 @@ class MapController
 
         fun walkTo(position: LatLng) {
             cancelAnyActiveMovement()
-            _sharedState.update {
-                it.copy(
-                    walkMode = WalkMode.Walking(target = position, start = it.currentPosition),
-                    routeTrace = null,
-                )
+            startStraightWalk(position, walkCoordinator.currentGeneration())
+        }
+
+        /**
+         * Starts a straight walk unless [expectedGeneration] went stale — i.e. a teleport, stop
+         * or newer walk cancelled the request that asked for it (issue #99).
+         *
+         * @return `true` if the walk started.
+         */
+        private fun startStraightWalk(
+            position: LatLng,
+            expectedGeneration: Long,
+        ): Boolean {
+            val walking = WalkMode.Walking(target = position, start = _sharedState.value.currentPosition)
+            _sharedState.update { it.copy(walkMode = walking, routeTrace = null) }
+            val started =
+                walkCoordinator.startWalk(position, appScope, expectedGeneration) { newPos, speedMs, bearing ->
+                    context.startService(
+                        MockLocationIntentBuilder.updatePosition(
+                            context,
+                            newPos.latitude,
+                            newPos.longitude,
+                            speedMs,
+                            bearing,
+                        ),
+                    )
+                }
+            if (!started) {
+                _sharedState.update { if (it.walkMode == walking) it.copy(walkMode = WalkMode.Idle) else it }
             }
-            walkCoordinator.startWalk(position, appScope) { newPos, speedMs, bearing ->
-                context.startService(
-                    MockLocationIntentBuilder.updatePosition(
-                        context,
-                        newPos.latitude,
-                        newPos.longitude,
-                        speedMs,
-                        bearing,
-                    ),
-                )
-            }
+            return started
         }
 
         fun walkViaRoads(position: LatLng) {
             cancelAnyActiveMovement()
+            // Teleports from other screens (Favorites, Routes, Capture jump) cancel through
+            // WalkCoordinator, not pendingRoadWalkJob, so the late OSRM result is gated on this
+            // token instead — otherwise it would start walking from the teleport spot back
+            // toward the old target (issue #99).
+            val generation = walkCoordinator.currentGeneration()
             pendingRoadWalkJob =
                 appScope.launch {
                     val current = locationRepository.currentPosition.value
                     if (current == null) {
                         Log.w(TAG, "walkViaRoads: no current position, straight walk")
-                        walkTo(position)
+                        startStraightWalk(position, generation)
                         return@launch
                     }
                     val routeResult =
@@ -444,19 +463,32 @@ class MapController
                     if (waypoints.isNullOrEmpty()) {
                         val reason = routeResult.exceptionOrNull()?.let(::classifyOsrmFailure)
                         Log.w(TAG, "OSRM road-following failed ($reason); falling back to straight walk")
+                        if (!startStraightWalk(position, generation)) return@launch
                         val prefix = osrmFailureMessage(context, reason ?: OsrmFailureReason.Unknown)
                         routingErrorReporter.report(context.getString(R.string.walk_via_roads_fallback_message, prefix))
-                        walkTo(position)
                         return@launch
                     }
+                    val walking = WalkMode.Walking(target = position, start = current, isViaRoads = true)
                     locationRepository.setRouteWaypoints(waypoints)
-                    _sharedState.update {
-                        it.copy(walkMode = WalkMode.Walking(target = position, start = it.currentPosition, isViaRoads = true))
-                    }
-                    walkCoordinator.startWalkAlongRoute(waypoints, appScope) { newPos, speedMs, bearing ->
-                        context.startService(
-                            MockLocationIntentBuilder.updatePosition(context, newPos.latitude, newPos.longitude, speedMs, bearing),
-                        )
+                    _sharedState.update { it.copy(walkMode = walking) }
+                    val started =
+                        walkCoordinator.startWalkAlongRoute(waypoints, appScope, generation) { newPos, speed, bearing ->
+                            context.startService(
+                                MockLocationIntentBuilder.updatePosition(
+                                    context,
+                                    newPos.latitude,
+                                    newPos.longitude,
+                                    speed,
+                                    bearing,
+                                ),
+                            )
+                        }
+                    if (!started) {
+                        Log.d(TAG, "walkViaRoads: cancelled while routing; dropping result")
+                        if (locationRepository.routeWaypoints.value == waypoints) {
+                            locationRepository.setRouteWaypoints(null)
+                        }
+                        _sharedState.update { if (it.walkMode == walking) it.copy(walkMode = WalkMode.Idle) else it }
                     }
                 }
         }

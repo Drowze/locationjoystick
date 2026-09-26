@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -246,5 +247,52 @@ class WalkCoordinatorTest {
                 targetB,
                 locationRepository.walkTarget.value,
             )
+        }
+
+    // Issue #99: a deferred start (e.g. after an OSRM lookup) must not revive a walk that a
+    // teleport cancelled in the meantime.
+    @Test
+    fun `startWalk with a token invalidated by cancel does not start`() =
+        runTest {
+            locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+            val token = walkCoordinator.currentGeneration()
+
+            walkCoordinator.cancel()
+            val started = walkCoordinator.startWalk(LatLng(48.9000, 2.3522), backgroundScope, token)
+
+            assertFalse(started)
+            assertNull(locationRepository.walkTarget.value)
+            assertTrue(locationRepository.currentMode.value != MockMode.WALK_TO)
+        }
+
+    @Test
+    fun `startWalk with a current token starts`() =
+        runTest {
+            locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+            val target = LatLng(48.9000, 2.3522)
+            val token = walkCoordinator.currentGeneration()
+
+            assertTrue(walkCoordinator.startWalk(target, backgroundScope, token))
+            assertEquals(target, locationRepository.walkTarget.value)
+            assertFalse("Starting a walk invalidates older tokens", walkCoordinator.isCurrent(token))
+        }
+
+    @Test
+    fun `no position ticks are applied after cancel`() =
+        runTest {
+            val start = LatLng(48.8566, 2.3522)
+            locationRepository.setPositionInternal(start)
+            var ticks = 0
+
+            walkCoordinator.startWalk(LatLng(48.9000, 2.3522), backgroundScope) { _, _, _ -> ticks++ }
+            advanceTimeBy(AppConstants.LocationConstants.UPDATE_INTERVAL_MS * 2 + 1)
+            val ticksBeforeCancel = ticks
+            walkCoordinator.cancel()
+            val teleport = LatLng(48.8000, 2.3000)
+            locationRepository.setPositionInternal(teleport)
+            advanceTimeBy(AppConstants.LocationConstants.UPDATE_INTERVAL_MS * 5)
+
+            assertEquals(ticksBeforeCancel, ticks)
+            assertEquals(teleport, locationRepository.currentPosition.value)
         }
 }

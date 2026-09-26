@@ -13,6 +13,7 @@ import com.locationjoystick.core.data.WalkToEngine
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RoamingDefaults
+import com.locationjoystick.core.model.SavedItemSortMode
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.core.routing.OsrmClient
@@ -22,6 +23,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -30,6 +33,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -63,18 +69,6 @@ class MapControllerWalkCancellationTest {
     @Test
     fun `walkTo cancels active ephemeral replay and starts new walk`() =
         runTest(UnconfinedTestDispatcher()) {
-            val locationRepository = LocationRepository()
-            val settingsRepository =
-                mockk<SettingsRepository>(relaxed = true) {
-                    every { getActiveSpeedProfile() } returns flowOf(walkProfile)
-                    every { getRoutesSortMode() } returns flowOf(com.locationjoystick.core.model.SavedItemSortMode.NEWEST_FIRST)
-                    every { getFavoritesSortMode() } returns flowOf(com.locationjoystick.core.model.SavedItemSortMode.NEWEST_FIRST)
-                    every { getSpeedUnit() } returns flowOf(SpeedUnit.KMH)
-                    every { getRecentSearches() } returns flowOf(emptyList())
-                    every { getRoamingDefaults() } returns flowOf(RoamingDefaults())
-                    every { getSettingsSnapshot() } returns emptyFlow()
-                    every { getRememberLastLocation() } returns flowOf(false)
-                }
             val osrmClient =
                 mockk<OsrmClient>(relaxed = true).also {
                     // resolveRoute with followRoads=false returns a straight-line pair — mirror
@@ -83,54 +77,10 @@ class MapControllerWalkCancellationTest {
                         listOf(secondArg<LatLng>(), thirdArg<LatLng>())
                     }
                 }
-            val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
-            val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
-            val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
-            val ephemeralController =
-                EphemeralReplayController(
-                    locationRepository,
-                    settingsRepository,
-                    walkCoordinator,
-                    osrmClient,
-                    routingErrorReporter,
-                )
-
-            val context = mockk<Context>(relaxed = true)
-            val isRoaming = MutableStateFlow(false)
-            val isRoamingPaused = MutableStateFlow(false)
-            val roamingRepository =
-                mockk<RoamingRepository>(relaxed = true) {
-                    every { this@mockk.isRoaming } returns isRoaming
-                    every { this@mockk.isRoamingPaused } returns isRoamingPaused
-                }
-            val routeRepository = mockk<RouteRepository>(relaxed = true) { every { getRoutes() } returns emptyFlow() }
-            val favoriteRepository =
-                mockk<FavoriteRepository>(relaxed = true) { every { getFavorites() } returns flowOf(emptyList()) }
-            val teleportUseCase =
-                mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() }
-            val startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true)
-
-            val mapController =
-                MapController(
-                    context = context,
-                    locationRepository = locationRepository,
-                    routeRepository = routeRepository,
-                    favoriteRepository = favoriteRepository,
-                    settingsRepository = settingsRepository,
-                    roamingRepository = roamingRepository,
-                    walkCoordinator = walkCoordinator,
-                    teleportUseCase = teleportUseCase,
-                    realLocationRepository =
-                        mockk<RealLocationRepository> {
-                            every { lastKnownRealPosition() } returns null
-                            every { hasFinePermission() } returns false
-                        },
-                    startRouteReplayUseCase = startRouteReplayUseCase,
-                    ephemeralReplayController = ephemeralController,
-                    osrmClient = osrmClient,
-                    routingErrorReporter = routingErrorReporter,
-                    appScope = backgroundScope,
-                )
+            val harness = buildHarness(backgroundScope, osrmClient)
+            val locationRepository = harness.locationRepository
+            val ephemeralController = harness.ephemeralController
+            val mapController = harness.mapController
 
             // Step 1: start walk-to (not via roads)
             val start = LatLng(48.8566, 2.3522)
@@ -182,4 +132,127 @@ class MapControllerWalkCancellationTest {
                 walkMode is WalkMode.Walking && walkMode.target == target2,
             )
         }
+
+    // Regression for issue #99: a teleport from a screen that bypasses MapController (Favorites,
+    // Routes, Capture jump) only cancels via WalkCoordinator. A walk-via-roads whose routing
+    // result lands afterwards must not start walking from the teleport spot toward the old target.
+    @Test
+    fun `teleport while walk-via-roads is routing drops the late route`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val routeResult = CompletableDeferred<Result<List<LatLng>>>()
+            val osrmClient =
+                mockk<OsrmClient>(relaxed = true).also {
+                    coEvery { it.getRoute(any(), any()) } coAnswers { routeResult.await() }
+                }
+            val harness = buildHarness(backgroundScope, osrmClient)
+            val start = LatLng(48.8566, 2.3522)
+            val targetA = LatLng(48.9000, 2.3522)
+            val teleportB = LatLng(48.8000, 2.3000)
+            harness.locationRepository.setPositionInternal(start)
+
+            harness.mapController.walkViaRoads(targetA)
+            // What TeleportUseCase.execute(resetMovement = true) does before the jump.
+            harness.walkCoordinator.cancel()
+            harness.locationRepository.setPositionInternal(teleportB)
+            routeResult.complete(Result.success(listOf(start, targetA)))
+
+            assertNull("Late route must not revive the walk", harness.locationRepository.walkTarget.value)
+            assertNotEquals(MockMode.WALK_TO, harness.locationRepository.currentMode.value)
+            assertFalse(harness.mapController.sharedState.value.walkMode is WalkMode.Walking)
+            assertEquals(teleportB, harness.locationRepository.currentPosition.value)
+        }
+
+    @Test
+    fun `teleport while walk-via-roads is routing drops the straight-line fallback`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val routeResult = CompletableDeferred<Result<List<LatLng>>>()
+            val osrmClient =
+                mockk<OsrmClient>(relaxed = true).also {
+                    coEvery { it.getRoute(any(), any()) } coAnswers { routeResult.await() }
+                }
+            val harness = buildHarness(backgroundScope, osrmClient)
+            harness.locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+
+            harness.mapController.walkViaRoads(LatLng(48.9000, 2.3522))
+            harness.walkCoordinator.cancel()
+            routeResult.complete(Result.failure(IllegalStateException("routing down")))
+
+            assertNull(harness.locationRepository.walkTarget.value)
+            assertNotEquals(MockMode.WALK_TO, harness.locationRepository.currentMode.value)
+            assertFalse(harness.mapController.sharedState.value.walkMode is WalkMode.Walking)
+        }
+
+    private class Harness(
+        val locationRepository: LocationRepository,
+        val walkCoordinator: WalkCoordinator,
+        val ephemeralController: EphemeralReplayController,
+        val mapController: MapController,
+    )
+
+    private fun buildHarness(
+        scope: CoroutineScope,
+        osrmClient: OsrmClient,
+    ): Harness {
+        val locationRepository = LocationRepository()
+        val settingsRepository =
+            mockk<SettingsRepository>(relaxed = true) {
+                every { getActiveSpeedProfile() } returns flowOf(walkProfile)
+                every { getRoutesSortMode() } returns flowOf(SavedItemSortMode.NEWEST_FIRST)
+                every { getFavoritesSortMode() } returns flowOf(SavedItemSortMode.NEWEST_FIRST)
+                every { getSpeedUnit() } returns flowOf(SpeedUnit.KMH)
+                every { getRecentSearches() } returns flowOf(emptyList())
+                every { getRoamingDefaults() } returns flowOf(RoamingDefaults())
+                every { getSettingsSnapshot() } returns emptyFlow()
+                every { getRememberLastLocation() } returns flowOf(false)
+            }
+        val walkToEngine = WalkToEngine(settingsRepository, locationRepository)
+        val walkCoordinator = WalkCoordinator(locationRepository, walkToEngine)
+        val routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true))
+        val ephemeralController =
+            EphemeralReplayController(
+                locationRepository,
+                settingsRepository,
+                walkCoordinator,
+                osrmClient,
+                routingErrorReporter,
+            )
+
+        val context = mockk<Context>(relaxed = true)
+        val isRoaming = MutableStateFlow(false)
+        val isRoamingPaused = MutableStateFlow(false)
+        val roamingRepository =
+            mockk<RoamingRepository>(relaxed = true) {
+                every { this@mockk.isRoaming } returns isRoaming
+                every { this@mockk.isRoamingPaused } returns isRoamingPaused
+            }
+        val routeRepository = mockk<RouteRepository>(relaxed = true) { every { getRoutes() } returns emptyFlow() }
+        val favoriteRepository =
+            mockk<FavoriteRepository>(relaxed = true) { every { getFavorites() } returns flowOf(emptyList()) }
+        val teleportUseCase =
+            mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() }
+        val startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true)
+
+        val mapController =
+            MapController(
+                context = context,
+                locationRepository = locationRepository,
+                routeRepository = routeRepository,
+                favoriteRepository = favoriteRepository,
+                settingsRepository = settingsRepository,
+                roamingRepository = roamingRepository,
+                walkCoordinator = walkCoordinator,
+                teleportUseCase = teleportUseCase,
+                realLocationRepository =
+                    mockk<RealLocationRepository> {
+                        every { lastKnownRealPosition() } returns null
+                        every { hasFinePermission() } returns false
+                    },
+                startRouteReplayUseCase = startRouteReplayUseCase,
+                ephemeralReplayController = ephemeralController,
+                osrmClient = osrmClient,
+                routingErrorReporter = routingErrorReporter,
+                appScope = scope,
+            )
+        return Harness(locationRepository, walkCoordinator, ephemeralController, mapController)
+    }
 }
