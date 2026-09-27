@@ -481,15 +481,7 @@ class SettingsViewModel
         }
 
         fun setCompassDisclosureAccepted(accepted: Boolean) {
-            viewModelScope.launch {
-                settingsRepository.setCompassDisclosureChoice(
-                    if (accepted) {
-                        AppConstants.CompassTrackingConstants.DISCLOSURE_ACCEPTED
-                    } else {
-                        AppConstants.CompassTrackingConstants.DISCLOSURE_DECLINED
-                    },
-                )
-            }
+            viewModelScope.launch { settingsRepository.recordCompassDisclosure(accepted) }
         }
 
         fun setCompassTestTargetPackage(packageName: String) {

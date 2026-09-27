@@ -362,6 +362,16 @@ class SettingsRepository
 
         suspend fun setCompassDisclosureChoice(choice: String) = dataSource.setCompassDisclosureChoice(choice)
 
+        /** Maps the disclosure dialog's answer to the stored choice, so callers don't duplicate the mapping. */
+        suspend fun recordCompassDisclosure(accepted: Boolean) =
+            setCompassDisclosureChoice(
+                if (accepted) {
+                    AppConstants.CompassTrackingConstants.DISCLOSURE_ACCEPTED
+                } else {
+                    AppConstants.CompassTrackingConstants.DISCLOSURE_DECLINED
+                },
+            )
+
         fun getSettingsSnapshot(): Flow<SettingsSnapshot> = dataSource.getSettingsSnapshot()
 
         suspend fun applySnapshot(snapshot: SettingsSnapshot) = dataSource.applySnapshot(snapshot)

@@ -1120,6 +1120,38 @@ class SettingsRepositoryTest {
             }
         }
 
+    // recordCompassDisclosure
+
+    @Test
+    fun `recordCompassDisclosure accepted stores DISCLOSURE_ACCEPTED`() =
+        runTest {
+            repository.recordCompassDisclosure(accepted = true)
+
+            assertEquals(
+                AppConstants.CompassTrackingConstants.DISCLOSURE_ACCEPTED,
+                fakeDataSource.compassDisclosureChoiceFlow.value,
+            )
+            repository.getCompassDisclosureAccepted().test {
+                assertTrue(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `recordCompassDisclosure declined stores DISCLOSURE_DECLINED`() =
+        runTest {
+            repository.recordCompassDisclosure(accepted = false)
+
+            assertEquals(
+                AppConstants.CompassTrackingConstants.DISCLOSURE_DECLINED,
+                fakeDataSource.compassDisclosureChoiceFlow.value,
+            )
+            repository.getCompassDisclosureAccepted().test {
+                assertFalse(awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     // resetAllData
 
     @Test
@@ -1581,9 +1613,13 @@ class FakeAppPreferencesDataSource : PreferencesDataSource {
 
     override suspend fun setCompassTestTargetPackage(packageName: String) = Unit
 
-    override fun getCompassDisclosureChoice(): Flow<String> = flowOf("")
+    val compassDisclosureChoiceFlow = MutableStateFlow("")
 
-    override suspend fun setCompassDisclosureChoice(choice: String) = Unit
+    override fun getCompassDisclosureChoice(): Flow<String> = compassDisclosureChoiceFlow
+
+    override suspend fun setCompassDisclosureChoice(choice: String) {
+        compassDisclosureChoiceFlow.value = choice
+    }
 
     val recentSearchesFlow = MutableStateFlow<List<RecentSearch>>(emptyList())
 

@@ -9,7 +9,6 @@ import android.view.accessibility.AccessibilityManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
@@ -75,15 +74,7 @@ class OnboardingViewModel
 
         /** Records the answer to the Accessibility disclosure shown from the optional compass step. */
         fun recordCompassDisclosure(accepted: Boolean) {
-            viewModelScope.launch {
-                settingsRepository.setCompassDisclosureChoice(
-                    if (accepted) {
-                        AppConstants.CompassTrackingConstants.DISCLOSURE_ACCEPTED
-                    } else {
-                        AppConstants.CompassTrackingConstants.DISCLOSURE_DECLINED
-                    },
-                )
-            }
+            viewModelScope.launch { settingsRepository.recordCompassDisclosure(accepted) }
         }
 
         fun onSetupComplete() {
