@@ -442,7 +442,7 @@ private fun PrivacySection(
  * Same mode toggle, List/Jump checkboxes, and pass-through browser picker as the top-level Capture
  * screen — sourced from the same `CaptureCoordinatesRepository` state so both surfaces agree. Setup
  * steps (default-browser role, supported links) stay on the Capture screen only; see
- * docs/features/capture-coordinates.md.
+ * docs/features/location-links.md (Opt-in Tier).
  */
 @Composable
 private fun CaptureSection(

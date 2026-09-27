@@ -111,8 +111,7 @@ Rules:
 | Roaming Mode | docs/features/roaming.md |
 | Export / Import | docs/features/export-import.md |
 | QR Share / Transfer | docs/features/qr-transfer.md |
-| Deep Links & Location Sharing | docs/features/deep-link.md |
-| Capture Coordinates | docs/features/capture-coordinates.md |
+| Location Links (Automatic & Capture) | docs/features/location-links.md |
 | Last Remembered Location | docs/features/last-location.md |
 | Onboarding | docs/features/onboarding.md |
 | Group Sync | docs/features/group-sync.md |

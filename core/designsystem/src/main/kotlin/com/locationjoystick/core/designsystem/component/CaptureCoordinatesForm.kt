@@ -54,7 +54,7 @@ import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.LatLng
 import kotlinx.coroutines.launch
 
-/** Capture-mode toggle (Step 1: mode + List/Jump) — see docs/features/capture-coordinates.md. */
+/** Capture-mode toggle (Step 1: mode + List/Jump) — see docs/features/location-links.md (Opt-in Tier). */
 data class CaptureModeState(
     val captureModeEnabled: Boolean,
     val captureEnabled: Boolean,
@@ -87,7 +87,7 @@ data class CaptureRouteSaveState(
 /**
  * Capture-mode setup guidance (default-browser role, Google Maps links, guide link) plus the
  * passthrough-browser picker. While `isDefaultBrowser` is false only the setup is shown — see
- * docs/features/capture-coordinates.md.
+ * docs/features/location-links.md (Opt-in Tier).
  */
 data class CaptureSetupState(
     val isDefaultBrowser: Boolean,
@@ -280,7 +280,7 @@ fun CaptureCoordinatesForm(
     }
 }
 
-/** Public so it can also be embedded as a Settings > Menus section — see docs/features/capture-coordinates.md. */
+/** Public so it can also be embedded as a Settings > Menus section — see docs/features/location-links.md (Opt-in Tier). */
 @Composable
 fun CaptureToggleStep(
     captureModeEnabled: Boolean,
@@ -362,7 +362,7 @@ private fun CaptureSetupSteps(
     }
 }
 
-/** Public so it can also be embedded as a Settings > Menus section — see docs/features/capture-coordinates.md. */
+/** Public so it can also be embedded as a Settings > Menus section — see docs/features/location-links.md (Opt-in Tier). */
 @Composable
 fun ColumnScope.CapturePassThroughRow(state: CaptureSetupState) {
     var showBrowserPicker by remember { mutableStateOf(false) }
