@@ -111,6 +111,9 @@
     <string name="settings_menus_show_route_jump_buttons_desc">"Adds Previous waypoint / Next waypoint buttons to route replay controls, for instantly teleporting between waypoints. Off by default."</string>
     <string name="settings_menus_show_altitude_override_button">"Show altitude override button"</string>
     <string name="settings_menus_show_altitude_override_button_desc">"Adds a button to the floating widget for typing in a fixed altitude from anywhere. Off by default."</string>
+    <string name="settings_menus_capture">"Capture"</string>
+    <string name="settings_menus_capture_desc">"Collects map links from other apps into a list, jumps to them, or both — the same settings as the Capture page. Deep links (geo:, google.navigation:, and share-to-app links) always work automatically and need no setup here."</string>
+    <string name="settings_menus_capture_browser_automatic">"Automatic"</string>
     <string name="settings_menus_debug">"Debug"</string>
     <string name="settings_menus_debug_stats">"Debug stats"</string>
     <string name="settings_menus_debug_stats_desc">"Shows live speed, altitude, coordinates, and tick rate in the floating widget panel while spoofing is active."</string>

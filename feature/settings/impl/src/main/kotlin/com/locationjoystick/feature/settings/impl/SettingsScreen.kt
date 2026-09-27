@@ -392,6 +392,22 @@ fun SettingsRoute(
                     viewModel.setDebugStatsEnabled(action.enabled)
                 }
 
+                is SettingsAction.SetCaptureModeEnabled -> {
+                    viewModel.setCaptureModeEnabled(action.enabled)
+                }
+
+                is SettingsAction.SetCaptureEnabled -> {
+                    viewModel.setCaptureEnabled(action.enabled)
+                }
+
+                is SettingsAction.SetJumpEnabled -> {
+                    viewModel.setJumpEnabled(action.enabled)
+                }
+
+                is SettingsAction.SetCapturePreviousBrowserPackage -> {
+                    viewModel.setCapturePreviousBrowserPackage(action.packageName)
+                }
+
                 is SettingsAction.SetTapToWalkOverlayEnabled -> {
                     viewModel.setTapToWalkOverlayEnabled(action.enabled)
                 }

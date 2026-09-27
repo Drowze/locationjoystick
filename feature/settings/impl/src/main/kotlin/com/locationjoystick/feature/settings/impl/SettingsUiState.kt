@@ -49,5 +49,9 @@ data class SettingsUiState(
     val altitudeJitterRadiusMeters: Double = AppConstants.RealismConstants.ALTITUDE_SIGMA_METERS,
     val altitudeOverrideButtonEnabled: Boolean = false,
     val debugStatsEnabled: Boolean = false,
+    val captureModeEnabled: Boolean = false,
+    val captureEnabled: Boolean = false,
+    val jumpEnabled: Boolean = false,
+    val capturePreviousBrowserPackage: String? = null,
     val isDirty: Boolean = false,
 )

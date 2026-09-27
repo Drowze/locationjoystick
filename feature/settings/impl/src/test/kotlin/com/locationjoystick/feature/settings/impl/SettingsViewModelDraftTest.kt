@@ -2,6 +2,7 @@ package com.locationjoystick.feature.settings.impl
 
 import com.locationjoystick.core.common.root.SensorPermissionBootstrap
 import com.locationjoystick.core.common.util.NsdCodeManager
+import com.locationjoystick.core.data.CaptureCoordinatesRepository
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -9,9 +10,11 @@ import com.locationjoystick.core.location.CompassHeadingSource
 import com.locationjoystick.core.model.AppFeature
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.core.testing.FakeFavoriteDao
+import com.locationjoystick.core.testing.FakePreferencesDataStore
 import com.locationjoystick.core.testing.FakeRouteDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -35,6 +38,7 @@ class SettingsViewModelDraftTest {
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var viewModel: SettingsViewModel
+    private lateinit var captureRepository: CaptureCoordinatesRepository
 
     @Before
     fun setUp() {
@@ -42,9 +46,11 @@ class SettingsViewModelDraftTest {
         val context = RuntimeEnvironment.getApplication()
         val fakeDataSource = SaveTestPreferencesDataSource()
         val settingsRepo = SettingsRepository(fakeDataSource)
+        captureRepository = CaptureCoordinatesRepository(FakePreferencesDataStore())
         viewModel =
             SettingsViewModel(
                 settingsRepository = settingsRepo,
+                captureCoordinatesRepository = captureRepository,
                 favoriteRepository = FavoriteRepository(FakeFavoriteDao()),
                 routeRepository = RouteRepository(routeDao = FakeRouteDao(), context = context),
                 sensorPermissionBootstrap = SensorPermissionBootstrap(context),
@@ -284,6 +290,40 @@ class SettingsViewModelDraftTest {
             viewModel.setTapToWalkScaleMpx(0.25)
             assertTrue(viewModel.uiState.value.isDirty)
             assertEquals(0.25, viewModel.uiState.value.tapToWalkScaleMpx, 1e-9)
+        }
+
+    // -------------------------------------------------------------------------
+    // Capture — live keys shared with CaptureCoordinatesRepository (Settings > Menus section),
+    // no draft/save step, same as the top-level Capture screen.
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `setCaptureModeEnabled writes through the shared capture repository without marking dirty`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            viewModel.setCaptureModeEnabled(true)
+            assertTrue(viewModel.uiState.value.captureModeEnabled)
+            assertFalse(viewModel.uiState.value.isDirty)
+            assertTrue(captureRepository.captureModeEnabled.first())
+        }
+
+    @Test
+    fun `setCaptureEnabled and setJumpEnabled write through the shared capture repository`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            viewModel.setCaptureEnabled(true)
+            viewModel.setJumpEnabled(true)
+            assertTrue(viewModel.uiState.value.captureEnabled)
+            assertTrue(viewModel.uiState.value.jumpEnabled)
+            assertFalse(viewModel.uiState.value.isDirty)
+        }
+
+    @Test
+    fun `setCapturePreviousBrowserPackage persists the pass-through browser choice`() =
+        runTest(testDispatcher) {
+            backgroundScope.launch(testDispatcher) { viewModel.uiState.collect {} }
+            viewModel.setCapturePreviousBrowserPackage("com.example.browser")
+            assertEquals("com.example.browser", viewModel.uiState.value.capturePreviousBrowserPackage)
         }
 
     // -------------------------------------------------------------------------

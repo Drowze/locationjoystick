@@ -56,8 +56,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.locationjoystick.core.common.constants.AppConstants
+import com.locationjoystick.core.common.util.captureBrowserChoices
+import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
+import com.locationjoystick.core.designsystem.component.CapturePassThroughRow
+import com.locationjoystick.core.designsystem.component.CaptureSetupState
+import com.locationjoystick.core.designsystem.component.CaptureToggleStep
 import com.locationjoystick.core.designsystem.component.CompassDisclosureDialog
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
@@ -145,6 +150,8 @@ internal fun SettingsMenusSubScreen(
                         TapToWalkSection(uiState, onAction, onTestCompassDetection, launchableApps)
                         Spacer(Modifier.height(24.dp))
                         PrivacySection(uiState, onAction)
+                        Spacer(Modifier.height(24.dp))
+                        CaptureSection(uiState, onAction)
                         Spacer(Modifier.height(24.dp))
                         DebugSection(uiState, onAction)
                     }
@@ -429,6 +436,55 @@ private fun PrivacySection(
         title = stringResource(R.string.settings_menus_show_altitude_override_button),
         description = stringResource(R.string.settings_menus_show_altitude_override_button_desc),
     )
+}
+
+/**
+ * Same mode toggle, List/Jump checkboxes, and pass-through browser picker as the top-level Capture
+ * screen — sourced from the same `CaptureCoordinatesRepository` state so both surfaces agree. Setup
+ * steps (default-browser role, supported links) stay on the Capture screen only; see
+ * docs/features/capture-coordinates.md.
+ */
+@Composable
+private fun CaptureSection(
+    uiState: SettingsUiState,
+    onAction: (SettingsAction) -> Unit,
+) {
+    val context = LocalContext.current
+    val browserChoices = remember(context) { captureBrowserChoices(context) }
+    val preferredBrowserPackage = resolvePreferredBrowserPackage(uiState.capturePreviousBrowserPackage, context.packageName)
+    val selectedBrowser = browserChoices.firstOrNull { it.packageName == preferredBrowserPackage } ?: browserChoices.firstOrNull()
+
+    Text(stringResource(R.string.settings_menus_capture), style = MaterialTheme.typography.headlineSmall)
+    Spacer(Modifier.height(4.dp))
+    Text(
+        stringResource(R.string.settings_menus_capture_desc),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(8.dp))
+    Column {
+        CaptureToggleStep(
+            captureModeEnabled = uiState.captureModeEnabled,
+            captureEnabled = uiState.captureEnabled,
+            jumpEnabled = uiState.jumpEnabled,
+            onCaptureModeEnabledChange = { onAction(SettingsAction.SetCaptureModeEnabled(it)) },
+            onCaptureEnabledChange = { onAction(SettingsAction.SetCaptureEnabled(it)) },
+            onJumpEnabledChange = { onAction(SettingsAction.SetJumpEnabled(it)) },
+        )
+        CapturePassThroughRow(
+            state =
+                CaptureSetupState(
+                    isDefaultBrowser = true,
+                    passThroughBrowserName = selectedBrowser?.label ?: stringResource(R.string.settings_menus_capture_browser_automatic),
+                    browserChoices = browserChoices,
+                    selectedBrowserPackage = selectedBrowser?.packageName,
+                    onSelectBrowser = { pkg -> onAction(SettingsAction.SetCapturePreviousBrowserPackage(pkg)) },
+                    onRequestDefaultBrowser = {},
+                    onOpenMapsLinks = {},
+                    onOpenSetupGuide = {},
+                ),
+        )
+    }
 }
 
 @Composable

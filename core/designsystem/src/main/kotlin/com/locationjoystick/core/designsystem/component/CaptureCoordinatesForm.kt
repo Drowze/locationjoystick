@@ -280,8 +280,9 @@ fun CaptureCoordinatesForm(
     }
 }
 
+/** Public so it can also be embedded as a Settings > Menus section — see docs/features/capture-coordinates.md. */
 @Composable
-private fun CaptureToggleStep(
+fun CaptureToggleStep(
     captureModeEnabled: Boolean,
     captureEnabled: Boolean,
     jumpEnabled: Boolean,
@@ -361,8 +362,9 @@ private fun CaptureSetupSteps(
     }
 }
 
+/** Public so it can also be embedded as a Settings > Menus section — see docs/features/capture-coordinates.md. */
 @Composable
-private fun ColumnScope.CapturePassThroughRow(state: CaptureSetupState) {
+fun ColumnScope.CapturePassThroughRow(state: CaptureSetupState) {
     var showBrowserPicker by remember { mutableStateOf(false) }
 
     TextButton(

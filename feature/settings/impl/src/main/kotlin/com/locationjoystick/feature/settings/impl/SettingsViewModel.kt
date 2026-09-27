@@ -15,6 +15,7 @@ import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.NetworkUtils
 import com.locationjoystick.core.common.util.NsdCodeManager
 import com.locationjoystick.core.common.util.RandomCode
+import com.locationjoystick.core.data.CaptureCoordinatesRepository
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -32,6 +33,7 @@ import com.locationjoystick.feature.settings.impl.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -56,6 +58,7 @@ class SettingsViewModel
     @Inject
     constructor(
         private val settingsRepository: SettingsRepository,
+        private val captureCoordinatesRepository: CaptureCoordinatesRepository,
         private val favoriteRepository: FavoriteRepository,
         private val routeRepository: RouteRepository,
         private val sensorPermissionBootstrap: SensorPermissionBootstrap,
@@ -91,6 +94,24 @@ class SettingsViewModel
         }
 
         private val compassServiceGranted = MutableStateFlow(false)
+
+        /** Live mirror of [CaptureCoordinatesRepository] — same source the top-level Capture screen reads, no draft/save step. */
+        private data class CaptureSnapshot(
+            val modeEnabled: Boolean,
+            val captureEnabled: Boolean,
+            val jumpEnabled: Boolean,
+            val previousBrowserPackage: String?,
+        )
+
+        private val captureSnapshot: Flow<CaptureSnapshot> =
+            combine(
+                captureCoordinatesRepository.captureModeEnabled,
+                captureCoordinatesRepository.captureEnabled,
+                captureCoordinatesRepository.jumpEnabled,
+                captureCoordinatesRepository.previousBrowserPackage,
+            ) { modeEnabled, captureEnabled, jumpEnabled, previousBrowserPackage ->
+                CaptureSnapshot(modeEnabled, captureEnabled, jumpEnabled, previousBrowserPackage)
+            }
 
         init {
             _isRooted.value = sensorPermissionBootstrap.isGranted()
@@ -193,13 +214,13 @@ class SettingsViewModel
                     settingsRepository.getCompassTestTargetPackage(),
                     settingsRepository.getCompassDisclosureChoice(),
                 ) { pkg, choice -> pkg to choice },
-                compassServiceGranted,
+                combine(compassServiceGranted, captureSnapshot) { granted, capture -> granted to capture },
                 settingsRepository.getThemeMode(),
                 settingsRepository.getBaseAltitudeOverride(),
             ) {
                 (snapshot, draftState),
                 (compassTestTargetPackage, compassDisclosureChoice),
-                isServiceGranted,
+                (isServiceGranted, capture),
                 themeMode,
                 baseAltitudeOverride,
                 ->
@@ -246,6 +267,10 @@ class SettingsViewModel
                     altitudeOverrideButtonEnabled =
                         draftState.altitudeOverrideButtonEnabled ?: snapshot.altitudeOverrideButtonEnabled,
                     debugStatsEnabled = draftState.debugStatsEnabled ?: snapshot.debugStatsEnabled,
+                    captureModeEnabled = capture.modeEnabled,
+                    captureEnabled = capture.captureEnabled,
+                    jumpEnabled = capture.jumpEnabled,
+                    capturePreviousBrowserPackage = capture.previousBrowserPackage,
                     compassTestTargetPackage = compassTestTargetPackage,
                     isCompassServiceGranted = isServiceGranted,
                     compassDisclosureAnswered =
@@ -428,6 +453,23 @@ class SettingsViewModel
 
         fun setDebugStatsEnabled(enabled: Boolean) {
             mutableDraft.update { it.copy(debugStatsEnabled = enabled) }
+        }
+
+        /** Live keys, no save step — same [CaptureCoordinatesRepository] the top-level Capture screen writes. */
+        fun setCaptureModeEnabled(enabled: Boolean) {
+            viewModelScope.launch { captureCoordinatesRepository.setCaptureModeEnabled(enabled) }
+        }
+
+        fun setCaptureEnabled(enabled: Boolean) {
+            viewModelScope.launch { captureCoordinatesRepository.setCaptureEnabled(enabled) }
+        }
+
+        fun setJumpEnabled(enabled: Boolean) {
+            viewModelScope.launch { captureCoordinatesRepository.setJumpEnabled(enabled) }
+        }
+
+        fun setCapturePreviousBrowserPackage(packageName: String) {
+            viewModelScope.launch { captureCoordinatesRepository.setPreviousBrowserPackage(packageName) }
         }
 
         fun setTapToWalkOverlayEnabled(enabled: Boolean) {

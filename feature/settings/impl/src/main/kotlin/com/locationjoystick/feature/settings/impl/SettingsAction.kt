@@ -160,6 +160,22 @@ internal sealed class SettingsAction {
         val enabled: Boolean,
     ) : SettingsAction()
 
+    data class SetCaptureModeEnabled(
+        val enabled: Boolean,
+    ) : SettingsAction()
+
+    data class SetCaptureEnabled(
+        val enabled: Boolean,
+    ) : SettingsAction()
+
+    data class SetJumpEnabled(
+        val enabled: Boolean,
+    ) : SettingsAction()
+
+    data class SetCapturePreviousBrowserPackage(
+        val packageName: String,
+    ) : SettingsAction()
+
     data class SetTapToWalkOverlayEnabled(
         val enabled: Boolean,
     ) : SettingsAction()

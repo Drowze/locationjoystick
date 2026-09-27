@@ -74,6 +74,19 @@ when the user taps the default-browser card again or when this app is no longer 
 The floating widget overlay is **not** part of intercept. Link handling depends on the
 overall **Capture mode** switch and List/Jump actions, not overlay visibility.
 
+### Settings > Menus section
+
+`SettingsMenusSubScreen` (`:feature:settings:impl`) also renders the mode toggle, List/Jump
+checkboxes, and pass-through browser picker (`CaptureToggleStep` / `CapturePassThroughRow`,
+now public in `:core:designsystem/component/CaptureCoordinatesForm.kt`) as an inline section,
+same pattern as `PrivacySection`/`TapToWalkSection`. It reads and writes the same
+`CaptureCoordinatesRepository` the top-level Capture screen uses — one state, two surfaces — so
+either screen reflects changes made on the other. `SettingsViewModel` writes these as live keys
+(no Save/Discard draft step), matching `resetAltitudeOverride`/`setCompassTestTargetPackage`. Setup
+steps (default-browser role, supported links) are **not** duplicated here; they stay on the
+top-level Capture screen only. Deep links (`geo:`/`google.navigation:`/share-to-app) need no setup
+and are not affected by this switch — see docs/features/deep-link.md.
+
 ## Intercept
 
 `LinkInterceptorActivity` (`singleInstance`, `excludeFromRecents`, `noHistory`, catch-all

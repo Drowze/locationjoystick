@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.root.SensorPermissionBootstrap
 import com.locationjoystick.core.common.util.NsdCodeManager
+import com.locationjoystick.core.data.CaptureCoordinatesRepository
 import com.locationjoystick.core.data.FavoriteRepository
 import com.locationjoystick.core.data.RouteRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -24,6 +25,7 @@ import com.locationjoystick.core.model.Route
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.SpeedUnit
 import com.locationjoystick.core.testing.FakeFavoriteDao
+import com.locationjoystick.core.testing.FakePreferencesDataStore
 import com.locationjoystick.core.testing.FakeRouteDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -70,6 +72,7 @@ class SettingsViewModelSaveTest {
         viewModel =
             SettingsViewModel(
                 settingsRepository = fakeSettingsRepo,
+                captureCoordinatesRepository = CaptureCoordinatesRepository(FakePreferencesDataStore()),
                 favoriteRepository = fakeFavoriteRepo,
                 routeRepository = fakeRouteRepo,
                 sensorPermissionBootstrap = SensorPermissionBootstrap(context),
