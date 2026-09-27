@@ -17,7 +17,9 @@ import com.locationjoystick.core.common.util.formatCapturedPoint
 import com.locationjoystick.core.common.util.isGoogleMapsWebLink
 import com.locationjoystick.core.common.util.pickForwardBrowserPackage
 import com.locationjoystick.core.common.util.resolvePreferredBrowserPackage
+import com.locationjoystick.core.common.util.shouldPinForConfirmSheet
 import com.locationjoystick.core.data.CaptureCoordinatesRepository
+import com.locationjoystick.core.data.DeepLinkRepository
 import com.locationjoystick.core.data.GoogleMapsShortLinkResolver
 import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.model.LatLng
@@ -33,6 +35,8 @@ class LinkInterceptorActivity : ComponentActivity() {
     @Inject lateinit var shortLinkResolver: GoogleMapsShortLinkResolver
 
     @Inject lateinit var teleportUseCase: TeleportUseCase
+
+    @Inject lateinit var deepLinkRepository: DeepLinkRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +98,13 @@ class LinkInterceptorActivity : ComponentActivity() {
                         Toast.LENGTH_SHORT,
                     ).show()
             }
-            CaptureLinkDecision.FORWARD -> forward(uri, preferGoogleMaps = !captureModeEnabled && isGoogleMapsWebLink(uri.toString()))
+            CaptureLinkDecision.FORWARD ->
+                if (shouldPinForConfirmSheet(captureModeEnabled, coords)) {
+                    deepLinkRepository.setPendingCoords(coords!!.first, coords.second)
+                    startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } else {
+                    forward(uri, preferGoogleMaps = !captureModeEnabled && isGoogleMapsWebLink(uri.toString()))
+                }
         }
     }
 

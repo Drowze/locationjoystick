@@ -60,6 +60,21 @@ class CaptureLinkTest {
     }
 
     @Test
+    fun `pins for confirm sheet when capture mode is off and coords parsed`() {
+        assertEquals(true, shouldPinForConfirmSheet(false, mushroom.latitude to mushroom.longitude))
+    }
+
+    @Test
+    fun `does not pin when capture mode is off but no coords`() {
+        assertEquals(false, shouldPinForConfirmSheet(false, null))
+    }
+
+    @Test
+    fun `does not pin when capture mode is on`() {
+        assertEquals(false, shouldPinForConfirmSheet(true, mushroom.latitude to mushroom.longitude))
+    }
+
+    @Test
     fun `recognizes only Google Maps web links`() {
         assertEquals(true, isGoogleMapsWebLink("https://maps.app.goo.gl/abc"))
         assertEquals(true, isGoogleMapsWebLink("https://www.google.com/maps/place/test"))

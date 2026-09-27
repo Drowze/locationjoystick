@@ -29,6 +29,16 @@ fun decideCaptureLink(
         else -> CaptureLinkDecision.FORWARD
     }
 
+/**
+ * True when a FORWARD decision should instead pin the coordinate and open the deep-link confirm
+ * sheet (Teleport/Walk/Do nothing) -- the default-off Capture install state, with a parsed
+ * coordinate available. Links with no coordinate (e.g. text search) still need a live page.
+ */
+fun shouldPinForConfirmSheet(
+    captureModeEnabled: Boolean,
+    coords: Pair<Double, Double>?,
+): Boolean = !captureModeEnabled && coords != null
+
 fun isGoogleMapsWebLink(url: String): Boolean {
     val uri = runCatching { java.net.URI(url) }.getOrNull() ?: return false
     val host = uri.host?.lowercase().orEmpty()
