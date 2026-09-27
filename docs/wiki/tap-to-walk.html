@@ -71,7 +71,7 @@
     <div class="feature-section" id="tap-to-walk-disclosure">
       <img class="phone-shot" src="screenshots/25_compass_disclosure.png" alt="Enable Tap to Walk confirmation screen">
       <ul class="section-bullets">
-        <li>Turning the overlay on opens this screen first. It states the detection risk and that accuracy depends on the scale setting, and links to this guide. Nothing turns on until you tap <strong>Enable anyway</strong>.</li>
+        <li>Turning the overlay on opens this screen first. It states the detection risk and that accuracy depends on the scale setting, and links to this guide. If your phone supports compass orientation, the same screen also explains the Accessibility permission it uses. Nothing turns on until you tap <strong>Accept</strong>.</li>
       </ul>
     </div>
 
@@ -110,14 +110,18 @@
 
     <h3 id="compass-setup">Setup</h3>
     <p>
-      The first time you turn Tap to Walk on, or the first time you tap the crosshair button,
-      a full-screen message explains what the compass helper looks at, why, and that the
-      picture of your screen never leaves your phone. Tap <strong>Agree</strong> to open
-      Android's accessibility settings, or <strong>No thanks</strong> to stop. You are asked
-      once — your answer is remembered.
+      Compass orientation uses Android's Accessibility permission. Before Android's
+      Accessibility settings ever open, a full-screen message explains what the compass helper
+      looks at, why, and that the picture of your screen never leaves your phone. Tap
+      <strong>Accept</strong> to open Android's Accessibility settings, or <strong>Decline</strong>
+      to keep it off.
+    </p>
+    <p>
+      You see this message during first-run setup (the optional <strong>Compass orientation</strong>
+      step), when you first turn Tap to Walk on, and the first time you tap the crosshair button.
     </p>
     <ol>
-      <li>Tap <strong>Agree</strong> on that message.</li>
+      <li>Tap <strong>Accept</strong> on that message.</li>
       <li>Find <strong>locationjoystick compass</strong> in the list and turn it on.</li>
       <li>Return to locationjoystick. Compass detection is now active — no further switch to flip.</li>
     </ol>

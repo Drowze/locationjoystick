@@ -5,6 +5,9 @@ data class OnboardingUiState(
     val overlayPermissionGranted: Boolean = false,
     val mockLocationEnabled: Boolean = false,
     val isDebugBuild: Boolean = false,
+    // Optional step, not counted in "Step X of 3" and never required to proceed.
+    val compassSupported: Boolean = false,
+    val compassServiceEnabled: Boolean = false,
 )
 
 val OnboardingUiState.canProceed: Boolean

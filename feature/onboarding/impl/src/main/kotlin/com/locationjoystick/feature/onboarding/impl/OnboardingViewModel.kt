@@ -1,11 +1,15 @@
 package com.locationjoystick.feature.onboarding.impl
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
+import android.view.accessibility.AccessibilityManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
@@ -54,8 +58,31 @@ class OnboardingViewModel
                             ) == PackageManager.PERMISSION_GRANTED,
                         overlayPermissionGranted = isOverlayPermissionGranted(context),
                         mockLocationEnabled = bypassMockLocationCheck || isMockLocationEnabled(context),
+                        // takeScreenshot needs API 30; below that compass tracking cannot run.
+                        compassSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
+                        compassServiceEnabled = isCompassServiceEnabled(),
                     )
                 }
+            }
+        }
+
+        private fun isCompassServiceEnabled(): Boolean =
+            context
+                .getSystemService(AccessibilityManager::class.java)
+                ?.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+                ?.any { it.id.contains("CompassAccessibilityService") }
+                ?: false
+
+        /** Records the answer to the Accessibility disclosure shown from the optional compass step. */
+        fun recordCompassDisclosure(accepted: Boolean) {
+            viewModelScope.launch {
+                settingsRepository.setCompassDisclosureChoice(
+                    if (accepted) {
+                        AppConstants.CompassTrackingConstants.DISCLOSURE_ACCEPTED
+                    } else {
+                        AppConstants.CompassTrackingConstants.DISCLOSURE_DECLINED
+                    },
+                )
             }
         }
 

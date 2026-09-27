@@ -45,6 +45,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.designsystem.component.AppIcon
+import com.locationjoystick.core.designsystem.component.CompassDisclosureDialog
 import com.locationjoystick.core.designsystem.component.LjGuidedStepCard
 import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
 import com.locationjoystick.core.designsystem.component.LjPrimaryButton
@@ -88,6 +89,7 @@ fun OnboardingRoute(
         uiState = uiState,
         onCheckPermissions = viewModel::checkPermissions,
         onSkipMockLocationCheck = viewModel::skipMockLocationCheck,
+        onCompassDisclosureAnswered = viewModel::recordCompassDisclosure,
         onSetupComplete = {
             viewModel.onSetupComplete()
             onSetupComplete()
@@ -109,6 +111,7 @@ internal fun OnboardingScreen(
     uiState: OnboardingUiState,
     onCheckPermissions: () -> Unit,
     onSkipMockLocationCheck: () -> Unit = {},
+    onCompassDisclosureAnswered: (accepted: Boolean) -> Unit = {},
     onSetupComplete: () -> Unit,
     isSpoofing: Boolean = false,
     onToggleSpoofing: () -> Unit = {},
@@ -119,6 +122,7 @@ internal fun OnboardingScreen(
 ) {
     val context = LocalContext.current
     var showSkipMockLocationDialog by remember { mutableStateOf(false) }
+    var showCompassDisclosure by remember { mutableStateOf(false) }
 
     val locationPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -290,6 +294,32 @@ internal fun OnboardingScreen(
                 onExtraAction = { showSkipMockLocationDialog = true },
             )
 
+            // Play's Accessibility API policy wants the disclosure in the normal usage flow, not only
+            // behind Settings menus. Onboarding is the one screen every install walks through, so the
+            // optional compass step lives here and always shows the disclosure right before Android's
+            // Accessibility settings open.
+            if (uiState.compassSupported) {
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = stringResource(R.string.onboarding_optional),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LjGuidedStepCard(
+                    title = stringResource(R.string.onboarding_compass_orientation),
+                    description = stringResource(R.string.onboarding_compass_orientation_desc),
+                    isGranted = uiState.compassServiceEnabled,
+                    icon = LjIcons.Explore,
+                    actionLabel = stringResource(R.string.onboarding_compass_review),
+                    onAction = { showCompassDisclosure = true },
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             LjPrimaryButton(
@@ -311,6 +341,22 @@ internal fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+
+    if (showCompassDisclosure) {
+        CompassDisclosureDialog(
+            onAccept = {
+                showCompassDisclosure = false
+                onCompassDisclosureAnswered(true)
+                context.startActivity(
+                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                )
+            },
+            onDecline = {
+                showCompassDisclosure = false
+                onCompassDisclosureAnswered(false)
+            },
+        )
     }
 
     if (showSkipMockLocationDialog) {
@@ -360,6 +406,7 @@ private fun OnboardingScreenPreview() {
                     locationPermissionGranted = true,
                     overlayPermissionGranted = false,
                     mockLocationEnabled = false,
+                    compassSupported = true,
                 ),
             onCheckPermissions = {},
             onSetupComplete = {},

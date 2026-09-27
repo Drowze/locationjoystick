@@ -10,7 +10,10 @@ Key files: `:feature:onboarding:impl/OnboardingScreen.kt`, `:feature:onboarding:
 2. Grant `ACCESS_FINE_LOCATION`
 3. Grant `SYSTEM_ALERT_WINDOW`
 4. Enable mock location (deep link to Developer Options; re-checked automatically on resume — see "Permission Checks" below)
-5. Done → MapScreen
+5. Optional: Compass orientation (API 30+ only) — opens the Accessibility prominent disclosure
+   (`CompassDisclosureDialog`), then Android's Accessibility settings on Accept. Not required to
+   proceed. See @docs/features/tap-to-walk.md, "Prominent Disclosure".
+6. Done → MapScreen
 
 A "Step X of 3" label and progress bar sit above the three permission cards, computed from how
 many of them are currently granted — steps 2–4 above, not Welcome/Done.

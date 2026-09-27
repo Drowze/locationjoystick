@@ -75,6 +75,7 @@ import com.locationjoystick.feature.settings.impl.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import com.locationjoystick.core.designsystem.R as DesignR
 
 @Composable
 internal fun SettingsMenusSubScreen(
@@ -353,7 +354,14 @@ private fun TapToWalkSection(
     if (showEnableDisclosure) {
         CompassDisclosureDialog(
             title = stringResource(R.string.settings_menus_enable_tap_to_walk_2),
-            acceptLabel = stringResource(R.string.settings_menus_enable_anyway),
+            // Play requires explicit Accept/Decline wording whenever the Accessibility disclosure
+            // is on screen; the caveats-only variant (below API 30) keeps "Enable anyway".
+            acceptLabel =
+                if (needsCompassDisclosure) {
+                    stringResource(DesignR.string.compass_disclosure_accept)
+                } else {
+                    stringResource(R.string.settings_menus_enable_anyway)
+                },
             caveats =
                 listOf(
                     stringResource(R.string.settings_menus_a_screen_overlay_that_intercepts_taps),

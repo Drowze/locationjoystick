@@ -24,4 +24,8 @@
     <string name="onboarding_open_developer_options">"Open Developer Options"</string>
     <string name="onboarding_skip">"Skip"</string>
     <string name="onboarding_start_using_locationjoystick">"Start using locationjoystick"</string>
+    <string name="onboarding_optional">"Optional"</string>
+    <string name="onboarding_compass_orientation">"Compass orientation (optional)"</string>
+    <string name="onboarding_compass_orientation_desc">"Lets Tap to Walk read your game’s compass so each tap walks the right way. It uses Android’s Accessibility permission. You can skip this; everything else works without it."</string>
+    <string name="onboarding_compass_review">"Review and turn on"</string>
 </resources>

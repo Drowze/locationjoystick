@@ -3,6 +3,7 @@
   "date": "2026-09-26",
   "entries": [
     { "category": "fix", "scope": "Click-to-Move / Teleport", "summary": "Teleporting while walking somewhere now always stops that walk. Before, a walk along roads that was still looking up its path could start anyway after the teleport and head back toward the old spot." },
-    { "category": "feat", "scope": "Floating Joystick", "summary": "Moving the joystick now puts you in control right away. It ends any walk, route, roam, or planting, even a paused one, and stops following a group leader, so you move from where you are instead of having to stop things first." }
+    { "category": "feat", "scope": "Floating Joystick", "summary": "Moving the joystick now puts you in control right away. It ends any walk, route, roam, or planting, even a paused one, and stops following a group leader, so you move from where you are instead of having to stop things first." },
+    { "category": "fix", "scope": "Tap to Walk", "summary": "First-run setup now has an optional compass orientation step. It explains the Accessibility permission the compass helper uses before Android's settings open, with clear Accept and Decline buttons." }
   ]
 }
