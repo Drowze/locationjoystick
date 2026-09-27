@@ -325,7 +325,7 @@ $ADB shell input swipe 540 1600 540 700
 wait_s 4 "Reading rest of disclosure"
 
 log "=== Decline (leaves the feature off and the device state unchanged) ==="
-tap_text_exact "No thanks"
+tap_text_exact "Decline"
 wait_s 3 "Dismissing disclosure"
 
 fi

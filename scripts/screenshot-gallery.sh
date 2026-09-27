@@ -1264,7 +1264,9 @@ if should_run_step "20"; then
   if [[ "$(switch_is_on "Enable Tap to Walk")" != "True" ]]; then
     tap_switch_for "Enable Tap to Walk"
     wait_s 1 "Warning dialog opening"
-    tap_text "Enable anyway"
+    # Button label depends on device API level: "Enable anyway" below API 30,
+    # "Accept" on API 30+ when the Accessibility disclosure is shown instead.
+    tap_text "Enable anyway" || tap_text "Accept"
     wait_s 1 "Enabling Tap to Walk — Map scale / Compass sections expanding"
   fi
   screenshot "20_tap_to_walk_settings"
@@ -1373,7 +1375,7 @@ if should_run_step "25"; then
   screenshot "25_compass_disclosure"
   # Decline leaves the feature off and records nothing, so the device keeps the
   # state it had before this step.
-  tap_text_exact "No thanks"
+  tap_text_exact "Decline"
   wait_s 1 "Dismissing disclosure"
 fi
 
