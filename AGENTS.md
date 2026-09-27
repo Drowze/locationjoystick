@@ -41,7 +41,7 @@ Work is NOT complete until affected docs are updated. These files must stay in s
 | `docs/features/export-import.md` | Any change to `ExportData` fields or import/export scope |
 | `README.md` — feature table | Adding or removing a user-visible feature |
 | `docs/wiki/<feature>.html` | Adding or changing any user-visible feature |
-| `docs/wiki/changelog.html` + `docs/wiki/changelog/<version>.json` (@docs/features/whats-new.md) | Any release with user-visible changes — the JSON is now the sole authored source for both: it feeds the in-app What's New popup directly, and the HTML is generated from it via `make wiki-changelog` |
+| `docs/wiki/changelog.html` + `docs/wiki/changelog/<version>.json` (docs/features/whats-new.md) | Any release with user-visible changes — the JSON is now the sole authored source for both: it feeds the in-app What's New popup directly, and the HTML is generated from it via `make wiki-changelog` |
 
 Rules:
 - New feature → create `docs/features/<feature>.md` AND add row to AGENTS.md's Feature Specifications table AND README.md's feature table.
@@ -82,52 +82,52 @@ Rules:
 
 ## Architecture
 
-→ See @docs/architecture.md
+→ See docs/architecture.md
 
 ---
 
 ## Constants
 
-→ See @docs/constants.md
+→ See docs/constants.md
 
 ---
 
 ## Feature Specifications
 
-→ See @docs/features/
+→ See docs/features/
 
 | Feature | Doc |
 |---------|-----|
-| Mock Location Engine + GPS Realism | @docs/features/mock-location.md |
-| Foreground Service | @docs/features/foreground-service.md |
-| Floating Joystick | @docs/features/joystick.md |
-| Map (MapLibre) | @docs/features/map.md |
-| Map tiles (OSM HTTP) | @docs/features/map-tiles.md |
-| Route System | @docs/features/routes.md |
-| Favorite Locations | @docs/features/favorites.md |
-| Speed Profiles | @docs/features/speed-profiles.md |
-| Floating Widget | @docs/features/widget.md |
-| Click-to-Move / Teleport | @docs/features/click-to-move.md |
-| Roaming Mode | @docs/features/roaming.md |
-| Export / Import | @docs/features/export-import.md |
-| QR Share / Transfer | @docs/features/qr-transfer.md |
-| Deep Links & Location Sharing | @docs/features/deep-link.md |
-| Capture Coordinates | @docs/features/capture-coordinates.md |
-| Last Remembered Location | @docs/features/last-location.md |
-| Onboarding | @docs/features/onboarding.md |
-| Group Sync | @docs/features/group-sync.md |
-| Tap to Walk | @docs/features/tap-to-walk.md |
-| Theme | @docs/features/theme.md |
-| Hide Teleport Features | @docs/features/hide-teleport.md |
-| What's New Popup | @docs/features/whats-new.md |
-| Update Available Check | @docs/features/update-check.md |
-| Localization | @docs/features/localization.md |
+| Mock Location Engine + GPS Realism | docs/features/mock-location.md |
+| Foreground Service | docs/features/foreground-service.md |
+| Floating Joystick | docs/features/joystick.md |
+| Map (MapLibre) | docs/features/map.md |
+| Map tiles (OSM HTTP) | docs/features/map-tiles.md |
+| Route System | docs/features/routes.md |
+| Favorite Locations | docs/features/favorites.md |
+| Speed Profiles | docs/features/speed-profiles.md |
+| Floating Widget | docs/features/widget.md |
+| Click-to-Move / Teleport | docs/features/click-to-move.md |
+| Roaming Mode | docs/features/roaming.md |
+| Export / Import | docs/features/export-import.md |
+| QR Share / Transfer | docs/features/qr-transfer.md |
+| Deep Links & Location Sharing | docs/features/deep-link.md |
+| Capture Coordinates | docs/features/capture-coordinates.md |
+| Last Remembered Location | docs/features/last-location.md |
+| Onboarding | docs/features/onboarding.md |
+| Group Sync | docs/features/group-sync.md |
+| Tap to Walk | docs/features/tap-to-walk.md |
+| Theme | docs/features/theme.md |
+| Hide Teleport Features | docs/features/hide-teleport.md |
+| What's New Popup | docs/features/whats-new.md |
+| Update Available Check | docs/features/update-check.md |
+| Localization | docs/features/localization.md |
 
 ---
 
 ## Domain Models
 
-→ See @docs/domain-models.md
+→ See docs/domain-models.md
 
 ---
 
@@ -143,7 +143,7 @@ Rules:
 | `FollowerCatchUpCoordinator` | `:core:location` | Class (not service) | Instantiated by `MockLocationService`. Owns the FOLLOWER-mode catch-up target (`AtomicReference<LatLng?>`), the per-tick step logic (`advance()`), and the leader-active bootstrap/pause state machine (`handleLeaderActiveUpdate()`) — all extracted from the service, mirroring the `WalkCoordinator` pattern: state ownership + step logic live in one small class instead of scattered `@Volatile` fields and call-site-local flags on the service. |
 | `AltitudeAnchorCoordinator` | `:core:location` | Class (not service) | Instantiated by `MockLocationService`. Owns the altitude-anchor convergence state (`currentBaseAltitudeMeters`/`targetBaseAltitudeMeters`, the elevation-fetch-in-flight guard) and the per-tick `stepConverge()` call — mirrors `FollowerCatchUpCoordinator`: state ownership + step logic live in one small class instead of scattered `@Volatile` fields on the service. |
 | `PositionJitterCoordinator` | `:core:location` | Class (not service) | Instantiated by `MockLocationService`. Owns a persistent position-jitter offset that wanders inside the configured radius, stepping at most `AppSettings.jitterMaxStepMeters` in a fresh random direction every tick (clamped back to the disc edge on overshoot), instead of teleporting between interval-gated Gaussian draws or beelining to one distant target per leg. |
-| `OverlayNotificationReactor` | `:core:location` | Class (not service) | Instantiated by `MockLocationService`. Owns the two settings-reactive collectors that keep the foreground notification (@docs/features/foreground-service.md, "Hiding the Notification Icon") and the widget overlay (@docs/features/widget.md, "Hiding the Overlay") in sync with live setting changes mid-session — previously inline in the service. |
+| `OverlayNotificationReactor` | `:core:location` | Class (not service) | Instantiated by `MockLocationService`. Owns the two settings-reactive collectors that keep the foreground notification (docs/features/foreground-service.md, "Hiding the Notification Icon") and the widget overlay (docs/features/widget.md, "Hiding the Overlay") in sync with live setting changes mid-session — previously inline in the service. |
 | `EphemeralReplayController` | `:core:location` | Class (`@Singleton`) | Owns the walk→ephemeral-replay transition. Injected by both `MapViewModel` and `FloatingWidgetService`. `addWaypoint()` decides whether to start a new ephemeral replay (walk→replay transition) or append to an existing one. Eliminates duplicated state-machine logic across call sites. |
 | `WalkCoordinator` | `:core:data` | Class (`@Singleton`) | Thin facade over `WalkToEngine`. Cancels any in-flight walk before starting a new one, forwards position ticks to `LocationRepository`, clears `walkTarget` on arrival or cancellation. |
 | `ActivityStateRepository` | `:core:data` | Repository (`@Singleton`) | Single source of truth for unified pause state across all movement modes. Exposes `isActivityPaused: Flow<Boolean>` combining walk-to, route replay, and roaming pause. Prefer over manually combining individual flows from `LocationRepository` and `RoamingRepository`. |
@@ -158,27 +158,27 @@ Rules:
 
 ## Permissions
 
-→ See @docs/permissions.md
+→ See docs/permissions.md
 
 ---
 
 ## Technical Constraints
 
-→ See @docs/technical-constraints.md
+→ See docs/technical-constraints.md
 
-Before changing maps, read @docs/features/map-tiles.md. Initialize MapLibre through `MapTileHttp.install`, construct maps through `createMapView`/`rememberMapView`, retain tile-client concurrency and R8 rules, and use `rememberMapView(overlay = true)` for overlay maps.
+Before changing maps, read docs/features/map-tiles.md. Initialize MapLibre through `MapTileHttp.install`, construct maps through `createMapView`/`rememberMapView`, retain tile-client concurrency and R8 rules, and use `rememberMapView(overlay = true)` for overlay maps.
 
 ---
 
 ## Code Style Rules
 
-→ See @docs/code-style.md
+→ See docs/code-style.md
 
 ---
 
 ## Testing Strategy
 
-→ See @docs/testing.md
+→ See docs/testing.md
 
 ```bash
 make coverage        # generate HTML + XML reports
@@ -233,7 +233,7 @@ The script (`scripts/screenshot-gallery.sh`) navigates the app and captures 17 c
 
 After adding or editing a version's JSON under `docs/wiki/changelog/`, run `make wiki-changelog`
 to regenerate `docs/wiki/changelog.html`. Never hand-edit `changelog.html` — it's fully
-overwritten on the next run. See @docs/features/whats-new.md, "Maintaining the Changelog", for
+overwritten on the next run. See docs/features/whats-new.md, "Maintaining the Changelog", for
 the JSON schema and authoring rules.
 
 ### Maintaining content

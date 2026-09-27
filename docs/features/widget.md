@@ -15,7 +15,7 @@ Key files: `:feature:widget:impl/FloatingWidgetService.kt`, `:feature:settings:i
 
 ## Hiding the Overlay
 
-Settings → Menus → Privacy → "Hide floating widget" (`AppSettings.hideWidgetOverlay`, DataStore key `hide_widget_overlay`, default `false`) stops `MockLocationService` from starting `FloatingWidgetService` when spoofing starts. The joystick overlay and any accessibility-based features (e.g. compass tracking, see @docs/features/tap-to-walk.md) are unaffected — this only hides the widget button/panel itself. Round-trips through `ExportData` like `hideTeleportFeatures`.
+Settings → Menus → Privacy → "Hide floating widget" (`AppSettings.hideWidgetOverlay`, DataStore key `hide_widget_overlay`, default `false`) stops `MockLocationService` from starting `FloatingWidgetService` when spoofing starts. The joystick overlay and any accessibility-based features (e.g. compass tracking, see docs/features/tap-to-walk.md) are unaffected — this only hides the widget button/panel itself. Round-trips through `ExportData` like `hideTeleportFeatures`.
 
 Live while spoofing is active: `MockLocationService.observeLocationState()` runs a reactive collector (`combine` of its own state and `getHideWidgetOverlay()`, decision via the pure `computeWidgetOverlayAction()` in `LocationLoopPolicy.kt`) that starts or stops `FloatingWidgetService` the moment the toggle changes, not just at the next RUNNING transition — flipping the setting mid-session removes (or restores) the overlay immediately.
 
@@ -76,7 +76,7 @@ cannot overwrite the jump, and the test provider is updated on that same intent 
 1 Hz tick). After widget Pause, paste and the other feature icons stay faded until Start —
 teleport does not unpark mock GPS.
 
-See @docs/features/favorites.md and @docs/features/routes.md for the shared `matchesNameSearch`
+See docs/features/favorites.md and docs/features/routes.md for the shared `matchesNameSearch`
 filter used by the in-app lists and map sheets.
 
 ## Appearance
@@ -89,7 +89,7 @@ white instead of nearly matching the circle. The launcher and every expanded con
 50 dp-wide, 52 dp-high slot: each control keeps a 48 dp touch target around its 42 dp circle, while
 the common slot centers the full column and reduces the visible gap by 4 dp. `WidgetSidePopup`
 uses the same slot height, so pause, stop, and other secondary controls stay centered on their
-parent row. See @docs/features/theme.md.
+parent row. See docs/features/theme.md.
 
 ## Service Lifecycle
 
@@ -123,7 +123,7 @@ does not affect the others.
 
 In the widget icon column the route icon is active (green, pause/stop popup) only for route replay and walk-to, and the roaming icon only for roaming — roaming never lights the route icon (`routeControlsActive`, `WidgetParkControls.kt`), matching the floating map. While roaming, tapping the route icon opens the routes picker.
 
-While a route replay is active, a `current/total` progress chip is pinned at the **bottom** of the widget panel icon list (after configurable features and extra sections, before debug stats) and at the bottom of the floating-map FAB column. Same `LocationRepository.routeProgress` source as the main map FAB column (@docs/features/routes.md, "Route progress"). Previous / Next on these surfaces use `RouteReplayEngine.jumpToNextWaypoint` / `jumpToPreviousWaypoint`; when Teleport between waypoints is on, the engine lingers at the jumped stop before the next automatic hop (@docs/features/routes.md, "Next / Previous Waypoint").
+While a route replay is active, a `current/total` progress chip is pinned at the **bottom** of the widget panel icon list (after configurable features and extra sections, before debug stats) and at the bottom of the floating-map FAB column. Same `LocationRepository.routeProgress` source as the main map FAB column (docs/features/routes.md, "Route progress"). Previous / Next on these surfaces use `RouteReplayEngine.jumpToNextWaypoint` / `jumpToPreviousWaypoint`; when Teleport between waypoints is on, the engine lingers at the jumped stop before the next automatic hop (docs/features/routes.md, "Next / Previous Waypoint").
 
 ## Expanded-control hit testing
 
@@ -151,13 +151,13 @@ When `AppFeature.MAP_FLOATING` is enabled, the floating map's FAB column include
   - **Pause / Resume** — toggles replay pause state.
 - **No replay active**: tapping the route button opens the floating routes picker (`showRoutesFloatingView()`), matching the main map screen's behaviour and the button's own "Open routes" label.
 - **Expansion state ownership**: the expanded/collapsed flag lives in `WidgetPanelPresenter.mapRouteControlsExpanded`, **not** in a `remember` inside `MapFloatingView`. `showPanel()` builds a fresh `ComposeView` on every open, so composable-local state would reset to collapsed each time the map panel was reopened mid-replay — leaving the pause/stop controls unreachable. The presenter collapses the flag automatically once `mockMode` leaves `ROUTE_REPLAY`, so a new route never starts pre-expanded.
-- **Settings gate**: `enabledMapFeatures` flows through `MapSharedState` so the floating map respects the same visibility toggle as the main map screen. Paste coordinates (`AppFeature.PASTE_COORDINATES`) is on both WIDGET and MAP, off by default (absent from `DEFAULT_WIDGET_ENABLED` / `DEFAULT_MAP_ENABLED`; enable in Settings → Menus → App Features), and uses the map-surface gate on the floating-map FAB column. The widget panel button opens `PasteCoordinatesFloatingView` (shared `PasteCoordinatesForm`): one valid point offers Teleport / Walk / Walk via roads; multiple points switch to route-labelled options and Start route. Save first as favorite remains separate from Save route. Roaming (`AppFeature.ROAMING`) is on both WIDGET and MAP, on by default on the widget (`DEFAULT_WIDGET_ENABLED`). Existing installs gain it via `mergeNewDefaultWidgetFeatures`: `LEGACY_WIDGET_SEEN_DEFAULTS` is the pre-paste set, and `WIDGET_PRE_ROAMING_SEEN_DEFAULTS` is the paste-era set, so roaming is unseen until 0.20.5. If `widget_seen_defaults` already contains `roaming`, the user ran a build where the widget button was a default and then turned it off — leave it off. Tap while idle opens `RoamingFloatingView` (Walk around the block + Planting). Tap while `MockMode.ROAMING` expands pause/stop via `WidgetSidePopup` (`roamingExpandedFlow`). A playing route blocks roam start; joystick toggle/lock and roam icons fade but stay readable on the black circle when that control is ignored. The widget eye shows or hides the overlay on its own (lock is not required). Joystick show/hide and lock stay tappable while faded (they still show and lock the overlay). Moving the stick then ends the route or roam and takes over (@docs/features/joystick.md, "Manual takeover"). Roam start stays a no-op while a route is playing. Capture coordinates (`AppFeature.CAPTURE_COORDINATES`) is MAP-only, on by default on the map FAB set, and opens the same helper page on the floating map; intercept does not require the overlay (@docs/features/capture-coordinates.md). Installs that already persisted `PASTE_COORDINATES` keep it; the upgrade merge never adds it. Map FABs gain `CAPTURE_COORDINATES` on upgrade via `mergeNewDefaultMapFeatures`. Turning either off in Settings then sticks.
+- **Settings gate**: `enabledMapFeatures` flows through `MapSharedState` so the floating map respects the same visibility toggle as the main map screen. Paste coordinates (`AppFeature.PASTE_COORDINATES`) is on both WIDGET and MAP, off by default (absent from `DEFAULT_WIDGET_ENABLED` / `DEFAULT_MAP_ENABLED`; enable in Settings → Menus → App Features), and uses the map-surface gate on the floating-map FAB column. The widget panel button opens `PasteCoordinatesFloatingView` (shared `PasteCoordinatesForm`): one valid point offers Teleport / Walk / Walk via roads; multiple points switch to route-labelled options and Start route. Save first as favorite remains separate from Save route. Roaming (`AppFeature.ROAMING`) is on both WIDGET and MAP, on by default on the widget (`DEFAULT_WIDGET_ENABLED`). Existing installs gain it via `mergeNewDefaultWidgetFeatures`: `LEGACY_WIDGET_SEEN_DEFAULTS` is the pre-paste set, and `WIDGET_PRE_ROAMING_SEEN_DEFAULTS` is the paste-era set, so roaming is unseen until 0.20.5. If `widget_seen_defaults` already contains `roaming`, the user ran a build where the widget button was a default and then turned it off — leave it off. Tap while idle opens `RoamingFloatingView` (Walk around the block + Planting). Tap while `MockMode.ROAMING` expands pause/stop via `WidgetSidePopup` (`roamingExpandedFlow`). A playing route blocks roam start; joystick toggle/lock and roam icons fade but stay readable on the black circle when that control is ignored. The widget eye shows or hides the overlay on its own (lock is not required). Joystick show/hide and lock stay tappable while faded (they still show and lock the overlay). Moving the stick then ends the route or roam and takes over (docs/features/joystick.md, "Manual takeover"). Roam start stays a no-op while a route is playing. Capture coordinates (`AppFeature.CAPTURE_COORDINATES`) is MAP-only, on by default on the map FAB set, and opens the same helper page on the floating map; intercept does not require the overlay (docs/features/capture-coordinates.md). Installs that already persisted `PASTE_COORDINATES` keep it; the upgrade merge never adds it. Map FABs gain `CAPTURE_COORDINATES` on upgrade via `mergeNewDefaultMapFeatures`. Turning either off in Settings then sticks.
 
 The floating map is a MapLibre `MapView` inside a `TYPE_APPLICATION_OVERLAY` window.
 `rememberMapView(overlay = true)` (`:core:map`) sets `textureMode` so the map composites
 over the app underneath. A default GLSurfaceView punches a transparent hole (location
 dot and FABs visible, no streets). OSM tiles use the same `MapTileHttp.install` path as
-the main map (@docs/features/map-tiles.md).
+the main map (docs/features/map-tiles.md).
 
 It opens as a compact window (82% of screen width, 58% of screen height, capped at 420 × 560 dp)
 with a drag handle and expand button. The window itself uses those compact bounds with
@@ -188,14 +188,14 @@ default `false`), the widget panel shows a terrain-icon button:
   `Intent`/service command needed, then the row collapses.
 - **Effect**: the override becomes the new base altitude the Gaussian walk clamps around,
   applied instantly (unlike a real-elevation fetch, which converges gradually — see
-  @docs/features/mock-location.md, "Real Elevation Lookup"), and takes priority over both the
+  docs/features/mock-location.md, "Real Elevation Lookup"), and takes priority over both the
   35 m default and any real-elevation fetch. Setting it also suspends the periodic elevation
   fetch until cleared via Settings → GPS → "Reset elevation override".
 - **Expansion state ownership**: `FloatingWidgetService.altitudeExpandedFlow`
   (`MutableStateFlow<Boolean>`), per the "Anti-Patterns to Avoid" rule below — never `remember`
   in `WidgetPanelContent` directly.
 - **Keyboard focus**: the widget's overlay window is `FLAG_NOT_FOCUSABLE` by design (it must
-  never steal keyboard focus from the foreground app — see @docs/features/joystick.md,
+  never steal keyboard focus from the foreground app — see docs/features/joystick.md,
   "Requirements"), which otherwise silently prevents the text field from ever receiving IME
   focus, so no keyboard appears and the field cannot be typed into. `FloatingWidgetService`
   clears `FLAG_NOT_FOCUSABLE` on the overlay window (`windowManager.updateViewLayout`) only
@@ -209,7 +209,7 @@ Settings → Menus → Debug → "Debug stats" (`AppSettings.debugStatsEnabled`,
 expanded: coordinates, speed (m/s), altitude, accuracy, bearing, and tick rate (Hz).
 
 - **Source**: `MockLocationService.pushLocationUpdate()` — the single 1 Hz tick every mode routes
-  through (see @docs/features/mock-location.md, "Internal Architecture") — publishes a
+  through (see docs/features/mock-location.md, "Internal Architecture") — publishes a
   `LocationRepository.DebugStats` snapshot every tick, unconditionally (cheap: one data class
   alloc at 1 Hz). Tick rate is derived from the wall-clock delta between ticks, not assumed to be
   a fixed 1 Hz, so a throttled or delayed loop is visible instead of hidden.
@@ -217,7 +217,7 @@ expanded: coordinates, speed (m/s), altitude, accuracy, bearing, and tick rate (
   `WidgetPanel` when the setting is enabled — the collector itself always runs, matching every
   other reactive widget-panel toggle.
 - **Unset bearing**: `DebugStats.hasBearing` mirrors `LocationFix.hasBearing` (see
-  @docs/features/mock-location.md, "No bearing before first move") — before the first tick with
+  docs/features/mock-location.md, "No bearing before first move") — before the first tick with
   motion in the session, the bearing segment reads "—" instead of a misleading "0°" (issue #58).
 
 ## Anti-Patterns to Avoid

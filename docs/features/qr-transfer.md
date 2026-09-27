@@ -27,4 +27,4 @@ The QR code does not carry the export data itself — it carries connection info
 - Malformed/foreign QR code (missing `host`/`port`/`token`) → "Invalid QR code" error snackbar, no fetch attempted.
 - Typed code not found within the NSD discovery window → "No sender found for code" error snackbar.
 - No size limit on the export — the HTTP body is just the same JSON used by file export.
-- Phone-hotspot networks often drop client-to-client multicast — typed-code discovery can fail there; QR scan (direct host:port) is the fallback. See the hotspot note in @docs/features/group-sync.md.
+- Phone-hotspot networks often drop client-to-client multicast — typed-code discovery can fail there; QR scan (direct host:port) is the fallback. See the hotspot note in docs/features/group-sync.md.

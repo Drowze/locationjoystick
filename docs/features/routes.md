@@ -77,7 +77,7 @@ A single pasted point is valid in Planting mode (one closed circle). As-is and w
 
 ## Paste coordinates (map and widget)
 
-The map FAB, floating map, and widget paste box share `PasteCoordinatesForm` (`:core:designsystem`). They use the same `parsePastedCoordinates` parser as the Routes-menu builder. Clipboard paste appends a new line when the field is not empty (`mergeClipboardIntoPasteText`). The compact coordinates field has no redundant format helper text, grows up to 10 lines, then scrolls inside the field, with a fade at the top and bottom edges so overflow is obvious. **Select all** and **Clear all** sit directly below it with 48 dp touch targets. The widget paste overlay is a bottom sheet that can shrink to a bar so other apps stay usable (@docs/features/widget.md, "Paste coordinates overlay"). Do not change `PasteCoordinatesScreen` except to keep sharing that parser.
+The map FAB, floating map, and widget paste box share `PasteCoordinatesForm` (`:core:designsystem`). They use the same `parsePastedCoordinates` parser as the Routes-menu builder. Clipboard paste appends a new line when the field is not empty (`mergeClipboardIntoPasteText`). The compact coordinates field has no redundant format helper text, grows up to 10 lines, then scrolls inside the field, with a fade at the top and bottom edges so overflow is obvious. **Select all** and **Clear all** sit directly below it with 48 dp touch targets. The widget paste overlay is a bottom sheet that can shrink to a bar so other apps stay usable (docs/features/widget.md, "Paste coordinates overlay"). Do not change `PasteCoordinatesScreen` except to keep sharing that parser.
 
 Layout:
 
@@ -122,7 +122,7 @@ The temp row appears in the Routes list until the next paste Start replaces it, 
   never write together.
 - Moving the joystick stick ends the replay — playing, paused, or still planning
   its Follow-roads path — and hands control to the stick at the current position
-  (@docs/features/joystick.md, "Manual takeover"). The saved route is kept. A
+  (docs/features/joystick.md, "Manual takeover"). The saved route is kept. A
   retained locked-stick direction does not end it: it is ignored while playing
   and steers while paused, and resume still jumps to the next named stop via
   `jumpToNextWaypoint`, then continues interpolation from there.
@@ -149,7 +149,7 @@ While a named route replay is active (running or paused), "Previous
 waypoint" / "Next waypoint" buttons instantly teleport the spoofed position
 to the adjacent stop in the route — skipping interpolation between them.
 Available on all three route-control surfaces (see
-@docs/features/widget.md, "Route Controls Across Surfaces"), alongside
+docs/features/widget.md, "Route Controls Across Surfaces"), alongside
 Pause/Resume/Stop. When Teleport between waypoints is on, a jump lands on
 that stop and lingers for the hop delay before the next automatic hop —
 otherwise Next would skip two named stops (e.g. 20/31 → 22/31) and Previous
@@ -162,7 +162,7 @@ index. When Follow roads or Planting has expanded the waypoint list, jumps snap 
 nearest *named* waypoint via the engine's boundary-index list rather than
 the nearest expanded point (road vertices, or planting-circle vertices). Not available for ephemeral (walk-here "Add next point") replay,
 which has no persisted waypoint list. Gated by `hideTeleportFeatures` like every other teleport entry point
-(@docs/features/hide-teleport.md), **and** by a separate, independent
+(docs/features/hide-teleport.md), **and** by a separate, independent
 opt-in toggle — `AppSettings.showRouteJumpButtons` (Settings → Menus →
 Privacy → "Show route jump buttons", DataStore key
 `show_route_jump_buttons`, default `false`). Both must allow the buttons
@@ -193,7 +193,7 @@ without dragging the sheet up. Settings checkboxes keep the 48.dp target.
   between-waypoint legs fell back, one summary message is reported via
   `RoutingErrorReporter` (e.g. "Road-following partially unavailable — 2 of 5
   legs used straight-line paths"), mirroring `RoamingEngine.planRoadFollowingRoute`
-  (@docs/features/roaming.md). When teleport-to-start is off (`hideTeleportFeatures`),
+  (docs/features/roaming.md). When teleport-to-start is off (`hideTeleportFeatures`),
   Follow roads also applies to the walk from the current position to the first waypoint.
   Combined with Planting, Follow roads applies only to the connectors between
   rings — the circles themselves stay geometric, matching paste Planting's
@@ -240,7 +240,7 @@ without dragging the sheet up. Settings checkboxes keep the 48.dp target.
 - **Teleport** — instantly teleports to the route's first waypoint (last,
   if Reverse is checked). Does not start replay; the sheet stays open so
   the user can still press Start afterward. Hidden when
-  `hideTeleportFeatures` is on (@docs/features/hide-teleport.md). Still
+  `hideTeleportFeatures` is on (docs/features/hide-teleport.md). Still
   jumps to the saved stop itself when Planting is on; Start then snaps to
   the first rim vertex.
 - **Start** — teleports to the first waypoint (last, if Reverse is checked),
@@ -318,7 +318,7 @@ never goes stale.
 - **Loop / Reverse / Return to location**: unaffected — these only decide which
   waypoints replay in what order, not whether movement between them is instant.
 - **Next / Previous waypoint jumps**: using the route-jump buttons
-  (@docs/features/widget.md, "Route Controls Across Surfaces") while a teleport replay
+  (docs/features/widget.md, "Route Controls Across Surfaces") while a teleport replay
   is waiting at a point resets that point's wait timer — landing on a waypoint, from
   either direction, always restarts its full configured wait.
 - **Speed profile**: a teleport route's `speedProfileId` is never read during replay —

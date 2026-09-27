@@ -80,7 +80,7 @@ Supported formats (all parsed by `parseDeepLinkCoords`):
 
 These intent filters are **not** `autoVerify` — we don't control those domains, so Android shows a disambiguation chooser rather than auto-opening. `www.google.com` is scoped to `pathPrefix="/maps"` so other Google links (search, etc.) aren't intercepted.
 
-Implicit `ACTION_VIEW` intents for Google Maps web URLs are intercepted when this app is the default browser and Maps' "Open supported links" is off. Explicit intents targeting the Maps package bypass interception. See @docs/features/capture-coordinates.md.
+Implicit `ACTION_VIEW` intents for Google Maps web URLs are intercepted when this app is the default browser and Maps' "Open supported links" is off. Explicit intents targeting the Maps package bypass interception. See docs/features/capture-coordinates.md.
 
 Apps that launch Maps via an **explicit** intent (`setPackage`/`setClassName` targeting `com.google.android.apps.maps` directly) still bypass intent-filter resolution — there is no fix for that case.
 

@@ -4,7 +4,7 @@ Long-press map → bottom sheet with "Walk here" or "Teleport here".
 
 Tapping the map while spoofing and opening a deep link pin a `LatLng` (`pendingTapPosition` + `isPendingTapSheetOpen`) and show this same confirm sheet. The map's paste-coordinates sheet does not pin: Teleport / Walk / Walk via roads under the paste field run those actions directly on the **first** valid pair (`parsePastedCoordinates`). Extra points do not change those three. A future "open location in Maps" intent should skip the paste field and pin a `LatLng` the same way as a deep link.
 
-With two or more valid points, the same sheet can **Save route** (new UUID, cloned waypoints) or **Start** a named `ROUTE_REPLAY` via a reserved Room row (`paste_temp_route` / "Temp Route from Paste") — see @docs/features/routes.md, "Paste coordinates (map and widget)". Start is real route replay, not ephemeral "Add next point". Teleport is hidden when `hideTeleportFeatures` is on; Start still walks to the first stop (`StartRouteReplayUseCase`).
+With two or more valid points, the same sheet can **Save route** (new UUID, cloned waypoints) or **Start** a named `ROUTE_REPLAY` via a reserved Room row (`paste_temp_route` / "Temp Route from Paste") — see docs/features/routes.md, "Paste coordinates (map and widget)". Start is real route replay, not ephemeral "Add next point". Teleport is hidden when `hideTeleportFeatures` is on; Start still walks to the first stop (`StartRouteReplayUseCase`).
 
 Key files: `:feature:map:impl/MapViewModel.kt`, `:core:location/EphemeralReplayController.kt`, `:core:data/WalkCoordinator.kt`
 
@@ -26,7 +26,7 @@ Key files: `:feature:map:impl/MapViewModel.kt`, `:core:location/EphemeralReplayC
 
 - Long-press map → bottom sheet → "Walk via roads".
 - Fetches OSRM route from current position to target; walks it segment by segment.
-- On OSRM failure (after the backend/profile ladder and bisection — see @docs/features/roaming.md), falls back to a straight-line walk and reports a reason-specific message via `RoutingErrorReporter` (`:core:routing`), e.g. "Routing server unavailable — using straight walk".
+- On OSRM failure (after the backend/profile ladder and bisection — see docs/features/roaming.md), falls back to a straight-line walk and reports a reason-specific message via `RoutingErrorReporter` (`:core:routing`), e.g. "Routing server unavailable — using straight walk".
 
 ## Add Next Point (Ephemeral Replay)
 
@@ -55,6 +55,6 @@ If a road-following leg falls back to a straight line (OSRM backend/profile ladd
 ## Edge Cases
 
 - New walk-here cancels the previous one.
-- Moving the joystick stick cancels a walk (running, paused, or still looking up its road route) and steers from the current position (@docs/features/joystick.md, "Manual takeover").
+- Moving the joystick stick cancels a walk (running, paused, or still looking up its road route) and steers from the current position (docs/features/joystick.md, "Manual takeover").
 - Walk-here while route replay is active → show confirmation dialog to stop replay before proceeding.
 - "Add next point" while in roaming mode → no-op (only valid during walk-to or active ephemeral replay).

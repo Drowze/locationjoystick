@@ -11,7 +11,7 @@ Key files: `:core:model/AppSettings.kt`, `:core:data/SettingsRepository.kt`, `:c
 - When enabled, every explicit teleport button, checkbox, or gesture is removed from its composable tree (not just disabled):
   - Map long-press bottom sheet: "Teleport here" and "Stop route and teleport" (both the main map sheet and the floating map's tap panel).
   - Favorites map-picker "Set location" button.
-  - Favorites list row tap — the whole row's tap is the teleport action (see @docs/features/favorites.md); with the toggle on, tapping a row becomes a no-op instead of a visible-but-inert button.
+  - Favorites list row tap — the whole row's tap is the teleport action (see docs/features/favorites.md); with the toggle on, tapping a row becomes a no-op instead of a visible-but-inert button.
   - The standalone **Teleport** button on the start-route sheet (map long-press
     sheet, Routes screen, and widget panel — three surfaces sharing
     `LjRouteStartOptions`) and the **Teleport between waypoints** checkbox on
@@ -25,7 +25,7 @@ Key files: `:core:model/AppSettings.kt`, `:core:data/SettingsRepository.kt`, `:c
   - Paste-coordinates **Teleport** on the map FAB, floating map, and widget paste box (`PasteCoordinatesForm`). **Start** on that same form still walks to the first stop when hide-teleport is on (`StartRouteReplayUseCase`).
   - Route replay "Previous waypoint" / "Next waypoint" buttons (main map
     FAB column, widget panel, and floating map — see
-    @docs/features/routes.md, "Next / Previous Waypoint (Teleport)").
+    docs/features/routes.md, "Next / Previous Waypoint (Teleport)").
 
 ## Idle-State Exception
 

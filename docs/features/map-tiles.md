@@ -6,8 +6,8 @@ recipe whenever you touch MapLibre, OkHttp, R8, or a new `MapView`.
 
 Key files: `:core:map/MapTileHttp.kt`, `:core:map/MapViews.kt`, `:core:map/MapCamera.kt`, `:core:map/MapLibreStyleExt.kt`.
 
-Details of map UX (FABs, paste, jitter overlay) stay in @docs/features/map.md.
-Overlay compositing is also noted in @docs/features/widget.md.
+Details of map UX (FABs, paste, jitter overlay) stay in docs/features/map.md.
+Overlay compositing is also noted in docs/features/widget.md.
 
 ## Required recipe
 

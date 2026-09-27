@@ -85,7 +85,7 @@ anisotropy as before.
 Mode/radius selection (`resolveJitterStepRequest`, `LocationLoopPolicy.kt`) lives outside
 `buildLocation`, which now just adds the precomputed offset to the anchor. The resolved radius
 is also published every tick via `DebugStats.jitterRadiusMeters` for the map's jitter-radius
-overlay (@docs/features/map.md).
+overlay (docs/features/map.md).
 
 All realism tuning values in `AppConstants.RealismConstants`.
 
@@ -124,7 +124,7 @@ instead of anchoring the altitude Gaussian walk to a flat `DEFAULT_ALTITUDE_METE
   ground elevation is static — and process lifetime only. A failed fetch is never cached.
 - **Failure/disabled**: the target simply doesn't move — the anchor stays wherever it last
   converged to (or the 35 m default on first failure).
-- **Manual override wins**: see "Altitude Override Button" in @docs/features/widget.md. Setting
+- **Manual override wins**: see "Altitude Override Button" in docs/features/widget.md. Setting
   an override suspends the periodic fetch entirely (checked before every fetch) until Settings →
   GPS → "Reset elevation override" clears it, at which point the next periodic cycle resumes
   fetching automatically.

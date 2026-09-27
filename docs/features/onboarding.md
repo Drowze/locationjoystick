@@ -12,7 +12,7 @@ Key files: `:feature:onboarding:impl/OnboardingScreen.kt`, `:feature:onboarding:
 4. Enable mock location (deep link to Developer Options; re-checked automatically on resume — see "Permission Checks" below)
 5. Optional: Compass orientation (API 30+ only) — opens the Accessibility prominent disclosure
    (`CompassDisclosureDialog`), then Android's Accessibility settings on Accept. Not required to
-   proceed. See @docs/features/tap-to-walk.md, "Prominent Disclosure".
+   proceed. See docs/features/tap-to-walk.md, "Prominent Disclosure".
 6. Done → MapScreen
 
 A "Step X of 3" label and progress bar sit above the three permission cards, computed from how
@@ -20,7 +20,7 @@ many of them are currently granted — steps 2–4 above, not Welcome/Done.
 
 An optional language dropdown (EN / CN / TW / System default) sits in the header, above the
 "Step X of 3" label — it is not one of the numbered/counted steps and can be left alone. See
-@docs/features/localization.md.
+docs/features/localization.md.
 
 ## Permission Checks
 
@@ -44,7 +44,7 @@ Settings does **not** force the user back through the full onboarding flow on th
 launch — only `ACCESS_FINE_LOCATION` and mock location remain required to reach `IDLE_ROUTE`.
 Joystick and widget overlays simply stay unavailable until the permission is re-granted
 (`MockLocationService` already gates auto-starting them on `Settings.canDrawOverlays`, see
-@docs/features/joystick.md and @docs/features/widget.md) — everything else (teleport, walk,
+docs/features/joystick.md and docs/features/widget.md) — everything else (teleport, walk,
 routes) keeps working.
 
 Losing `ACCESS_FINE_LOCATION` is unaffected by this and still forces a restart (see
@@ -72,7 +72,7 @@ pass for spoofing to work — "Skip anyway" calls
 
 This is an onboarding action, not a Settings toggle — there is no way to
 re-enable the check from the UI short of a fresh install or "Reset all
-data" (@docs/features/export-import.md).
+data" (docs/features/export-import.md).
 
 Both gates honor the persisted flag:
 - `OnboardingViewModel.checkPermissions()` treats mock location as enabled
@@ -94,7 +94,7 @@ Settings does **not** force the user back through the full onboarding flow on th
 launch — only `ACCESS_FINE_LOCATION` and mock location remain required to reach `IDLE_ROUTE`.
 Joystick and widget overlays simply stay unavailable until the permission is re-granted
 (`MockLocationService` already gates auto-starting them on `Settings.canDrawOverlays`, see
-@docs/features/joystick.md and @docs/features/widget.md) — everything else (teleport, walk,
+docs/features/joystick.md and docs/features/widget.md) — everything else (teleport, walk,
 routes) keeps working.
 
 Losing `ACCESS_FINE_LOCATION` is unaffected by this and still forces a restart (see

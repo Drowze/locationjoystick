@@ -10,7 +10,7 @@ Key files: `:app/UpdateAvailablePopup.kt`, `:app/UpdateAvailableViewModel.kt`, `
 - `UpdateCheckRepository.fetchLatestVersion()` does one `GET api.github.com/repos/<slug>/releases/latest` and returns `tag_name` without its `v` prefix, or `null` on any failure (offline degrades silently).
 - The badge shows when the cached version is `isNewerVersion` than `AppInfo.VERSION_NAME` and differs from the dismissed version. The compare strips a `v` prefix and any `-` pre-release suffix; missing segments count as 0.
 - The release URL is derived from the cached version (`UpdateCheckConstants.releaseUrl`), not stored separately.
-- Shown on the Idle screen only, bottom-end, opposite the What's New badge (@docs/features/whats-new.md). Both share `DismissiblePillBadge`.
+- Shown on the Idle screen only, bottom-end, opposite the What's New badge (docs/features/whats-new.md). Both share `DismissiblePillBadge`.
 - No Settings toggle. `update_check_last_checked_at_ms`, `update_check_cached_latest_version`, and `update_check_dismissed_version` are per-device DataStore keys, not part of `AppSettings`/`ExportData`.
 
 ## Not yet

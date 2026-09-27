@@ -58,7 +58,7 @@ External links (GitHub, issue tracker) go in `EXT_ITEMS` below `NAV_ITEMS`, not 
 (`make wiki-changelog`) rebuilds it from every `docs/wiki/changelog/<version>.json` file. Never
 hand-edit `changelog.html` directly; edits are overwritten on the next generation.
 
-See @docs/features/whats-new.md, "Maintaining the Changelog", for the authoring workflow and the
+See docs/features/whats-new.md, "Maintaining the Changelog", for the authoring workflow and the
 JSON schema (`category`/`scope`/`summary` per entry).
 
 Note on the general writing guidelines above: unlike other wiki pages, a changelog entry's

@@ -8,7 +8,7 @@ Key files: `:feature:widget:impl/MapFloatingView.kt`, `:feature:widget:impl/TapT
 
 Tier 1's toggle lives in Settings → Menus → Privacy, next to "Hide teleport features" — it moved
 there because Floating Map Quick Walk is its own standalone feature, not part of the Tap to Walk
-umbrella (see @docs/features/hide-teleport.md; it is not one of the features that toggle hides).
+umbrella (see docs/features/hide-teleport.md; it is not one of the features that toggle hides).
 Tier 2 stays in Settings → Menus → Tap to Walk. Compass tracking has no toggle — it is always
 on whenever the accessibility service is granted (see "Compass Orientation" below).
 
@@ -195,7 +195,7 @@ Accessibility services running in the background are detectable by some games. T
 
 API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section and the onboarding compass step are hidden, and the service itself is disabled in the manifest (`android:enabled="@bool/compass_accessibility_service_enabled"`, `false` in `values/bools.xml`, `true` in `values-v30/`), so it never appears in Android's Accessibility settings where it could be turned on without the in-app disclosure. `CompassAccessibilityService.onServiceConnected()` also skips binding as a second guard. The rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
 
-The disclosure, the onboarding step and the service's system-settings description are localized in every supported locale with identical keys (@docs/features/localization.md). The Chinese strings keep the English word "Accessibility" in parentheses next to 无障碍 so a reviewer testing in any locale sees the term Play asks for.
+The disclosure, the onboarding step and the service's system-settings description are localized in every supported locale with identical keys (docs/features/localization.md). The Chinese strings keep the English word "Accessibility" in parentheses next to 无障碍 so a reviewer testing in any locale sees the term Play asks for.
 
 ## Warning Screen
 

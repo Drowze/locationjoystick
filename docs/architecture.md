@@ -26,7 +26,7 @@ core/model       — Pure Kotlin data classes, no Android deps
 | `:core:designsystem` | Tokens, theme, typography, shared components |
 | `:core:location` | Mock GPS foreground service + movement engine |
 | `:core:model` | Pure Kotlin domain classes |
-| `:core:map` | GeoJSON utils, MapLibre lifecycle bridge, `createMapView`/`rememberMapView`, OSM tile HTTP (`MapTileHttp` — @docs/features/map-tiles.md) |
+| `:core:map` | GeoJSON utils, MapLibre lifecycle bridge, `createMapView`/`rememberMapView`, OSM tile HTTP (`MapTileHttp` — docs/features/map-tiles.md) |
 | `:core:overlay` | WindowManager overlay utils |
 | `:core:routing` | OSRM client, route interpolation, roaming engine, replay engine |
 | `:core:testing` | Shared test utils, fakes |

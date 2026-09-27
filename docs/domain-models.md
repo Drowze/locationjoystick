@@ -26,7 +26,7 @@ All in `:core:model`. Pure Kotlin — no Android, no Room. Room entities in `:co
 | `FeatureSurface` | enum: `WIDGET`, `MAP` |
 | `JoystickStyle` | enum: `FLOATING`, `FIXED` |
 | `SpeedUnit` | enum: `KMH`, `MPH` |
-| `MapTileSource` | enum: `OSM`, `AMAP` — carries `tileUrlTemplates`, `minZoom`/`maxZoom`, `clampCamera: Boolean`, `coordinateSystem: MapCoordinateSystem`, `defaultCenter: LatLng`; `DEFAULT = OSM`, lenient `fromName()` (see @docs/features/map.md, "Map source") |
+| `MapTileSource` | enum: `OSM`, `AMAP` — carries `tileUrlTemplates`, `minZoom`/`maxZoom`, `clampCamera: Boolean`, `coordinateSystem: MapCoordinateSystem`, `defaultCenter: LatLng`; `DEFAULT = OSM`, lenient `fromName()` (see docs/features/map.md, "Map source") |
 | `MapCoordinateSystem` | enum: `WGS84`, `GCJ02` — datum a tile provider renders in; drives the presentation-edge projection in `:core:map` |
 | `ThemeMode` | enum: `DARK`, `LIGHT` |
 | `AppLanguage` | enum (each carries `languageTag: String?`): `SYSTEM_DEFAULT`, `ENGLISH`, `CHINESE_SIMPLIFIED`, `CHINESE_TRADITIONAL` |

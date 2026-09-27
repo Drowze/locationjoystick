@@ -20,7 +20,7 @@ Each entry in `routes` includes the optional `speedProfileId` field (`Route.spee
 
 Each entry in `routes` also includes `randomizeTeleportOrder` (`Route.randomizeTeleportOrder`). Old exports without it import cleanly — a missing field defaults to `false`.
 
-Each waypoint in a route includes `waitSeconds` (`Waypoint.waitSeconds`, used by teleport routes — see @docs/features/routes.md, "Teleport Routes"). Old exports without it import cleanly — a missing `waitSeconds` defaults to `0`.
+Each waypoint in a route includes `waitSeconds` (`Waypoint.waitSeconds`, used by teleport routes — see docs/features/routes.md, "Teleport Routes"). Old exports without it import cleanly — a missing `waitSeconds` defaults to `0`.
 `routesSortMode` and `favoritesSortMode` preserve the four list sort choices. Older exports with
 only `routesSortNewestFirst` / `favoritesSortNewestFirst` migrate to **Newest saved** or
 **Oldest saved**. The legacy booleans remain in new exports for backward compatibility.
@@ -43,7 +43,7 @@ Overflow menu → Export section → "Export settings":
 3. Share via `FileProvider` + `Intent.ACTION_SEND`.
 
 "Export via QR code" (same section) instead starts the local QR transfer server — see
-@docs/features/qr-transfer.md.
+docs/features/qr-transfer.md.
 
 ## Import Flow
 
@@ -58,7 +58,7 @@ Overflow menu → Import section → "Import from file":
 All I/O runs on `Dispatchers.IO`.
 
 "Import from QR code" and "Import via code" (same section) instead fetch the export over the
-local network — see @docs/features/qr-transfer.md.
+local network — see docs/features/qr-transfer.md.
 
 ## GPX Import (Routes only)
 
@@ -72,7 +72,7 @@ Routes can be imported from GPX files via the Routes screen overflow menu → "I
 
 Key function: `parseGpxRoutes` in `:core:common/util/GpxRoutes.kt` (used by Routes → Import GPX and by opening a GPX from another app).
 
-Opening a `.gpx` from Files / Downloads / Share / a chat app uses the same parser, then the map paste-coordinates sheet (`GpxOpenRepository`) instead of saving every track immediately. See @docs/features/routes.md.
+Opening a `.gpx` from Files / Downloads / Share / a chat app uses the same parser, then the map paste-coordinates sheet (`GpxOpenRepository`) instead of saving every track immediately. See docs/features/routes.md.
 
 ## Third-Party Imports
 

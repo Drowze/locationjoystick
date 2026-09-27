@@ -50,7 +50,7 @@ Helpers in `SmokeTestHelpers.kt`: `waitForIdleScreen()`, `openDrawer()`, `naviga
 - Bearing: known lat/lon pairs → expected bearing
 - `randomPointInRadius`: output always within radius
 - Export/import: round-trip full `ExportData` through JSON
-- OSM tile HTTP: required recipe @docs/features/map-tiles.md (`MapTileUserAgentTest`)
+- OSM tile HTTP: required recipe docs/features/map-tiles.md (`MapTileUserAgentTest`)
 
 Shared utils in `:core:testing`.
 

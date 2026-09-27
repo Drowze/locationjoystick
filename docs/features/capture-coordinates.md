@@ -21,7 +21,7 @@ and reappear after setup; the gate is view-only.
 
 ### Setup incomplete (not the default browser)
 
-Only onboarding-style step cards (`LjGuidedStepCard`, shared with @docs/features/onboarding.md's
+Only onboarding-style step cards (`LjGuidedStepCard`, shared with docs/features/onboarding.md's
 permission cards) and a **Setup guide** text button are shown. No Capture mode switch, List/Jump,
 captured list, pass-through row or Save as route.
 

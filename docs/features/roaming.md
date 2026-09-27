@@ -3,7 +3,7 @@
 Two mutually exclusive modes, configured via the roaming sheet on the Map screen, the floating widget, or Settings → Roaming. Only one roaming session can run at a time. The roaming sheet (map, widget panel, floating map) shows only one mode's config at a time — a toggle button, top-right of the sheet at the same level as the "Roaming" title, switches between the two modes (defaults to walk-around), instead of displaying both blocks stacked. Settings → Roaming still shows both modes' default fields at once, since it's pre-configuring defaults for either mode rather than picking one to start now.
 
 - **Walk around the block** — set a center, radius, and distance. Walks randomly within the radius (straight-line or follow-roads). This is the original roaming behaviour.
-- **Planting** — Archimedean spiral around the current point from a starting radius (default 5 m) out to an ending radius (default 39 m), then back in. One loop is one full expand and contract. Infinite loop or N loops. Straight-line only (no follow-roads). Distinct from route Planting circles around saved-route stops (@docs/features/routes.md).
+- **Planting** — Archimedean spiral around the current point from a starting radius (default 5 m) out to an ending radius (default 39 m), then back in. One loop is one full expand and contract. Infinite loop or N loops. Straight-line only (no follow-roads). Distinct from route Planting circles around saved-route stops (docs/features/routes.md).
 
 Default settings for both blocks persist in DataStore and round-trip through `ExportData`.
 
@@ -37,7 +37,7 @@ first point ahead), not index 0 (the start position itself, which is `route.firs
 `RouteReplayEngine`'s `resumeWaypointIndex` convention. Targeting index 0 would put the walk's very
 first tick at distance 0 from its own target, snapping instantly and wasting that tick's movement
 budget (issue #75). Movement itself is shared with Route Replay via `RouteInterpolator` (see
-@docs/features/routes.md, "Replay") — dense road-following geometry benefits from the same
+docs/features/routes.md, "Replay") — dense road-following geometry benefits from the same
 full-tick-budget-consumption fix.
 
 ## Configuration Fields (`RoamingConfig`)
@@ -93,9 +93,9 @@ Public OSRM servers have no SLA and can throttle, error, or time out unpredictab
 - `RoamingRepository` owns `isRoaming` and `isRoamingPaused` `StateFlow`s.
 - `RoamingEngine` owns `activeJob` and the coroutine scope. Only one session active at a time — starting a new one awaits cancellation of the previous via `cancelAndJoin` before movement begins.
 - Completion (natural loop exit) fires `onComplete` callback → `RoamingRepository` resets mode and clears route waypoints.
-- `RoamingRepository` reports live travel-direction bearing between consecutive ticks via `LocationRepository.currentBearing`, the same mechanism route replay uses (@docs/features/routes.md, "Replay") — previously frozen at 0°/north for the whole roaming session.
+- `RoamingRepository` reports live travel-direction bearing between consecutive ticks via `LocationRepository.currentBearing`, the same mechanism route replay uses (docs/features/routes.md, "Replay") — previously frozen at 0°/north for the whole roaming session.
 - `RoamingRepository` also propagates its movement speed to `MockLocationService` via `LocationRepository.currentSpeedMps`/`setSpeedInternal` — previously always reported as 0 m/s to consumers of the mock fix, which also suppressed bearing reporting since `MockLocationService` only starts reporting bearing once a tick with nonzero speed occurs.
 
 ## Movement priority
 
-Playing route replay blocks roam start (walk-around and planting). Pause or stop the route first; a paused replay is stopped synchronously (`RouteReplayEngine.stop()`) before roam starts so both engines cannot tick at once. Starting a saved route still stops roam (`ReplayOrchestrator.startReplayWithWaypoints`). Moving the joystick stick stops roaming (walk-around or planting, running or paused) and hands control to the stick (@docs/features/joystick.md, "Manual takeover"). Without a new touch, a retained locked-stick direction is ignored while roam is running and steers while roam is paused (mode stays `ROAMING`). Widget joystick show/hide and lock still open and lock the overlay while faded. Map/widget roam controls fade toward their background while a route is playing, but stay readable. Policy: `canStartRoaming` / `shouldIgnoreJoystickInput` / `shouldJoystickTakeOver` / `isRoutePlaying` in `:core:model/MovementPriority.kt`.
+Playing route replay blocks roam start (walk-around and planting). Pause or stop the route first; a paused replay is stopped synchronously (`RouteReplayEngine.stop()`) before roam starts so both engines cannot tick at once. Starting a saved route still stops roam (`ReplayOrchestrator.startReplayWithWaypoints`). Moving the joystick stick stops roaming (walk-around or planting, running or paused) and hands control to the stick (docs/features/joystick.md, "Manual takeover"). Without a new touch, a retained locked-stick direction is ignored while roam is running and steers while roam is paused (mode stays `ROAMING`). Widget joystick show/hide and lock still open and lock the overlay while faded. Map/widget roam controls fade toward their background while a route is playing, but stay readable. Policy: `canStartRoaming` / `shouldIgnoreJoystickInput` / `shouldJoystickTakeOver` / `isRoutePlaying` in `:core:model/MovementPriority.kt`.
