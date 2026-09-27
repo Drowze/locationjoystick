@@ -152,6 +152,7 @@ Rules:
 | `GpxOpenRepository` | `:core:data` | Repository (`@Singleton`) | Buffers externally opened GPX files until the map paste sheet consumes them. |
 | `UpdateCheckRepository` | `:core:data` | Repository (`@Singleton`) | Fetches the latest GitHub release tag (api.github.com) for the home-screen "update available" badge; gated by a 24h cache, no toggle. |
 | `StartRouteReplayUseCase` | `:core:location` | Class (`@Singleton`) | Starts a route replay: resolves the route's speed profile, optionally teleports to the start waypoint first (via `TeleportUseCase`), then sends the start-replay intent to `MockLocationService`. Dedupes route-replay-start logic previously duplicated in `MapViewModel` and `FloatingWidgetService`. |
+| `CompassHeadingSource` | `:core:location` | Class (`@Singleton`) | Bridges `CompassAccessibilityService` (`:feature:widget:impl`) and consumers (e.g. `FloatingWidgetService`) via `bind`/`unbind`/`captureHeading()`. Gates capture on `SettingsRepository.getCompassDisclosureAccepted()` — Play's Accessibility API policy requires the in-app disclosure accepted before any screenshot. |
 
 ---
 
