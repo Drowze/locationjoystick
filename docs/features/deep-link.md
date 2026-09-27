@@ -108,4 +108,4 @@ The shared text usually contains a shortened link (`https://goo.gl/maps/...` or 
 | Channel | `DeepLinkRepository` — `SharedFlow(replay=1)`; `consume()` calls `resetReplayCache()` to clear after delivery |
 | Consumer | `MapViewModel.observeDeepLinkCoords` — pins via `pinCoordinateTarget` (`pendingTapPosition` + `pendingCameraTarget` + confirm sheet), the same path as map paste-coordinates |
 | URL builder | `AppConstants.AppInfo.buildDeepLink(lat, lon)` |
-| Manifest | Intent filters on `MainActivity`: HTTPS own domain (`autoVerify`) + custom scheme + `geo:` + Google Maps hosts + `google.navigation:` + `ACTION_SEND` text/plain |
+| Manifest | Intent filters on `MainActivity`: HTTPS own domain (`autoVerify`) + custom scheme + `geo:` + `google.navigation:` + `ACTION_SEND` text/plain; Google Maps hosts on `LinkInterceptorActivity` |
