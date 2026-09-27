@@ -205,10 +205,11 @@ caveats before activating:
 2. Accuracy depends on the scale setting matching the game's zoom level.
 
 The caveats and the accessibility disclosure share one screen, so the user confirms once instead of
-passing a dialog and then a disclosure screen. "Enable anyway" turns the overlay on; when the
-accessibility disclosure was part of that screen it also records the accept and opens
-`ACTION_ACCESSIBILITY_SETTINGS`. "No thanks" leaves the toggle off and records nothing — the user
-declined the feature, not the accessibility service. State is local (`rememberSaveable`) so the
+passing a dialog and then a disclosure screen. The confirm button turns the overlay on. It reads
+"Accept" when the accessibility disclosure is part of the screen, and then also records the accept
+and opens `ACTION_ACCESSIBILITY_SETTINGS`. Below API 30, where only the caveats show, it reads
+"Enable anyway". "Decline" leaves the toggle off and records nothing — the user declined the
+feature, not the accessibility service. State is local (`rememberSaveable`) so the
 screen re-shows if the user disables and re-enables.
 
 ## Anti-Patterns to Avoid
