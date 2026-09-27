@@ -155,6 +155,7 @@
 
         <service
             android:name="com.locationjoystick.feature.widget.impl.CompassAccessibilityService"
+            android:enabled="@bool/compass_accessibility_service_enabled"
             android:exported="true"
             android:label="@string/accessibility_service_label"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

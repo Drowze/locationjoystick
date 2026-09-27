@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">"locationjoystick"</string>
     <string name="accessibility_service_label">"locationjoystick 羅盤"</string>
-    <string name="accessibility_service_description">"僅供選用的「點擊行走」羅盤功能使用，且需要你在設定中啟用。該功能會讀取螢幕上的羅盤方向，使點擊對應到正確的實際方向。本服務不是面向身心障礙使用者的協助工具。"</string>
+    <string name="accessibility_service_description">"僅供選用的「點擊行走」羅盤功能使用，且只在你於應用程式內的無障礙（Accessibility）說明中點擊「接受」後啟用。開啟「點擊行走」覆蓋層時擷取一張螢幕截圖以讀取遊戲羅盤方向。截圖只留在你的手機上並立即刪除，不會收集或分享任何資料。本服務不是面向身心障礙使用者的協助工具。"</string>
     <string name="app_couldn_t_open_that_link">"無法開啟該連結"</string>
     <string name="drawer_close_menu_cd">"關閉選單"</string>
     <string name="drawer_home_cd">"首頁"</string>

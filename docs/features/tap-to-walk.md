@@ -193,7 +193,9 @@ Accessibility services running in the background are detectable by some games. T
 
 `android.permission.BIND_ACCESSIBILITY_SERVICE` — granted by Android when the user enables the service in system Accessibility Settings. No runtime prompt needed.
 
-API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section is hidden and `CompassAccessibilityService.onServiceConnected()` skips binding, so compass tracking is unavailable; the rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
+API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section and the onboarding compass step are hidden, and the service itself is disabled in the manifest (`android:enabled="@bool/compass_accessibility_service_enabled"`, `false` in `values/bools.xml`, `true` in `values-v30/`), so it never appears in Android's Accessibility settings where it could be turned on without the in-app disclosure. `CompassAccessibilityService.onServiceConnected()` also skips binding as a second guard. The rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
+
+The disclosure, the onboarding step and the service's system-settings description are localized in every supported locale with identical keys (@docs/features/localization.md). The Chinese strings keep the English word "Accessibility" in parentheses next to 无障碍 so a reviewer testing in any locale sees the term Play asks for.
 
 ## Warning Screen
 

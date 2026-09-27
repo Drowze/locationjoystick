@@ -57,8 +57,8 @@
     <string name="language_short_chinese">"CN"</string>
     <string name="language_short_traditional_chinese">"TW"</string>
     <string name="language_dropdown_cd">"更改语言"</string>
-    <string name="compass_disclosure_title">"无障碍权限：罗盘方向"</string>
-    <string name="compass_disclosure_intro">"locationjoystick 仅在一项可选功能中使用 Android 的无障碍服务 API（AccessibilityService）：“点击行走”的罗盘方向。应用的其他部分都不使用无障碍功能。"</string>
+    <string name="compass_disclosure_title">"无障碍（Accessibility）权限：罗盘方向"</string>
+    <string name="compass_disclosure_intro">"locationjoystick 仅在一项可选功能中使用 Android 的无障碍服务（Accessibility Service）API：“点击行走”的罗盘方向。应用的其他部分都不使用无障碍（Accessibility）功能。"</string>
     <string name="compass_disclosure_data">"访问的数据：一张屏幕截图，仅在你打开“点击行走”覆盖层或在设置中点击“测试”时拍摄。"</string>
     <string name="compass_disclosure_purpose">"用途：在该截图中找到游戏的罗盘图标，把你的点击转换成正确的实际行走方向。"</string>
     <string name="compass_disclosure_handling">"收集或分享的数据：无。截图在本机分析后立即删除，绝不保存、发送给我们或与任何人分享。该服务不读取文字，不收集个人数据，也不会代你点击或执行任何操作。"</string>

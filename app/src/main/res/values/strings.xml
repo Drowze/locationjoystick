@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">locationjoystick</string>
     <string name="accessibility_service_label">locationjoystick compass</string>
-    <string name="accessibility_service_description">Used only by the optional Tap to Walk compass feature, when you enable it in Settings. Reads the on-screen compass direction so your taps map to the correct real-world direction. Not an accessibility tool for users with disabilities.</string>
+    <string name="accessibility_service_description">"Used only by the optional Tap to Walk compass feature, after you tap Accept on the in-app Accessibility disclosure. Takes one screenshot when the Tap to Walk overlay opens to read your game’s compass direction. The screenshot stays on your phone and is deleted immediately. Nothing is collected or shared. Not an accessibility tool for users with disabilities."</string>
     <string name="app_couldn_t_open_that_link">"Couldn't open that link"</string>
     <string name="drawer_close_menu_cd">"Close menu"</string>
     <string name="drawer_home_cd">"Home"</string>
