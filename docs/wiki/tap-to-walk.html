@@ -26,127 +26,103 @@
   <main>
     <h1 id="tap-to-walk">Tap to walk</h1>
     <p>
-      Tap to walk gives you two shortcuts for moving your spoofed location with a single tap,
-      without opening the app. Both are turned off by default. Turn them on under
-      <strong>Settings → Menus → Tap to Walk</strong>.
+      Tap to walk gives you two shortcuts to move your fake location with one tap, without opening the app.
+      Both are off by default. Turn them on in <strong>Settings &rarr; Menus &rarr; Tap to Walk</strong>.
     </p>
 
     <div class="feature-section" id="tap-to-walk-settings">
       <img class="phone-shot" src="screenshots/20_tap_to_walk_settings.png" alt="Tap to Walk settings screen">
       <ul class="section-bullets">
-        <li>The <strong>Scale</strong> slider sets how many real-world meters each screen pixel
-          stands for — match it to how zoomed in the game is.</li>
-        <li><strong>Compass orientation</strong> connects an accessibility service that keeps
-          taps accurate even when the game map rotates.</li>
-        <li>A warning appears the first time you turn Tap to Walk on, since some games can
-          detect this kind of background helper.</li>
+        <li>The <strong>Scale</strong> slider sets how many real-world meters each pixel on your screen stands for. Match it to how far the game is zoomed in.</li>
+        <li><strong>Compass orientation</strong> keeps taps accurate when the game map rotates. It uses an Android accessibility feature.</li>
+        <li>The first time you turn Tap to Walk on, a warning appears. Some games can detect this kind of background helper.</li>
       </ul>
     </div>
 
     <div class="feature-section" id="compass-orientation-settings">
       <img class="phone-shot" src="screenshots/21_compass_orientation.png" alt="Compass orientation settings">
       <ul class="section-bullets">
-        <li>Pick your game from the <strong>Game app</strong> list, then tap
-          <strong>Test</strong> to confirm detection works on your device.</li>
+        <li>Pick your game from the <strong>Game app</strong> list, then tap <strong>Test</strong> to check that detection works on your phone.</li>
       </ul>
     </div>
 
     <h2 id="floating-map-quick-walk">Floating map quick walk</h2>
     <p>
-      When this is turned on, tapping anywhere on the floating map walks to that spot right
-      away — it skips the popup that normally asks whether to walk, teleport, or take roads.
-      Useful once you already know where you're going.
+      Turn it on in <strong>Settings &rarr; Menus &rarr; Privacy</strong>. Then a tap on the floating map walks to that spot at once. It skips the popup that asks whether to walk, teleport, or use roads.
     </p>
 
     <h2 id="screen-overlay">Screen tap-to-walk overlay</h2>
     <p>
-      This adds a crosshair button to the floating widget panel. Tap it once to place a
-      clear layer over whatever app you're using — your next tap anywhere on screen
-      becomes your walk destination, and the layer then disappears on its own.
-    </p>
-    <p>
-      To cancel without walking anywhere, tap the close button in the bottom-right corner.
+      This adds a crosshair button to the floating widget. Tap it once to place a clear layer over your current app.
+      Your next tap anywhere becomes your walk destination. The layer then disappears.
+      To cancel, tap the close button in the bottom-right corner.
     </p>
 
     <div class="feature-section" id="tap-to-walk-disclosure">
       <img class="phone-shot" src="screenshots/25_compass_disclosure.png" alt="Enable Tap to Walk confirmation screen">
       <ul class="section-bullets">
-        <li>Turning the overlay on opens this screen first. It states the detection risk and that accuracy depends on the scale setting, and links to this guide. If your phone supports compass orientation, the same screen also explains the Accessibility permission it uses. Nothing turns on until you tap <strong>Accept</strong>.</li>
+        <li>Turning the overlay on opens this screen first. It explains the detection risk and that accuracy depends on the scale setting. If your phone supports compass orientation, it also explains the accessibility permission. Nothing turns on until you tap <strong>Accept</strong>.</li>
       </ul>
     </div>
 
     <h3 id="scale-setting">Scale setting</h3>
     <p>
-      The overlay turns your tap into a real-world location using the
-      <strong>Scale</strong> value, in meters per pixel. A higher number covers more
-      real-world distance per pixel, which suits a zoomed-out game map; a lower number
-      suits a zoomed-in one.
+      The overlay turns your tap into a real-world location using the <strong>Scale</strong> value, in meters per pixel.
+      A higher number suits a zoomed-out game map. A lower number suits a zoomed-in map.
     </p>
     <p>
-      If your taps land too far from where you meant, adjust the scale to match how
-      zoomed in the game is — zooming out usually gives more accurate results, since
-      small positioning errors matter less at that scale.
+      If taps land too far from where you meant, adjust the scale to match the game's zoom.
+      Zooming out in the game usually gives better results.
     </p>
 
     <h3 id="warning">Important note</h3>
     <p>
-      The overlay assumes the map you're tapping is oriented with north at the top. If the game
-      rotates the map to follow your character, taps may not land where you expect. The
-      <strong>Compass orientation</strong> feature below can correct for this automatically.
+      The overlay assumes north is at the top of the map. If the game rotates the map to follow your character,
+      taps may land in the wrong place. <a href="#compass-orientation">Compass orientation</a> can correct this.
     </p>
     <p>
-      Some apps can detect when a location is being faked and may take action on your account.
-      Only use this feature in apps where you understand and accept that risk.
+      Some apps can detect a fake location and act on your account. Use this feature only in apps where you accept that risk.
     </p>
 
     <h2 id="compass-orientation">Compass orientation</h2>
     <p>
-      locationjoystick screenshots the tap-to-walk overlay the moment it opens and
-      automatically finds your game's compass icon in its usual top-right spot. It uses
-      the icon's direction to rotate the walk target so it lands correctly even when the
-      game map is turned. There's no switch for this — it runs automatically once the
-      accessibility service below is turned on.
+      When the overlay opens, the app takes a picture of the screen and looks for your game's compass icon in the top-right corner.
+      It uses the compass direction to rotate the walk target, so it lands correctly on a turned map.
+      There is no separate switch. It runs once you turn on the accessibility feature below.
     </p>
 
     <h3 id="compass-setup">Setup</h3>
     <p>
-      Compass orientation uses Android's Accessibility permission. Before Android's
-      Accessibility settings ever open, a full-screen message explains what the compass helper
-      looks at, why, and that the picture of your screen never leaves your phone. Tap
-      <strong>Accept</strong> to open Android's Accessibility settings, or <strong>Decline</strong>
-      to keep it off.
+      Compass orientation uses Android's Accessibility permission. Before Android's Accessibility settings open,
+      a full-screen message explains what the app looks at and why. The picture of your screen never leaves your phone.
+      Tap <strong>Accept</strong> to continue, or <strong>Decline</strong> to keep it off.
     </p>
     <p>
-      You see this message during first-run setup (the optional <strong>Compass orientation</strong>
-      step), when you first turn Tap to Walk on, and the first time you tap the crosshair button.
+      You see this message during first-run setup (the optional <strong>Compass orientation</strong> step),
+      when you first turn Tap to Walk on, and the first time you tap the crosshair button.
     </p>
     <ol>
-      <li>Tap <strong>Accept</strong> on that message.</li>
+      <li>Tap <strong>Accept</strong> on the message.</li>
       <li>Find <strong>locationjoystick compass</strong> in the list and turn it on.</li>
-      <li>Return to locationjoystick. Compass detection is now active — no further switch to flip.</li>
+      <li>Return to locationjoystick. Compass detection is now on.</li>
     </ol>
     <p>
-      To see the message again later, or to start from Settings instead, go to
-      <strong>Settings → Menus → Tap to Walk → Compass orientation</strong> and tap
-      <strong>Open Settings</strong>.
+      To see the message again, go to <strong>Settings &rarr; Menus &rarr; Tap to Walk &rarr; Compass orientation</strong> and tap <strong>Open Settings</strong>.
     </p>
 
-    <h3 id="compass-verify">Verifying it works on your device</h3>
+    <h3 id="compass-verify">Check that it works</h3>
+    <ol>
+      <li>Pick your game from the <strong>Game app</strong> list.</li>
+      <li>Tap <strong>Test</strong>. The app switches to your game, reads its compass, and returns.</li>
+      <li>The app shows the detected direction. If it finds nothing, make sure the compass is visible in the game.</li>
+    </ol>
     <p>
-      Pick your game from the <strong>Game app</strong> list, then tap <strong>Test</strong> —
-      locationjoystick switches to it for you, captures its compass, and returns automatically.
-      It shows the detected direction, or a message telling you to make sure the compass is
-      visible if nothing was found. If you'd rather not pick an app, leave the list on
-      <em>Select app…</em>: switch to your game yourself first, then switch back to
-      locationjoystick and tap <strong>Test</strong> — it briefly minimizes itself to capture
-      whatever's on screen.
+      If you do not pick a game, leave the list on <em>Select app…</em>. Switch to your game, switch back to locationjoystick, and tap <strong>Test</strong>. The app briefly minimizes to read what is on screen.
     </p>
 
     <h3 id="compass-warning">Important note</h3>
     <p>
-      Some apps can notice when this kind of background helper is active. If the game you use
-      checks for this and limits features when it finds one, disable the locationjoystick
-      compass entry in your phone's accessibility settings — there is no separate in-app switch.
+      Some apps can notice this background helper. If your game limits features when it finds one, turn off the locationjoystick compass entry in your phone's accessibility settings. The app has no separate switch for this.
     </p>
   </main>
 

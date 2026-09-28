@@ -27,36 +27,41 @@
   <main>
     <h1 id="routes">Routes</h1>
     <p>
-      Place a series of stops on the map and play them back at whatever speed you choose.
-      Routes can follow straight lines between stops, or snap to real roads. All of your
-      route data stays on your device — see the <a href="privacy.html#no-cloud">privacy policy</a>.
+      A route is a list of stops on the map. Play it back at the speed you choose.
+      Routes move in straight lines between stops or follow real roads.
+      Your routes stay on your device. See the <a href="privacy.html#no-cloud">privacy policy</a>.
     </p>
 
     <div class="feature-section" id="routes-list">
       <img class="phone-shot" src="screenshots/03_routes.png" alt="Routes list screen">
       <ul class="section-bullets">
-        <li>Tap the add button to create a new route by placing stops on the map, pasting coordinates, or importing a file.</li>
-        <li>Tap a saved route to start it. Playback jumps to the first stop, then follows the path. You can loop it, reverse it, or have it return to the start.</li>
-        <li>A search box at the top of the list finds a route by name as you type — the map's routes sheet has the same box. From the floating widget, tap the search icon next to the close button to open it. Closing the list clears what you typed.</li>
-        <li>Sort routes A–Z, Z–A, newest saved, or oldest saved. The same choice applies to the floating widget's route list.</li>
-        <li>While a route is playing, a count like <code>3/12</code> at the bottom of the map and widget button lists shows which stop you're on.</li>
-        <li>The three-dot menu on a saved route lets you edit it, share its coordinates, export it, or delete it. Share shows every stop as <code>lat, lon</code> lines you can copy or send as a message.</li>
-        <li>The floating widget's route detail also has rename, share, and delete buttons. It closes before the phone's share sheet appears, so neither panel covers the other.</li>
-        <li>Import a route from a GPX file, or draw one on the map, using the add button. Very large routes (thousands of points) are skipped, and a message tells you how many were left out.</li>
+        <li>Tap the add button to create a route.</li>
+        <li>Tap a saved route to start it. Playback jumps to the first stop, then follows the path. You can loop it, reverse it, or return to the start.</li>
+        <li>Use the search box to find a route by name. The map's routes sheet has the same box. In the widget, tap the search icon next to the close button. Closing the list clears the search.</li>
+        <li>Sort routes A–Z, Z–A, newest, or oldest. The widget's route list uses the same order.</li>
+        <li>While a route plays, a count such as <code>3/12</code> shows your current stop. It appears at the bottom of the map and widget button lists.</li>
+        <li>The three-dot menu on a route lets you edit, share, export, or delete it. Share lists every stop as <code>lat, lon</code> lines to copy or send.</li>
+        <li>The widget's route detail has rename, share, and delete buttons. It closes before the share menu opens.</li>
       </ul>
     </div>
 
     <h2 id="how-to-add-a-route">How to add a route</h2>
-    <p>Tap the add button at the bottom-right of the Routes screen to start a new route.</p>
+    <p>Tap the add button at the bottom right of the Routes screen.</p>
 
     <div class="feature-section" id="routes-add-button">
       <img class="phone-shot" src="screenshots/16_routes_add_button.png" alt="Routes screen with add button visible">
       <ul class="section-bullets">
-        <li>The button opens a menu with every way to add a route.</li>
-        <li>Choose "Draw on map" to place stops by hand, "Draw on map (follow roads)" to snap them to real streets, "Draw on map (teleport)" to jump between stops, "Paste coordinates" to build a route from a list of points, or "Import GPX file" to import an existing route.</li>
-        <li>You can also open a GPX file from another app (Files, Downloads, Share, or a chat app). This app appears in the list of apps that can open it, even when the other app sends it as a generic document, but not for photos or app installer files. The map then shows the same Start sheet as paste coordinates, with the path filled in. Save keeps the original file name unless the file already has a name inside it. Teleport, Walk, and Start work the same as paste. If the app is already open, that sheet still appears. If the file is not a GPX, a short message says it could not be opened.</li>
+        <li><strong>Draw on map</strong>: place stops by hand.</li>
+        <li><strong>Draw on map (follow roads)</strong>: the route follows real streets.</li>
+        <li><strong>Draw on map (teleport)</strong>: you jump between stops.</li>
+        <li><strong>Paste coordinates</strong>: build a route from a list of points.</li>
+        <li><strong>Import GPX file</strong>: import an existing route.</li>
       </ul>
     </div>
+    <p>
+      You can also <a href="map.html#open-gpx">open a GPX file from another app</a>.
+      Routes with thousands of points are skipped, and a message shows how many.
+    </p>
 
     <h2 id="route-types">Route types</h2>
     <div class="table-wrap">
@@ -65,15 +70,15 @@
       <tbody>
         <tr>
           <td><strong>Straight</strong></td>
-          <td>You move between stops in straight lines at your current speed. No internet connection is needed. This is the default for imported routes.</td>
+          <td>You move between stops in straight lines at your current speed. Works offline. Imported routes use this type.</td>
         </tr>
         <tr>
           <td><strong>Guided (road-following)</strong></td>
-          <td>Each stretch between stops is sent to an online road routing service at <a href="https://router.project-osrm.org" target="_blank" rel="noopener">router.project-osrm.org</a>, which returns a path along real roads. The Walk and Run speeds use walking directions; the Bike speed uses cycling directions. If the service can't be reached, that stretch <a href="map.html#road-routing-fallback">falls back to a straight line</a>. The road path is saved after it's fetched once, so later replays don't need to fetch it again.</td>
+          <td>Each stretch between stops follows real roads. The app loads the roads from an online service, <a href="https://router.project-osrm.org" target="_blank" rel="noopener">router.project-osrm.org</a>. Walk and Run use walking roads. Bike uses cycling roads. If the service is unreachable, that stretch <a href="map.html#road-routing-fallback">uses a straight line</a>. The app saves the road path after the first load, so replays work offline.</td>
         </tr>
         <tr>
           <td><strong>Teleport</strong></td>
-          <td>You jump straight between stops instead of walking. When you place a stop while drawing this kind of route, you're asked how many seconds to stay there before jumping to the next one (at least 1 second). During playback, you stay at each stop for the time you set, then jump straight to the next one — no movement in between. Follow roads has no effect on this route type, since nothing walks between the stops.</td>
+          <td>You jump between stops instead of walking. When you place a stop, the app asks how many seconds to stay there (at least 1). During playback, you wait at each stop, then jump to the next. Follow roads has no effect on this type.</td>
         </tr>
       </tbody>
     </table>
@@ -81,8 +86,7 @@
 
     <h2 id="replay-options">Replay options</h2>
     <p>
-      Tapping play on a saved route opens a sheet with these options. Cancel and Start sit at
-      the bottom of that sheet — you should not need to drag it up to reach them.
+      Tap play on a saved route to open a sheet with these options. Cancel and Start are at the bottom of the sheet.
     </p>
     <div class="table-wrap">
     <table class="option-table">
@@ -90,43 +94,43 @@
       <tbody>
         <tr>
           <td><strong>Loop</strong></td>
-          <td>Checked when you open the sheet. Once you reach the last stop, playback starts over from the first. It keeps going until you stop it.</td>
+          <td>On when the sheet opens. After the last stop, playback restarts from the first. It continues until you stop it.</td>
         </tr>
         <tr>
           <td><strong>Planting</strong></td>
-          <td>Walks a circle around each saved stop during playback, instead of through its center. The saved route is not changed. After the last circle, playback walks back to the start of the first circle and repeats until you stop it. Loop is turned on automatically. Combine with Follow roads to travel between circles along roads. Combine with Teleport between waypoints to walk each circle, then jump to the next one.</td>
+          <td>Walks a circle around each stop instead of through its center. The saved route does not change. Turns Loop on. With Follow roads, only travel between circles follows roads. With Teleport between waypoints, you walk each circle, then jump to the next.</td>
         </tr>
         <tr>
           <td><strong>Reverse</strong></td>
-          <td>Plays the stops in reverse order, from last to first. You can combine this with loop.</td>
+          <td>Plays the stops from last to first. Works with Loop.</td>
         </tr>
         <tr>
           <td><strong>Return to start</strong></td>
-          <td>After the last stop, you walk back to the first one before stopping. This avoids a sudden jump in position when the route ends.</td>
+          <td>After the last stop, you walk back to the first stop. This avoids a sudden jump when the route ends.</td>
         </tr>
         <tr>
           <td><strong>Follow roads</strong></td>
-          <td>Not available for teleport routes. When checked, movement between each stop follows real roads instead of a straight line. If jump-to-location options are hidden in Settings, this also applies to the walk to the first stop before playback starts. With Planting also on, only the travel between circles follows roads — the circles themselves stay round.</td>
+          <td>Not available for teleport routes. Movement between stops follows real roads. If teleport options are hidden in Settings, this also applies to the walk to the first stop.</td>
         </tr>
         <tr>
           <td><strong>Teleport between waypoints</strong></td>
-          <td>Jumps from stop to stop instead of walking the stretches in between. Playback waits at the first stop, then after each jump waits again so other apps still see you there — 8 seconds unless you change the delay box next to the checkbox (0 still waits a short moment so jumps do not all happen at once; the longest wait is 10 minutes). With Planting also on, each circle is walked all the way around, then you jump to the start of the next circle — the same as skipping ahead by hand. Hidden when jump-to-location options are turned off in Settings.</td>
+          <td>Jumps from stop to stop instead of walking. Playback waits at each stop before the next jump. The default wait is 8 seconds. Change it in the box next to the checkbox (up to 10 minutes). Hidden when teleport options are off in Settings.</td>
         </tr>
         <tr>
           <td><strong>Teleport</strong></td>
-          <td>Jump straight to the route's first stop without starting playback. Press Start afterward when you're ready. Hidden when jump-to-location options are turned off in Settings. This still jumps to the stop itself when Planting is on.</td>
+          <td>Jumps to the first stop without starting playback. Tap Start when you are ready. With Planting on, it still jumps to the stop itself. Hidden when teleport options are off in Settings.</td>
         </tr>
         <tr>
           <td><strong>Start</strong></td>
-          <td>Jumps to the first stop (or the last stop, if Reverse is checked) and begins playback. Loop is on unless you turn it off. If Planting is on, playback then walks a circle around each stop. If Teleport between waypoints is on, playback waits at the first stop, then jumps to the next and waits again — 8 seconds unless you change the delay box. If jump-to-location options are turned off in Settings, you walk to that point first instead.</td>
+          <td>Jumps to the first stop (the last stop if Reverse is on) and starts playback. If teleport options are off in Settings, you walk to that point instead.</td>
         </tr>
         <tr>
           <td><strong>Pause / Resume</strong></td>
-          <td>Pauses movement while holding your position in place. Available from the widget and the map while a route is running. You can steer with the joystick while a route is paused. Resume jumps to the next stop, then continues the route from there. Pause or stop the route to start roaming.</td>
+          <td>Pauses movement and holds your position. Available from the widget and the map while a route runs. You can steer with the joystick while paused. Resume jumps to the next stop and continues. Pause or stop the route before you start roaming.</td>
         </tr>
         <tr>
           <td><strong>Previous / Next stop</strong></td>
-          <td>Jump straight to the stop before or after the one you're on, without waiting for the app to walk there. Available from the widget and the routes screen while a route is running. On a teleport route, jumping to a stop always restarts its full wait time, even if you'd already been waiting there before. With Teleport between waypoints on, you land on that one stop and wait there for the same delay as the automatic jumps, then playback continues — Previous does not stay put, and Next does not skip an extra stop.</td>
+          <td>Jumps to the stop before or after the current one. Available from the widget and the routes screen while a route runs. You then wait the usual delay before playback continues. Turn it on in <a href="settings.html#route-jump-buttons">Settings</a>.</td>
         </tr>
       </tbody>
     </table>
@@ -134,73 +138,57 @@
 
     <h2 id="paste-coordinates">Paste coordinates</h2>
     <p>
-      Paste a list of coordinates to turn them into a saved route. The app cleans up messy text:
-      numbered lists, emoji, coordinates that used a dot instead of a comma between lat and lon,
-      and degrees-minutes-seconds copied from a map app (for example
-      <code>37°34'11.4"N 127°00'17.9"E</code>).
-      Headings and notes can stay in the list. Lines the app does not recognize are skipped as a
-      whole, so numbers in a note are not mistaken for a location.
+      Paste a list of coordinates to make a saved route. The app ignores lines it does not recognize, so you can keep headings and notes.
       Check <strong>Swap lat / lon order</strong> when the first number is longitude.
-      If you leave the app to copy more coordinates from another app, this screen stays open until you save or go back.
+      The <a href="map.html#paste-coordinates">paste box on the map and widget</a> accepts the same text and can start a route without saving.
     </p>
     <ul class="section-bullets">
-      <li><strong>As-is</strong> connects the cleaned points with straight lines. No internet needed.</li>
-      <li><strong>Walkable path</strong> follows real footpaths between the points. Needs internet for the first build; the path is saved so later replays work offline.</li>
-      <li><strong>Planting mode</strong> walks a circle around each pasted point (35 meters by default) instead of walking through its center. Travel between circles can be a straight line or via roads. To circle stops on a route you already saved, turn on Planting when you start playback instead — that does not change the saved route.</li>
-      <li><strong>Optimize proximity</strong> reorders the points so each stop is near the previous one, instead of keeping the pasted order.</li>
+      <li><strong>As-is</strong> joins the points with straight lines. Works offline.</li>
+      <li><strong>Walkable path</strong> follows real footpaths. Needs internet the first time. The app saves the path for offline replays.</li>
+      <li><strong>Planting mode</strong> walks a circle (35 meters by default) around each point instead of through it. It needs one point. The other modes need two or more.</li>
+      <li><strong>Optimize proximity</strong> reorders the points so each stop is near the previous one.</li>
     </ul>
-    <p>One paste makes one route. A single point is enough for Planting mode (one circle). The other modes need at least two points.</p>
-    <p>
-      The paste box on the map and on the floating widget is a quicker path. Exactly one valid point offers Teleport, Walk, and Walk via roads.
-      With two or more points it switches automatically to route actions, where you can save a named route or tap Start route to play the list right away (loop, reverse, return, follow roads, planting, and teleport between waypoints).
-      Save first as favorite intentionally keeps only the first point; Save route keeps the full sequence.
-      Starting without saving keeps one temporary route in your list named <code>Temp Route from Paste</code>. The next Start from paste replaces that one route only.
-      A route you saved under your own name stays, even if you pick the same title.
-    </p>
-    <p>
-      Opening a GPX file from another app uses this same box on the map. The title says Open GPX, the points are already filled, and Save route suggests the original file name when the path itself has no name. Chat apps may send the file as a generic document; this app still appears for those, but not for photos or app installer files. If the app is already open, the sheet still appears. If the file is not a GPX, a short message says it could not be opened.
-      The paste box grows up to 10 lines, then scrolls. The top and bottom edges fade so you can tell there is more. Select all and Clear all sit under it.
-    </p>
+    <p>One paste makes one route. A route started without saving appears as <code>Temp Route from Paste</code>. The next start replaces it. Routes you saved under your own name stay.</p>
 
     <h2 id="route-creator">Route creator</h2>
-    <p>Place stops by tapping the map. The route draws itself as a line as you add each point.</p>
+    <p>Tap the map to place stops. A line draws between them.</p>
 
-    <div class="feature-section" id="route-creator">
+    <div class="feature-section" id="route-creator-shot">
       <img class="phone-shot" src="screenshots/09_route_creator.png" alt="Route creator screen">
       <ul class="section-bullets">
-        <li>Search for a location by name using the search button, backed by <a href="https://nominatim.openstreetmap.org" target="_blank" rel="noopener">nominatim.openstreetmap.org</a>.</li>
-        <li>Undo the last stop you placed with the undo button.</li>
-        <li>Choose between a straight line, road-following, or teleport before saving.</li>
-        <li>On a teleport route, placing a stop asks how many seconds to stay there before jumping onward.</li>
-        <li>Record mode: tap record to capture your phone's real movement as a new route as you walk.</li>
+        <li>Search for a place by name with the search button. Search uses <a href="https://nominatim.openstreetmap.org" target="_blank" rel="noopener">nominatim.openstreetmap.org</a>.</li>
+        <li>Use the heart button to pick a favorite. The map moves there so you can place a stop. Use the target button to center the map on your position.</li>
+      <li>Undo the last stop with the undo button.</li>
+        <li>Before you save, choose straight, road-following, or teleport.</li>
+        <li>On a teleport route, each stop asks how many seconds to stay. The default is 5. The minimum is 1.</li>
+        <li>Record mode: tap record to save your phone's real movement as a route while you walk.</li>
       </ul>
     </div>
 
     <h2 id="route-detail">Route detail</h2>
-    <p>Edit an existing route: rename it, reorder or remove individual stops, or change how it moves between them.</p>
+    <p>Rename a route, reorder or remove stops, or change how it moves between stops.</p>
 
-    <div class="feature-section" id="route-detail">
+    <div class="feature-section" id="route-detail-shot">
       <img class="phone-shot" src="screenshots/10_route_detail.png" alt="Route detail / edit screen">
       <ul class="section-bullets">
-        <li>Drag stops in the list to reorder them.</li>
-        <li>Tap a stop to highlight it on the map preview.</li>
-        <li>Choose the speed this route plays back at from a dropdown, or leave it on "None" to use whatever speed is currently active. Hidden for teleport routes, since nothing moves between stops there.</li>
-        <li>On a teleport route, each stop has an edit button to change how many seconds you wait there. A "Set wait time for all stops" button above the list sets the same wait time everywhere at once — handy for a route with many stops.</li>
-        <li>On a teleport route, a "Randomize order" switch makes each run jump between stops in a random order instead of the saved order, picking a new random order again every time a looping route restarts.</li>
-        <li>Switching a route from straight to road-following looks up the road path again the next time you start it.</li>
-        <li>Delete the route for good from the action bar.</li>
+        <li>Drag stops to reorder them.</li>
+        <li>Tap a stop to highlight it on the map.</li>
+        <li>Choose the speed for this route, or choose "None" to use the current speed. Hidden for teleport routes.</li>
+        <li>On a teleport route, each stop has an edit button for its wait time. "Set wait time for all stops" sets one wait time for every stop.</li>
+        <li>On a teleport route, "Randomize order" jumps between stops in a random order. A looping route picks a new order each time it restarts.</li>
+        <li>If you switch a route from straight to road-following, the app loads the roads again the next time you start it.</li>
+        <li>Delete the route from the action bar. This cannot be undone.</li>
       </ul>
     </div>
 
     <h2 id="hot-routes">Hot routes</h2>
     <p>
-      In Settings, under Routes, turning on <strong>Show hot routes</strong> adds a curated set of
-      ready-made routes for popular event locations around the world: large walking areas, parks,
-      and landmarks that come in handy for spoofing your location. This is off by default.
+      In Settings, turn on <strong>Show hot routes</strong> to add ready-made routes for popular event locations around the world.
+      They include large walking areas, parks, and landmarks. This is off by default.
     </p>
     <ul class="section-bullets">
-      <li>Turning it off removes only the routes this feature added. Your own routes are never touched.</li>
-      <li>The setting sticks across app restarts and is included when you export or import your data.</li>
+      <li>Turning it off removes only the routes this feature added. Your own routes stay.</li>
+      <li>The setting is kept when you restart the app. Export and import include it.</li>
     </ul>
 
     <h2 id="import-formats">Import formats</h2>
@@ -210,19 +198,19 @@
       <tbody>
         <tr>
           <td><strong>GPX</strong></td>
-          <td>A common file format for GPS tracks and routes. Both recorded tracks and planned routes are supported, and both come in as straight-line routes. Any elevation data in the file is ignored, since locationjoystick handles altitude separately through the GPS realism settings.</td>
+          <td>A common file format for GPS tracks and routes. Recorded tracks and planned routes both work. Both become straight-line routes. The app ignores elevation in the file. Altitude comes from the GPS realism settings.</td>
         </tr>
         <tr>
           <td><strong>GPS Joystick</strong></td>
-          <td>Export a GPX file from GPS Joystick, then import it from Settings. Named places become favorites, and each route is saved as straight-line segments. Routes with thousands of points are skipped, with a message telling you how many.</td>
+          <td>Export a GPX file from GPS Joystick, then import it from Settings. Named places become favorites. Each route becomes straight lines. Routes with thousands of points are skipped, and a message shows how many.</td>
         </tr>
         <tr>
           <td><strong>YAMLA</strong></td>
-          <td>The export file from the YAMLA app. Favorites and speed settings come across; routes are imported as straight-line segments.</td>
+          <td>The export file from the YAMLA app. Favorites and speeds are imported. Routes become straight lines.</td>
         </tr>
         <tr>
           <td><strong>locationjoystick backup</strong></td>
-          <td>The app's own backup format. Keeps everything, including route type, stops, and other details. Choose Add to merge it with what you already have, or Replace to overwrite it.</td>
+          <td>The app's own backup. It keeps everything, including route type and stops. Choose Add to merge it with your data, or Replace to overwrite your data.</td>
         </tr>
       </tbody>
     </table>

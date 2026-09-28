@@ -39,35 +39,32 @@
   <main>
     <h1 class="page-title">locationjoystick</h1>
     <p>
-      Change the location your phone reports on Android. Move a floating joystick,
-      replay a saved route, or let the app wander for you, and your other apps keep
-      working like nothing changed.
+      Change the location your phone reports. Move a floating joystick, play a saved route,
+      or let the app wander for you. Your other apps see the new location.
     </p>
     <p>
-      The app plugs into a location setting built into Android. Turn on Developer
-      Options, pick locationjoystick as the app allowed to set your location, and
-      every app on your phone sees the position you choose.
+      The app uses a location setting built into Android. Turn on Developer Options and pick
+      locationjoystick as the mock location app. Every app on your phone then sees the position you choose.
     </p>
 
     <div class="feature-section" id="home-screen">
       <img class="phone-shot" src="screenshots/01_idle.png" alt="Home screen with feature cards">
       <ul class="section-bullets">
-        <li>The Home screen lists every part of the app: Map, Routes, Favorites, Capture, Group Sync, and Settings.</li>
-        <li>The button at the top starts and stops location spoofing from any screen. When spoofing is off it also names the place you are about to start from.</li>
+        <li>The Home screen links to every part of the app: Map, Routes, Favorites, Capture, Group Sync, and Settings.</li>
+        <li>The button at the top starts and stops spoofing from any screen. When spoofing is off, it names the place you will start from.</li>
       </ul>
     </div>
 
     <h2 id="install">Install</h2>
     <ol class="quickstart">
       <li><a href="https://github.com/shortcuts/locationjoystick/releases/latest" target="_blank" rel="noopener">Download the latest APK</a> from GitHub Releases.</li>
-      <li>Open the downloaded file. If you see a prompt to <em>"Allow installs from unknown sources"</em>, turn it on in Settings for your browser or file manager, then come back and try again.</li>
-      <li>You may see an <em>"App scan recommended"</em> message from Google Play Protect. This warning shows up for any app installed outside the Play Store, and it's nothing to worry about. Tap <strong>Install without scanning</strong>, or scan first if you'd rather. Both work fine.</li>
+      <li>Open the downloaded file. If Android asks you to <em>"Allow installs from unknown sources"</em>, turn it on for your browser or file manager, then try again.</li>
+      <li>Google Play Protect may show <em>"App scan recommended"</em>. It appears for any app installed outside the Play Store. Tap <strong>Install without scanning</strong>, or scan first.</li>
     </ol>
 
     <h2 id="first-run-setup">First-run setup</h2>
     <p>
-      The first time you open the app, it walks you through three permissions it
-      needs before it can work.
+      The first time you open the app, it guides you through the setup below.
     </p>
 
     <ul class="step-list">
@@ -75,8 +72,7 @@
         <div>
           <strong>Location permission</strong>
           <p>
-            Grant <strong>Precise location</strong> so the map can center on where you are
-            and route recording works properly.
+            Grant <strong>Precise location</strong>. The map uses it to center on you, and route recording needs it.
           </p>
         </div>
       </li>
@@ -84,9 +80,8 @@
         <div>
           <strong>Overlay permission</strong>
           <p>
-            Grant <strong>Display over other apps</strong> to turn on the floating joystick
-            and widget. The app opens the system settings page for you. Turn on locationjoystick
-            in the list, then go back to the app.
+            Grant <strong>Display over other apps</strong> for the floating joystick and widget.
+            The app opens the settings page. Turn on locationjoystick in the list, then go back to the app.
           </p>
         </div>
       </li>
@@ -94,11 +89,9 @@
         <div>
           <strong>Mock location provider</strong>
           <p>
-            Turn on <strong>Developer Options</strong> on your device (go to Settings, then About
-            phone, then tap Build number seven times), then go to Settings, then Developer Options,
-            then <strong>Select mock location app</strong> and choose locationjoystick.
-            Tap <strong>Check again</strong> in the app. It checks the setting and moves you forward
-            automatically once it's correct.
+            First, turn on <strong>Developer Options</strong>: go to Settings &rarr; About phone and tap Build number seven times.
+            Then go to Settings &rarr; Developer Options &rarr; <strong>Select mock location app</strong> and choose locationjoystick.
+            Tap <strong>Check again</strong> in the app. It moves on when the setting is correct.
           </p>
         </div>
       </li>
@@ -106,12 +99,10 @@
         <div>
           <strong>Compass orientation (optional)</strong>
           <p>
-            Tap to Walk can read your game's compass so each tap walks the right way. This uses
-            Android's Accessibility permission, so tapping <strong>Review and turn on</strong> first
-            shows a full-screen explanation of exactly what it reads and that nothing leaves your
-            phone. Tap <strong>Accept</strong> to open Android's Accessibility settings and turn on
-            <strong>locationjoystick compass</strong>, or <strong>Decline</strong> to skip it.
-            Everything else works without it.
+            <a href="tap-to-walk.html">Tap to Walk</a> can read your game's compass so each tap walks the right way.
+            It uses Android's Accessibility permission. Tap <strong>Review and turn on</strong> to see what it reads.
+            Nothing leaves your phone. Tap <strong>Accept</strong>, then turn on <strong>locationjoystick compass</strong> in Android's Accessibility settings.
+            Or tap <strong>Decline</strong> to skip it. Everything else works without it.
           </p>
         </div>
       </li>
@@ -119,29 +110,32 @@
         <div>
           <strong>All done</strong>
           <p>
-            Setup finishes and you land on the Map screen, ready to go. You won't see
-            this flow again unless you clear the app's data.
+            Setup ends and the Map screen opens. You see setup again only if you clear the app's data.
           </p>
         </div>
       </li>
     </ul>
 
     <h2 id="start-spoofing">Start changing your location</h2>
-    <p>Tap <strong>Map</strong>, tap the start button, then long-press anywhere on the map to walk or teleport there. Use the floating widget or joystick to control your location while you're in another app.</p>
+    <p>Tap <strong>Map</strong>, tap the start button, then long-press the map to walk or teleport there. Use the floating widget or joystick to control your location from other apps.</p>
 
     <h2 id="updating">Updating</h2>
-    <p>Open the new APK file. Android will ask <em>"Replace app?"</em> and keep your data as it is.</p>
+    <p>Open the new APK file. Android asks <em>"Replace app?"</em>. Your data stays.</p>
 
     <h3 id="switching-from-the-play-store-version">Switching from the Play Store version</h3>
     <p>
-      The Play Store version and the GitHub version are signed differently, so Android won't let
-      you update directly from one to the other. Export your data first via <strong>Settings, Export</strong>,
-      then uninstall the Play Store version, install the GitHub APK, and import your data back in.
+      Android cannot update directly between the Play Store version and the GitHub version. To switch:
     </p>
+    <ol>
+      <li>Export your data: <strong>Settings &rarr; Export</strong>.</li>
+      <li>Uninstall the Play Store version.</li>
+      <li>Install the GitHub APK.</li>
+      <li>Import your data.</li>
+    </ol>
 
     <h2 id="home-badges">Home screen badges</h2>
-    <p><strong>Update available.</strong> When a newer release exists on GitHub, a small badge such as <em>v1.2.3 available</em> shows on the Home screen. The app checks about once a day when you open it, so it needs an internet connection and quietly does nothing when you're offline. Tap the badge to open that release's page in your browser. Tap the <strong>X</strong> to hide it without opening anything. Either way, it stays hidden until an even newer version comes out. There is no setting to turn the check off.</p>
-    <p><strong>What's new.</strong> After an update, a second badge on Home lets you see what changed in your current version. Tap it to read the list of new features and fixes. It works offline. Tap the <strong>X</strong> to dismiss it without reading. It stays hidden until the next version. The full history is on the <a href="changelog.html">changelog</a> page.</p>
+    <p><strong>Update available.</strong> When GitHub has a newer release, a badge such as <em>v1.2.3 available</em> appears on the Home screen. The app checks about once a day and needs internet. Tap the badge to open the release page. Tap <strong>X</strong> to hide it. The badge stays hidden until a newer version comes out. You cannot turn the check off.</p>
+    <p><strong>What's new.</strong> After an update, a second badge shows what changed. Tap it to read the new features and fixes. It works offline. Tap <strong>X</strong> to dismiss it until the next version. See the <a href="changelog.html">changelog</a> for the full history.</p>
 
     <h2 id="source">Source</h2>
     <p>
@@ -149,8 +143,7 @@
       Free, open source, under the MIT license.
     </p>
     <p>
-      See <a href="acknowledgements.html">Acknowledgements</a> for the full list of open-source
-      projects and data sources this app is built on.
+      See <a href="acknowledgements.html">Acknowledgements</a> for the open-source projects and data sources the app uses.
     </p>
   </main>
 

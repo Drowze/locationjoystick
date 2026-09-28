@@ -26,32 +26,32 @@
   <main>
     <h1 id="group-sync">Group Sync</h1>
     <p>
-      Share one location across multiple devices on the same Wi-Fi network. One device
-      acts as the leader and sends out its position, and the rest follow along automatically.
-      No account needed — see the <a href="privacy.html#no-cloud">privacy policy</a> for the app's no-cloud stance.
+      Share one location across several devices on the same Wi-Fi network. One device is the leader and sends its position.
+      The other devices follow. No account is needed.
+      See the <a href="privacy.html#no-cloud">privacy policy</a>.
     </p>
 
     <div class="feature-section" id="group-main">
       <img class="phone-shot" src="screenshots/17_group_sync.png" alt="Group Sync screen">
       <ul class="section-bullets">
         <li>One device creates the group and becomes the leader.</li>
-        <li>Other devices join by scanning a QR code shown on the leader's screen, or by typing a short join code shown next to it.</li>
-        <li>Followers walk toward the leader's location automatically over the same Wi-Fi, moving at their own current speed.</li>
-        <li>It all stays between the devices themselves, over the local Wi-Fi network.</li>
+        <li>Other devices join by scanning the QR code on the leader's screen, or by typing the 6-character join code next to it.</li>
+        <li>Followers walk toward the leader's location at their own current speed.</li>
+        <li>Everything stays between the devices on your Wi-Fi network.</li>
       </ul>
     </div>
 
     <h2 id="how-it-works">How it works</h2>
     <ol class="section-bullets">
-      <li>The leader opens <strong>Group Sync</strong> from the navigation drawer and taps <strong>Create group: I'm the leader</strong>.</li>
-      <li>A QR code and a short join code appear on the leader's screen. Either one identifies the group.</li>
-      <li>Each follower opens <strong>Group Sync</strong> on their own device, then either scans the QR code with their camera or types the join code by hand.</li>
-      <li>The follower joins automatically and starts following the leader right away (<strong>Follow leader</strong> is on).</li>
+      <li>On the leader, open <strong>Group Sync</strong> from the side menu and tap <strong>Create group: I'm the leader</strong>.</li>
+      <li>A QR code and a short join code appear. Either one identifies the group.</li>
+      <li>On each follower, open <strong>Group Sync</strong>. Scan the QR code or type the join code.</li>
+      <li>The follower joins and starts following at once. <strong>Follow leader</strong> is on.</li>
     </ol>
 
     <h2 id="leader">Leader</h2>
     <p>
-      The leader device shares its current location with every connected follower once a second, over the local Wi-Fi network.
+      The leader sends its location to every follower once a second.
     </p>
 
     <div class="table-wrap">
@@ -60,15 +60,15 @@
       <tbody>
         <tr>
           <td><strong>QR code</strong></td>
-          <td>Shows the join invite, plus the join code as text for typing in by hand. Tap the refresh icon to generate a fresh QR code without changing the join code.</td>
+          <td>Shows the join invite and the join code as text. Tap the refresh icon for a new QR code. The join code stays the same.</td>
         </tr>
         <tr>
           <td><strong>Sharing</strong> toggle</td>
-          <td>When on, the leader actively sends its position to followers. Turn it off to pause sharing without leaving the group.</td>
+          <td>When on, the leader sends its position. Turn it off to pause sharing and stay in the group.</td>
         </tr>
         <tr>
           <td><strong>Leave group</strong></td>
-          <td>Removes the device from the group. All followers lose the connection and stop getting updates.</td>
+          <td>Removes this device from the group. Followers lose the connection and stop getting updates.</td>
         </tr>
       </tbody>
     </table>
@@ -76,15 +76,12 @@
 
     <h2 id="follower">Follower</h2>
     <p>
-      Each follower connects to the leader and receives its position updates. Instead of jumping
-      straight there, the follower's location walks toward the leader's, at whatever speed
-      (Slow Walk, Walk, Run, Bike, or Drive) is currently set on that device. If the follower
-      starts far away, it may take a while to catch up, and it may never fully catch up if the
-      leader keeps moving. That's intentional, so the movement always looks like a real walk
-      rather than a sudden jump.
+      A follower does not jump to the leader's position. It walks there at the speed set on that device
+      (Slow Walk, Walk, Run, Bike, or Drive). If the follower starts far away, catching up can take a while.
+      If the leader keeps moving, the follower may never fully catch up. This is on purpose, so the movement looks like a real walk.
     </p>
     <p>
-      If the leader stops sharing its spot and later starts again, followers pause and then jump to the leader's new location.
+      If the leader stops sharing and later starts again, followers pause and then jump to the leader's new location.
     </p>
 
     <div class="table-wrap">
@@ -93,19 +90,19 @@
       <tbody>
         <tr>
           <td><strong>Follow leader</strong> toggle</td>
-          <td>On by default when you join a group. When on, the device walks toward the leader's location as it updates. Turn it off to pause following while staying in the group. Moving the joystick also turns it off, so you can walk on your own.</td>
+          <td>On by default when you join. When on, the device walks toward the leader. Turn it off to pause following and stay in the group. Moving the joystick also turns it off.</td>
         </tr>
         <tr>
           <td><strong>Follow leader teleports</strong> toggle</td>
-          <td>On by default. When the leader teleports, or stops, moves and starts again somewhere new, your device jumps there too. Turn it off to walk there instead. Hidden when teleport features are hidden in Settings, and your device then always walks.</td>
+          <td>On by default. When the leader teleports, or stops and restarts somewhere new, your device jumps there too. Turn it off to walk there instead. Hidden when teleport features are hidden in Settings. Your device then always walks.</td>
         </tr>
         <tr>
           <td><strong>Teleport to leader now</strong></td>
-          <td>Jumps straight to the leader's last known position right away, instead of walking there. Shown while Follow leader is on.</td>
+          <td>Jumps to the leader's last known position at once. Shown while Follow leader is on. A badge next to it shows the <a href="map.html#teleport-wait">suggested wait</a> before you jump. If the app does not know the leader's position yet, it asks you to try again in a moment.</td>
         </tr>
         <tr>
           <td><strong>Leave group</strong></td>
-          <td>Disconnects from the leader and clears the saved connection details.</td>
+          <td>Disconnects from the leader and clears the saved connection.</td>
         </tr>
       </tbody>
     </table>
@@ -113,30 +110,28 @@
 
     <h2 id="persistence">Persistence</h2>
     <p>
-      A follower's connection details are saved on the device. If <strong>Follow leader</strong>
-      was turned on when the app last closed, following starts again automatically the next time
-      you open the app, even after a device restart.
+      The app saves a follower's connection. If <strong>Follow leader</strong> was on when you closed the app,
+      following restarts when you open it again, even after a restart of the phone.
     </p>
     <p>
-      A leader's role is saved the same way — the group starts back up automatically the next
-      time the app opens, including after a device restart, without needing to tap
-      <strong>Create group</strong> again.
+      The app also saves a leader's role. The group starts again when you open the app.
+      You do not need to tap <strong>Create group</strong> again.
     </p>
 
     <h2 id="requirements">Requirements</h2>
     <ul class="section-bullets">
       <li>All devices must be on the <strong>same Wi-Fi network</strong>.</li>
-      <li>Mock location must be turned on separately on each device. A follower spoofs its own location using the position it receives.</li>
-      <li>No extra permissions are needed beyond what the app already asks for.</li>
+      <li>Set up mock location on each device. A follower uses the position it receives as its fake location.</li>
+      <li>No extra permissions are needed.</li>
     </ul>
 
     <h2 id="limitations">Limitations</h2>
     <ul class="section-bullets">
-      <li>Mobile data or a VPN can prevent a device from reaching the leader's local address.</li>
-      <li>If the leader's network address changes, for example after its own app restarts, followers try to reconnect automatically for a short while before giving up; if that fails, rejoin by scanning a new QR code or re-entering the join code.</li>
-      <li>Some phone hotspots don't allow the join code to find the leader (a Wi-Fi limitation on the hotspot's end) — scanning the QR code works around it, since it doesn't need that discovery step.</li>
-      <li>A leader can only run one active group at a time.</li>
-      <li>A follower joining far from the leader walks there at its own speed instead of jumping instantly, though later leader teleports carry followers along unless <strong>Follow leader teleports</strong> is off. Use <strong>Teleport to leader now</strong> for an immediate jump.</li>
+      <li>Mobile data or a VPN can stop a device from reaching the leader.</li>
+      <li>If the leader's network address changes, for example after the leader restarts the app, followers try to reconnect for a short time. If that fails, rejoin with a new QR code or the join code.</li>
+      <li>Some phone hotspots block the join code from finding the leader. Scan the QR code instead.</li>
+      <li>A leader can run only one group at a time.</li>
+      <li>A follower that joins far from the leader walks there at its own speed. Later leader teleports carry followers along unless <strong>Follow leader teleports</strong> is off. Use <strong>Teleport to leader now</strong> to jump at once.</li>
     </ul>
   </main>
 
