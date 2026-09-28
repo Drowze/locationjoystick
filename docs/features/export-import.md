@@ -103,3 +103,4 @@ Key files: `:feature:settings:impl/SettingsScreen.kt` (`ResetAllDataConfirmDialo
 - Skip confirmation on fresh install (empty DB).
 - GPX file exceeds max size → show "File too large" error.
 - Invalid third-party format → show "Invalid file" error.
+- The control-API key (Group Sync) is a secret and is never exported.

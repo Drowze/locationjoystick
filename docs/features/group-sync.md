@@ -139,6 +139,17 @@ earlier than that.
 - **Both open around the same time**: exponential backoff with jitter prevents thundering herd; most followers reconnect within 10–15 seconds.
 - **Wi-Fi disconnected at restoration start**: restoration retries continue; once Wi-Fi reconnects, discovery succeeds on the next attempt.
 
+## Control API foundation
+
+The leader's sync server (same socket, same port) also serves a versioned control API under `/api/v1/`. Only the leader can expose it.
+
+- Off by default. `LeaderSyncServer.enableApi(key)` turns it on (only while the server runs); `stop()` (leave group, app exit) turns it off. While off, every `/api/v1/` path returns 404.
+- Auth: `Authorization: Bearer <api key>`. The key is a persisted 32-char random string (`GroupRepository.getOrCreateApiKey()` / `regenerateApiKey()`), separate from the group code, and kept across leave-group. It is never exported. `/api/v1/` paths skip the `?token=` check; `/position` and `/health` are unchanged.
+- Routes: `registerApiRoute(method, path, handler)`, exact-path match. Built in: `GET /api/v1/status` returns `{"apiVersion":1,"role":"leader","followers":N}`.
+- Check order: disabled 404, bad key 401 (`WWW-Authenticate: Bearer`), body over 64 KiB 413, unknown path 404, wrong method 405 (`Allow`), handler exception 500.
+- Errors always use `{"error":{"code":"<snake_case>","message":"..."}}`.
+- Transport is plain HTTP on the local network only. No TLS, no internet exposure.
+
 ## Edge Cases
 
 - Leader pauses its route/roaming/walk → broadcasting to followers continues (frozen position, refreshed each tick) instead of going stale. `MockLocationService.observeLocationState` keeps the update loop alive on `PAUSED` when `leaderSharingEnabled` is true.

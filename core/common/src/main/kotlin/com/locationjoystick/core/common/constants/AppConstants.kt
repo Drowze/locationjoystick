@@ -368,6 +368,7 @@ object AppConstants {
         const val KEY_GROUP_FOLLOWER_MODE_ENABLED = "group_follower_mode_enabled"
         const val KEY_GROUP_FOLLOW_LEADER_TELEPORTS = "group_follow_leader_teleports"
         const val KEY_GROUP_SHARING_ENABLED = "group_sharing_enabled"
+        const val KEY_API_KEY = "api_key"
         const val KEY_CAPTURE_MODE_ENABLED = "capture_coordinates_mode_enabled"
         const val KEY_CAPTURE_ENABLED = "capture_coordinates_enabled"
         const val KEY_CAPTURE_JUMP_ENABLED = "capture_coordinates_jump_enabled"
@@ -526,6 +527,8 @@ object AppConstants {
         const val NSD_SERVICE_TYPE = "_ljsync._tcp."
         const val NSD_DISCOVERY_TIMEOUT_MS = 10_000L
         const val GROUP_CODE_LENGTH = 6
+        const val API_KEY_LENGTH = 32
+        const val API_MAX_BODY_BYTES = 65_536
 
         /**
          * At [POLL_INTERVAL_MS] (1s) + up to [POLL_TIMEOUT_MS] per attempt, 5 failures gave up

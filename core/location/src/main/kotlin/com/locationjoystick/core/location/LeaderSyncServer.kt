@@ -1,5 +1,6 @@
 package com.locationjoystick.core.location
 
+import android.util.Log
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.model.SyncPositionUpdate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.PrintWriter
 import java.net.Socket
+import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -17,6 +19,28 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "LeaderSyncServer"
+
+data class ApiResponse(
+    val status: Int,
+    val body: String,
+)
+
+/** Uniform API error body. Pass fixed strings only (no JSON escaping is done). */
+fun apiError(
+    status: Int,
+    code: String,
+    message: String,
+) = ApiResponse(status, "{\"error\":{\"code\":\"$code\",\"message\":\"$message\"}}")
+
+private val REASONS =
+    mapOf(
+        200 to "OK",
+        401 to "Unauthorized",
+        404 to "Not Found",
+        405 to "Method Not Allowed",
+        413 to "Payload Too Large",
+        500 to "Internal Server Error",
+    )
 
 @Singleton
 class LeaderSyncServer
@@ -29,6 +53,40 @@ class LeaderSyncServer
         private val _followerCount = MutableStateFlow(0)
         val followerCount: StateFlow<Int> = _followerCount.asStateFlow()
         private var cleanupExecutor: ScheduledExecutorService? = null
+
+        // Path -> method -> handler. Exact-path match only; later tasks register here.
+        // ponytail: handlers are non-suspend, run on the connection thread; bridge coroutines with runBlocking.
+        private val routes = ConcurrentHashMap<String, MutableMap<String, (ApiRequest) -> ApiResponse>>()
+
+        @Volatile private var apiKey: String? = null
+        private val _apiEnabled = MutableStateFlow(false)
+        val apiEnabled: StateFlow<Boolean> = _apiEnabled.asStateFlow()
+
+        init {
+            registerApiRoute("GET", "/api/v1/status") {
+                ApiResponse(200, "{\"apiVersion\":1,\"role\":\"leader\",\"followers\":${_followerCount.value}}")
+            }
+        }
+
+        fun registerApiRoute(
+            method: String,
+            path: String,
+            handler: (ApiRequest) -> ApiResponse,
+        ) {
+            routes.getOrPut(path) { ConcurrentHashMap() }[method] = handler
+        }
+
+        /** Enables the API with [key] (call again to rotate). No-op unless the server is running. */
+        fun enableApi(key: String) {
+            if (!isRunning) return
+            apiKey = key
+            _apiEnabled.value = true
+        }
+
+        fun disableApi() {
+            apiKey = null
+            _apiEnabled.value = false
+        }
 
         fun start(groupId: String): Int {
             val port = startServer(groupId)
@@ -45,6 +103,7 @@ class LeaderSyncServer
 
         fun stop() {
             stopServer()
+            disableApi()
             latestUpdate.set(null)
             seq.set(0L)
             cleanupExecutor?.shutdown()
@@ -65,6 +124,42 @@ class LeaderSyncServer
 
         override fun configureSocket(socket: Socket) {
             socket.soTimeout = AppConstants.SyncConstants.POLL_TIMEOUT_MS.toInt()
+        }
+
+        override fun handleApiRequest(
+            request: ApiRequest,
+            writer: PrintWriter,
+        ) {
+            val response = routeApi(request)
+            val bytes = response.body.toByteArray(Charsets.UTF_8)
+            val extra =
+                when (response.status) {
+                    401 -> "WWW-Authenticate: Bearer\r\n"
+                    405 -> "Allow: ${routes[request.path]?.keys?.sorted()?.joinToString(", ")}\r\n"
+                    else -> ""
+                }
+            writer.print(
+                "HTTP/1.1 ${response.status} ${REASONS[response.status]}\r\n$extra" +
+                    "Content-Type: application/json\r\nContent-Length: ${bytes.size}\r\n\r\n${response.body}",
+            )
+            writer.flush()
+        }
+
+        private fun routeApi(request: ApiRequest): ApiResponse {
+            val key = apiKey
+            if (key == null) return apiError(404, "not_found", "Not found")
+            val expected = "Bearer $key".toByteArray(Charsets.UTF_8)
+            val given = (request.headers["authorization"] ?: "").toByteArray(Charsets.UTF_8)
+            if (!MessageDigest.isEqual(expected, given)) return apiError(401, "unauthorized", "Missing or invalid API key")
+            if (request.body == null) return apiError(413, "payload_too_large", "Request body too large")
+            val methods = routes[request.path] ?: return apiError(404, "not_found", "Not found")
+            val handler = methods[request.method] ?: return apiError(405, "method_not_allowed", "Method not allowed")
+            return try {
+                handler(request)
+            } catch (e: Exception) {
+                Log.w(TAG, "API handler failed for ${request.path}", e)
+                apiError(500, "internal_error", "Internal error")
+            }
         }
 
         override fun handleRequest(

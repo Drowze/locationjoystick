@@ -10,8 +10,20 @@ import java.net.Socket
 import java.net.SocketException
 import java.util.concurrent.Executors
 
+const val API_PREFIX = "/api/v1/"
+
+/** [body] is null when the declared Content-Length is over the cap or unparsable. */
+data class ApiRequest(
+    val method: String,
+    val path: String,
+    val query: String,
+    val headers: Map<String, String>,
+    val body: String?,
+)
+
 /**
- * A minimal single-endpoint-family HTTP/1.1 server over a raw [ServerSocket], gated by a
+ * A minimal single-endpoint-family HTTP/1.1 server over a raw [ServerSocket], gated (non-API paths only;
+ * `/api/v1/` paths do their own auth) by a
  * `?token=` query param shared out-of-band (QR code / typed code / NSD).
  *
  * Shared by [LeaderSyncServer] (Group Sync) and [ExportSyncServer] (QR export) — both serve a
@@ -53,6 +65,15 @@ abstract class TokenAuthHttpServer(
         writer: PrintWriter,
     )
 
+    /** Called for `/api/v1/` requests, which bypass the `?token=` gate. Default: bare 404. */
+    protected open fun handleApiRequest(
+        request: ApiRequest,
+        writer: PrintWriter,
+    ) {
+        writer.print("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n")
+        writer.flush()
+    }
+
     /** Override to set per-socket options (e.g. read timeout) before the request is parsed. */
     protected open fun configureSocket(socket: Socket) {}
 
@@ -79,16 +100,40 @@ abstract class TokenAuthHttpServer(
         try {
             configureSocket(socket)
             socket.use {
-                val reader = BufferedReader(InputStreamReader(it.getInputStream()))
+                // latin1: one char == one byte, so Content-Length counts chars correctly.
+                val reader = BufferedReader(InputStreamReader(it.getInputStream(), Charsets.ISO_8859_1))
                 val writer = PrintWriter(it.getOutputStream(), true)
                 val requestLine = reader.readLine() ?: return
-                // Consume remaining headers
+                val headers = mutableMapOf<String, String>()
                 var line = reader.readLine()
                 while (!line.isNullOrBlank()) {
+                    headers[line.substringBefore(":").trim().lowercase()] = line.substringAfter(":", "").trim()
                     line = reader.readLine()
                 }
 
-                val path = requestLine.substringAfter("GET ").substringBefore(" HTTP")
+                val method = requestLine.substringBefore(" ")
+                val path = requestLine.substringAfter(" ").substringBefore(" HTTP")
+                if (path.startsWith(API_PREFIX)) {
+                    val declared = headers["content-length"]?.toIntOrNull() ?: 0
+                    val body =
+                        if (declared < 0 || declared > AppConstants.SyncConstants.API_MAX_BODY_BYTES) {
+                            null
+                        } else {
+                            val buf = CharArray(declared)
+                            var read = 0
+                            while (read < declared) {
+                                val n = reader.read(buf, read, declared - read)
+                                if (n < 0) break
+                                read += n
+                            }
+                            String(String(buf, 0, read).toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
+                        }
+                    handleApiRequest(
+                        ApiRequest(method, path.substringBefore("?"), path.substringAfter("?", ""), headers, body),
+                        writer,
+                    )
+                    return
+                }
                 val requestToken = extractQueryParam(path, "token")
 
                 if (requestToken != token) {

@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.security.SecureRandom
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,6 +40,7 @@ class GroupRepository
             val GROUP_FOLLOW_LEADER_TELEPORTS =
                 booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_FOLLOW_LEADER_TELEPORTS)
             val GROUP_SHARING_ENABLED = booleanPreferencesKey(AppConstants.DataStoreConstants.KEY_GROUP_SHARING_ENABLED)
+            val API_KEY = stringPreferencesKey(AppConstants.DataStoreConstants.KEY_API_KEY)
         }
 
         val groupState: Flow<GroupState> =
@@ -96,6 +99,17 @@ class GroupRepository
 
         suspend fun setSharingEnabled(enabled: Boolean) {
             dataStore.edit { prefs -> prefs[Keys.GROUP_SHARING_ENABLED] = enabled }
+        }
+
+        /** The control-API Bearer key. Survives [leaveGroup]; only [regenerateApiKey] replaces it. */
+        suspend fun getOrCreateApiKey(): String = dataStore.data.first()[Keys.API_KEY] ?: regenerateApiKey()
+
+        suspend fun regenerateApiKey(): String {
+            val chars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+            val rng = SecureRandom()
+            val key = String(CharArray(AppConstants.SyncConstants.API_KEY_LENGTH) { chars[rng.nextInt(chars.size)] })
+            dataStore.edit { it[Keys.API_KEY] = key }
+            return key
         }
 
         /** Follower-only, in-memory: the leader's last-known position, for cooldown/distance UI. Not persisted. */

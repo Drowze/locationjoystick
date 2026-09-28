@@ -190,4 +190,18 @@ class GroupRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `api key is 32 alnum chars, stable, regenerable and survives leaveGroup`() =
+        runTest {
+            val key = repository.getOrCreateApiKey()
+            assertTrue(Regex("[A-Za-z0-9]{32}").matches(key))
+            assertEquals(key, repository.getOrCreateApiKey())
+            repository.createGroup("h", 1, "abc")
+            repository.leaveGroup()
+            assertEquals(key, repository.getOrCreateApiKey())
+            val fresh = repository.regenerateApiKey()
+            assertTrue(fresh != key)
+            assertEquals(fresh, repository.getOrCreateApiKey())
+        }
 }

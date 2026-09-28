@@ -145,4 +145,104 @@ class LeaderSyncServerTest {
             conn.disconnect()
         }
     }
+
+    private fun call(
+        port: Int,
+        path: String,
+        method: String = "GET",
+        auth: String? = "Bearer k",
+        body: String? = null,
+        declaredLength: Int? = null,
+    ): Triple<Int, String, HttpURLConnection> {
+        val conn = URL("http://localhost:$port$path").openConnection() as HttpURLConnection
+        conn.requestMethod = method
+        auth?.let { conn.setRequestProperty("Authorization", it) }
+        if (body != null || declaredLength != null) {
+            conn.doOutput = true
+            val bytes = (body ?: "").toByteArray()
+            conn.setFixedLengthStreamingMode(declaredLength ?: bytes.size)
+            if (declaredLength == null) conn.outputStream.use { it.write(bytes) }
+        }
+        val code =
+            try {
+                conn.responseCode
+            } catch (_: java.io.IOException) {
+                // declaredLength without a body: server replies before we finish; treat as 413
+                413
+            }
+        val text = (if (code < 400) conn.inputStream else conn.errorStream)?.bufferedReader()?.readText() ?: ""
+        return Triple(code, text, conn)
+    }
+
+    @Test
+    fun `api disabled returns 404 while position still works`() {
+        val port = server.start("gid")
+        val (code, body, _) = call(port, "/api/v1/status")
+        assertEquals(404, code)
+        assertTrue(body.contains("\"code\":\"not_found\""))
+        assertEquals(204, call(port, "/position?token=gid", auth = null).first)
+    }
+
+    @Test
+    fun `enableApi when not started stays disabled`() {
+        server.enableApi("k")
+        assertTrue(!server.apiEnabled.value)
+    }
+
+    @Test
+    fun `api auth failures return 401 with challenge`() {
+        val port = server.start("gid")
+        server.enableApi("k")
+        for (auth in listOf(null, "Bearer wrong")) {
+            val (code, body, conn) = call(port, "/api/v1/status", auth = auth)
+            assertEquals(401, code)
+            assertEquals("Bearer", conn.getHeaderField("WWW-Authenticate"))
+            assertTrue(body.contains("\"code\":\"unauthorized\""))
+        }
+        assertEquals(401, call(port, "/api/v1/status?token=gid", auth = null).first)
+    }
+
+    @Test
+    fun `status returns leader info with correct key`() {
+        val port = server.start("gid")
+        server.enableApi("k")
+        val (code, body, _) = call(port, "/api/v1/status")
+        assertEquals(200, code)
+        assertEquals("{\"apiVersion\":1,\"role\":\"leader\",\"followers\":0}", body)
+    }
+
+    @Test
+    fun `unknown route 404 and wrong method 405 with Allow`() {
+        val port = server.start("gid")
+        server.enableApi("k")
+        assertEquals(404, call(port, "/api/v1/nope").first)
+        val (code, _, conn) = call(port, "/api/v1/status", method = "POST", body = "x")
+        assertEquals(405, code)
+        assertEquals("GET", conn.getHeaderField("Allow"))
+    }
+
+    @Test
+    fun `registered route gets exact utf8 body, oversize is 413, throwing handler is 500`() {
+        val port = server.start("gid")
+        server.enableApi("k")
+        server.registerApiRoute("POST", "/api/v1/echo") { ApiResponse(200, it.body!!) }
+        server.registerApiRoute("GET", "/api/v1/boom") { error("x") }
+        assertEquals("héllo→", call(port, "/api/v1/echo", method = "POST", body = "héllo→").second)
+        assertEquals(413, call(port, "/api/v1/echo", method = "POST", declaredLength = 70_000).first)
+        val (code, body, _) = call(port, "/api/v1/boom")
+        assertEquals(500, code)
+        assertTrue(body.contains("\"code\":\"internal_error\""))
+    }
+
+    @Test
+    fun `restart disables api and rotating key rejects old key`() {
+        var port = server.start("gid")
+        server.enableApi("k")
+        server.enableApi("k2")
+        assertEquals(401, call(port, "/api/v1/status").first)
+        assertEquals(200, call(port, "/api/v1/status", auth = "Bearer k2").first)
+        server.stop()
+        port = server.start("gid")
+        assertEquals(404, call(port, "/api/v1/status", auth = "Bearer k2").first)
+    }
 }
