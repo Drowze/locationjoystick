@@ -219,6 +219,13 @@ expanded: coordinates, speed (m/s), altitude, accuracy, bearing, and tick rate (
 - **Unset bearing**: `DebugStats.hasBearing` mirrors `LocationFix.hasBearing` (see
   docs/features/mock-location.md, "No bearing before first move") — before the first tick with
   motion in the session, the bearing segment reads "—" instead of a misleading "0°" (issue #58).
+- **Own window**: the readout renders inside a `WidgetSidePopup` (`TYPE_APPLICATION_SUB_PANEL`),
+  not inline in the panel `Column`. Inline, it widened the overlay's `WRAP_CONTENT` hit rectangle
+  to the bounding box of an L-shaped layout — a narrow icon column plus a wide readout — so the
+  empty map to the right of the icon column silently ate taps meant for the app underneath
+  (issue #104). Its popup has no anchor icon, so the anchor `Box` collapses to zero width and the
+  readout stays flush with the icon column's left edge; `widgetSidePopupOffset` flips it to the
+  left when the widget is docked near the right screen edge.
 
 ## Anti-Patterns to Avoid
 
