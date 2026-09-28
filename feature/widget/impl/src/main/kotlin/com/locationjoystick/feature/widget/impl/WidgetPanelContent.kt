@@ -521,11 +521,10 @@ internal fun WidgetPanel(
             // overlay's WRAP_CONTENT hit rectangle to the bounding box of an L-shaped layout, so
             // the empty map right of the icon column ate taps meant for the app underneath
             // (issue #104). Same reason the route / roaming / altitude controls use one.
-            val stats = debugStats
-            if (controlsEnabled && stats != null) {
+            if (controlsEnabled && debugStats != null) {
                 Box {
                     WidgetSidePopup(visible = true) {
-                        DebugStatsPanel(stats)
+                        DebugStatsPanel(debugStats)
                     }
                 }
             }
