@@ -463,7 +463,7 @@ object AppConstants {
         const val GITHUB_ISSUES_URL = "https://github.com/$GITHUB_REPO_SLUG/issues/new?template=bug_report.yml"
         const val DOCS_URL = "https://locationjoystick.shrtcts.fr/"
         const val TROUBLESHOOTING_URL = "https://locationjoystick.shrtcts.fr/troubleshooting.html"
-        const val CAPTURE_GUIDE_URL = "https://locationjoystick.shrtcts.fr/capture-coordinates.html"
+        const val CAPTURE_GUIDE_URL = "https://locationjoystick.shrtcts.fr/location-links.html#set-up-capture"
         const val TAP_TO_WALK_GUIDE_URL = "https://locationjoystick.shrtcts.fr/tap-to-walk.html"
         const val CHANGELOG_URL = "https://locationjoystick.shrtcts.fr/changelog.html"
         const val DEEP_LINK_HOST = "locationjoystick.shrtcts.fr"

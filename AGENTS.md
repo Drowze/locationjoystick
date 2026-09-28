@@ -203,7 +203,7 @@ make wiki-serve   # http://localhost:8080
 | `docs/wiki/map.html` | Map screen + bottom sheets |
 | `docs/wiki/routes.html` | Routes list + creator + detail |
 | `docs/wiki/favorites.html` | Favorites list + map picker |
-| `docs/wiki/share.html` | Share & deep link URL reference |
+| `docs/wiki/location-links.html` | Location links: sharing, deep links, Capture mode |
 | `docs/wiki/group.html` | Group Sync (leader/follower Wi-Fi sync) |
 | `docs/wiki/tap-to-walk.html` | Tap to Walk (quick-walk + screen overlay) |
 | `docs/wiki/settings.html` | Settings + QR transfer |

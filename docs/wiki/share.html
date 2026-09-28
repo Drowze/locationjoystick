@@ -2,110 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Share & Deep Links — locationjoystick</title>
-  <link rel="icon" href="icon.png" type="image/png">
-  <meta name="description" content="Share any GPS coordinate as a link. Anyone with locationjoystick installed can open it and teleport straight to that spot.">
-  <link rel="canonical" href="https://locationjoystick.shrtcts.fr/share.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="locationjoystick">
-  <meta property="og:title" content="Share & Deep Links — locationjoystick">
-  <meta property="og:description" content="Share any GPS coordinate as a link. Anyone with locationjoystick installed can open it and teleport straight to that spot.">
-  <meta property="og:url" content="https://locationjoystick.shrtcts.fr/share.html">
-  <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Share & Deep Links — locationjoystick">
-  <meta name="twitter:description" content="Share any GPS coordinate as a link. Anyone with locationjoystick installed can open it and teleport straight to that spot.">
-  <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
+  <title>Location Links — locationjoystick</title>
+  <meta http-equiv="refresh" content="0; url=location-links.html">
+  <link rel="canonical" href="https://shortcuts.github.io/locationjoystick/location-links.html">
+  <meta name="robots" content="noindex">
 </head>
 <body>
-<div class="layout">
-
-  <main>
-    <h1 id="share-deep-links">Share and deep links</h1>
-    <p>
-      Share a saved favorite as coordinates, or share a map pin as a link. Tapping a
-      locationjoystick link on Android opens the app directly, centers the map on the location,
-      and asks what you want to do with it.
-    </p>
-
-    <h2 id="sharing-a-location">Sharing a location</h2>
-    <p>Two places in the app send a location out:</p>
-    <ul class="section-bullets">
-      <li>From Favorites, tap the three-dot menu on any saved favorite, then <strong>Copy coordinates</strong> or <strong>Send as message</strong>. Both use decimal <code>lat, lon</code> text, the same format you can paste back in later.</li>
-      <li>From the map, press and hold any point, then tap <strong>Share this location</strong> in the menu that appears. That one sends a link that opens this app on the tapped spot.</li>
-    </ul>
-    <p>
-      Routes have their own share option in the three-dot menu: it shows every stop as
-      <code>lat, lon</code> lines, with buttons to copy or send as a message.
-    </p>
-
-    <h2 id="what-happens-when-the-link-is-opened">What happens when the link is opened</h2>
-    <ol class="section-bullets">
-      <li>The app opens, or comes to the front if it's already running.</li>
-      <li>The map screen appears and slides over to the linked location.</li>
-      <li>A popup appears asking what to do next:
-        <ul>
-          <li><strong>Teleport here</strong> moves your spoofed position there instantly.</li>
-          <li><strong>Walk here</strong> walks toward the coordinate at your current speed.</li>
-          <li><strong>Walk here via roads</strong> follows real roads to get to the coordinate.</li>
-          <li><strong>Do nothing</strong> closes the popup without changing your position.</li>
-        </ul>
-      </li>
-    </ol>
-    <p>Nothing happens automatically. You always confirm what happens next.</p>
-
-    <h2 id="url-format">URL format</h2>
-    <p>The canonical link format is:</p>
-    <pre><code>https://locationjoystick.shrtcts.fr/?lat=LAT&amp;lon=LON</code></pre>
-
-    <div class="table-wrap">
-    <table class="option-table">
-      <thead>
-        <tr><th>Parameter</th><th>Type</th><th>Valid range</th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td><code>lat</code></td><td>decimal</td><td>−90 to 90</td><td>Latitude</td></tr>
-        <tr><td><code>lon</code></td><td>decimal</td><td>−180 to 180</td><td>Longitude</td></tr>
-      </tbody>
-    </table>
-    </div>
-
-    <p>Example:</p>
-    <pre><code>https://locationjoystick.shrtcts.fr/?lat=35.6762&amp;lon=139.6503</code></pre>
-
-    <h2 id="opening-links-from-other-apps">Opening links from other apps</h2>
-    <p>
-      You don't need this app's own share button to bring a location in. If another app offers
-      a share location or share place option, you can often choose this app from the list, and
-      it opens the spot directly with the same popup described above.
-    </p>
-    <p>
-      This works for map links shared by many different apps, including the Maps app's own
-      <strong>Share</strong> button, which sends a shortened link. This app follows that link to
-      find the real coordinates before it opens. If a shared link or location can't be
-      understood, a short message appears at the bottom of the screen to let you know, rather
-      than doing nothing at all.
-    </p>
-
-    <h2 id="for-third-party-tools">For third-party tools</h2>
-    <p>
-      If you're building automation, scripts, or other tools that open coordinates in
-      locationjoystick, you can build the link yourself. No key or account sign-in is needed.
-    </p>
-    <ul class="section-bullets">
-      <li>Both <code>lat</code> and <code>lon</code> are required. Missing either silently drops the link.</li>
-      <li>Coordinates outside the valid range are rejected and the link is ignored.</li>
-      <li>Normal URL encoding rules apply, though coordinates only use plain characters anyway.</li>
-    </ul>
-    <p>A custom link format is also available for connecting directly between apps:</p>
-    <pre><code>locationjoystick://open?lat=LAT&amp;lon=LON</code></pre>
-    <p>Both link formats work the same way. Use the regular web link (https://) when sharing with other people.</p>
-  </main>
-
-</div>
-<script src="wiki-init.js"></script>
+<p>This page moved. See <a href="location-links.html">Location Links</a>.</p>
 </body>
 </html>
