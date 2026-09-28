@@ -1,6 +1,8 @@
 package com.locationjoystick.core.location
 
+import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.SettingsRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,10 +34,20 @@ class CompassHeadingSource
          * Play's Accessibility API policy: no screenshot may be taken before the user accepts the
          * in-app disclosure. Android's own accessibility settings can enable the service without
          * the app ever being opened, so the consent check lives here rather than at each call site.
+         *
+         * Retries a null result (screenshot rejected or needle not found) up to
+         * [AppConstants.CompassTrackingConstants.CAPTURE_ATTEMPTS] times; returns null if unbound.
          */
         suspend fun captureHeading(): Float? {
             if (!settingsRepository.getCompassDisclosureAccepted().first()) return null
-            return service?.captureHeading()
+            repeat(AppConstants.CompassTrackingConstants.CAPTURE_ATTEMPTS) { attempt ->
+                val svc = service ?: return null
+                svc.captureHeading()?.let { return it }
+                if (attempt < AppConstants.CompassTrackingConstants.CAPTURE_ATTEMPTS - 1) {
+                    delay(AppConstants.CompassTrackingConstants.CAPTURE_RETRY_DELAY_MS)
+                }
+            }
+            return null
         }
     }
 

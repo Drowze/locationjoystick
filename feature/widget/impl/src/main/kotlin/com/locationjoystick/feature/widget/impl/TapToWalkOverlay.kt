@@ -63,7 +63,8 @@ internal class TapToWalkOverlay(
         if (isShowing()) return
         if (getHeadingAsync != null) {
             scope.launch {
-                preCapturedHeading = withTimeoutOrNull(1500L) { getHeadingAsync.invoke() }
+                preCapturedHeading =
+                    withTimeoutOrNull(AppConstants.CompassTrackingConstants.OVERLAY_HEADING_TIMEOUT_MS) { getHeadingAsync.invoke() }
             }
         }
         val view =

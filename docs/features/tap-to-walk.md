@@ -88,7 +88,7 @@ where θ = `northAngleRad` (clockwise from screen-up to geographic north).
 
 When enabled, `TapToWalkOverlay` takes a screenshot immediately after `show()` and auto-locates the
 game's compass needle icon to detect its heading. The heading is available by the time the user
-taps (1.5 s budget; falls back to north-up if not ready). **No manual calibration**: an earlier
+taps (3 s budget; falls back to north-up if not ready). **No manual calibration**: an earlier
 version asked the user to drag a circle onto the compass and store its position/radius — that
 required precise calibration to avoid picking up unrelated red UI elements (a gym marker, a raid
 egg) nearby, and a bad calibration made detection "confused" (issue reported after that version
@@ -99,7 +99,7 @@ Key files: `:core:location/CompassHeadingSource.kt`, `:feature:widget:impl/Compa
 
 ### CompassHeadingSource
 
-`@Singleton` bridge owned by `:core:location`. `CompassAccessibilityService` calls `bind(this)` on connect and `unbind()` on disconnect. `FloatingWidgetService` calls `captureHeading()` which delegates to the live service; `SettingsViewModel.testCompassDetection()` calls the same method for the Settings screen's Test button (see "Verifying On-Device" below).
+`@Singleton` bridge owned by `:core:location`. `CompassAccessibilityService` calls `bind(this)` on connect and `unbind()` on disconnect. `FloatingWidgetService` calls `captureHeading()` which delegates to the live service; `SettingsViewModel.testCompassDetection()` calls the same method for the Settings screen's Test button (see "Verifying On-Device" below). `captureHeading()` retries up to 3 times, 500 ms apart, on any null result.
 
 ### CompassAccessibilityService
 
