@@ -21,6 +21,8 @@
     <string name="drawer_website">"官方网站"</string>
     <string name="drawer_discord_cd">"Discord"</string>
     <string name="drawer_discord">"Discord"</string>
+    <string name="drawer_acknowledgements_cd">"致谢"</string>
+    <string name="drawer_acknowledgements">"致谢"</string>
     <string name="idle_map_description">"模拟你的 GPS 位置，并在地图上控制移动。"</string>
     <string name="idle_routes_description">"回放已保存的路线。"</string>
     <string name="idle_favorites_description">"瞬移或步行到已保存的位置。"</string>

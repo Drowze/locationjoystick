@@ -466,6 +466,7 @@ object AppConstants {
         const val CAPTURE_GUIDE_URL = "https://locationjoystick.shrtcts.fr/location-links.html#set-up-capture"
         const val TAP_TO_WALK_GUIDE_URL = "https://locationjoystick.shrtcts.fr/tap-to-walk.html"
         const val CHANGELOG_URL = "https://locationjoystick.shrtcts.fr/changelog.html"
+        const val ACKNOWLEDGEMENTS_URL = "https://locationjoystick.shrtcts.fr/acknowledgements.html"
         const val DEEP_LINK_HOST = "locationjoystick.shrtcts.fr"
 
         fun buildDeepLink(

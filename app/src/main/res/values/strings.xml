@@ -21,6 +21,8 @@
     <string name="drawer_website">"Website"</string>
     <string name="drawer_discord_cd">"Discord"</string>
     <string name="drawer_discord">"Discord"</string>
+    <string name="drawer_acknowledgements_cd">"Acknowledgements"</string>
+    <string name="drawer_acknowledgements">"Acknowledgements"</string>
     <string name="idle_map_description">"Spoof your GPS location and control movement on the map."</string>
     <string name="idle_routes_description">"Replay saved routes."</string>
     <string name="idle_favorites_description">"Teleport or walk to saved locations."</string>

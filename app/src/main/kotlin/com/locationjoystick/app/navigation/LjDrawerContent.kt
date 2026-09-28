@@ -189,5 +189,24 @@ fun LjDrawerContent(
                 scope.launch { drawerState.close() }
             },
         )
+        NavigationDrawerItem(
+            icon = { Icon(LjIcons.Info, stringResource(R.string.drawer_acknowledgements_cd)) },
+            label = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.drawer_acknowledgements))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = LjIcons.OpenInNew,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
+            },
+            selected = false,
+            onClick = {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://acknowledgements.gg/r9DRnkwbMf")))
+                scope.launch { drawerState.close() }
+            },
+        )
     }
 }
