@@ -2,6 +2,7 @@ package com.locationjoystick.core.location
 
 import android.content.Context
 import com.locationjoystick.core.data.FavoriteRepository
+import com.locationjoystick.core.data.GroupRepository
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
@@ -189,6 +190,23 @@ class MapControllerWalkCancellationTest {
         }
 
     @Test
+    fun `joystick takeover in follower mode turns Follow leader off once`() =
+        runTest(UnconfinedTestDispatcher()) {
+            every { MockLocationIntentBuilder.exitFollower(any()) } returns mockk(relaxed = true)
+            val gate = CompletableDeferred<Unit>()
+            val harness = buildHarness(backgroundScope, mockk(relaxed = true))
+            coEvery { harness.groupRepository.setFollowerModeEnabled(false) } coAnswers { gate.await() }
+            harness.locationRepository.setMockMode(MockMode.FOLLOWER)
+
+            harness.mapController.pauseAutomatedMovement()
+            harness.mapController.pauseAutomatedMovement()
+            gate.complete(Unit)
+
+            coVerify(exactly = 1) { harness.groupRepository.setFollowerModeEnabled(false) }
+            verify(exactly = 1) { harness.context.startService(any()) }
+        }
+
+    @Test
     fun `joystick pauses a pending road walk and resume walks from the manual position`() =
         runTest(UnconfinedTestDispatcher()) {
             val routeResult = CompletableDeferred<Result<List<LatLng>>>()
@@ -308,6 +326,8 @@ class MapControllerWalkCancellationTest {
         val ephemeralController: EphemeralReplayController,
         val mapController: MapController,
         val teleportUseCase: TeleportUseCase,
+        val groupRepository: GroupRepository,
+        val context: Context,
     )
 
     private fun buildHarness(
@@ -352,6 +372,7 @@ class MapControllerWalkCancellationTest {
         val teleportUseCase =
             mockk<TeleportUseCase>(relaxed = true) { every { cooldownsFor(any()) } returns emptyFlow() }
         val startRouteReplayUseCase = mockk<StartRouteReplayUseCase>(relaxed = true)
+        val groupRepository = mockk<GroupRepository>(relaxed = true)
 
         val mapController =
             MapController(
@@ -372,8 +393,17 @@ class MapControllerWalkCancellationTest {
                 ephemeralReplayController = ephemeralController,
                 osrmClient = osrmClient,
                 routingErrorReporter = routingErrorReporter,
+                groupRepository = groupRepository,
                 appScope = scope,
             )
-        return Harness(locationRepository, walkCoordinator, ephemeralController, mapController, teleportUseCase)
+        return Harness(
+            locationRepository,
+            walkCoordinator,
+            ephemeralController,
+            mapController,
+            teleportUseCase,
+            groupRepository,
+            context,
+        )
     }
 }

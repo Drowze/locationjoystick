@@ -82,6 +82,11 @@ object MockLocationIntentBuilder {
             action = MockLocationService.ACTION_ROUTE_REPLAY_CANCEL
         }
 
+    fun exitFollower(context: Context): Intent =
+        Intent(context, MockLocationService::class.java).apply {
+            action = ServiceConstants.ACTION_EXIT_FOLLOWER
+        }
+
     fun appendWaypoint(
         context: Context,
         waypoint: LatLng,

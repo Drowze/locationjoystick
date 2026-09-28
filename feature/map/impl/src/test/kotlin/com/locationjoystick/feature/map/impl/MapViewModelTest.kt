@@ -146,6 +146,7 @@ class MapViewModelTest {
             ephemeralReplayController = ephemeralReplayController,
             osrmClient = osrmClient,
             routingErrorReporter = RoutingErrorReporter(mockk<android.content.Context>(relaxed = true)),
+            groupRepository = mockk(relaxed = true),
             appScope = CoroutineScope(testDispatcher),
         )
 

@@ -7,6 +7,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.di.ApplicationScope
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.FavoriteRepository
+import com.locationjoystick.core.data.GroupRepository
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RealLocationRepository
 import com.locationjoystick.core.data.RoamingRepository
@@ -84,6 +85,7 @@ class MapController
         private val ephemeralReplayController: EphemeralReplayController,
         private val osrmClient: OsrmClient,
         private val routingErrorReporter: RoutingErrorReporter,
+        private val groupRepository: GroupRepository,
         @param:ApplicationScope private val appScope: CoroutineScope,
     ) {
         @Suppress("ktlint:standard:property-naming")
@@ -101,6 +103,9 @@ class MapController
 
         private var pendingRoadWalkJob: Job? = null
         private var restoreJob: Job? = null
+
+        /** Deduplicates requests to turn Follow leader off while the setting is being persisted. */
+        private var followerExitJob: Job? = null
 
         init {
             observeLocationState()
@@ -512,11 +517,23 @@ class MapController
             _sharedState.update { it.copy(walkMode = WalkMode.Idle, isWalkPaused = false, routeTrace = null) }
         }
 
-        /** Pauses the current activity for manual steering, retaining its destination and progress. */
+        /**
+         * Joystick takeover for every mode: pauses the current activity in place for manual steering,
+         * retaining its destination and progress. A follower leaves Follow leader instead (same as
+         * turning it off on the Group Sync screen; the device stays in the group).
+         */
         fun pauseAutomatedMovement() {
             val mode = locationRepository.currentMode.value
             when {
-                mode == MockMode.FOLLOWER -> Unit // Following is disabled by the joystick's group controls.
+                mode == MockMode.FOLLOWER -> {
+                    if (followerExitJob?.isActive != true) {
+                        followerExitJob =
+                            appScope.launch {
+                                groupRepository.setFollowerModeEnabled(false)
+                                context.startService(MockLocationIntentBuilder.exitFollower(context))
+                            }
+                    }
+                }
                 mode == MockMode.WALK_TO || pendingRoadWalkJob?.isActive == true -> {
                     if (!locationRepository.isWalkPaused.value) pauseWalk()
                 }

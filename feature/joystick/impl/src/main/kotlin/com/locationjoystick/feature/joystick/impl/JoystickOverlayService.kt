@@ -12,7 +12,6 @@ import android.view.View
 import android.view.WindowManager
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.advancePosition
-import com.locationjoystick.core.data.GroupRepository
 import com.locationjoystick.core.data.LocationRepository
 import com.locationjoystick.core.data.RoamingRepository
 import com.locationjoystick.core.data.SettingsRepository
@@ -96,9 +95,6 @@ class JoystickOverlayService : OverlayService() {
     @Inject
     lateinit var mapController: MapController
 
-    @Inject
-    lateinit var groupRepository: GroupRepository
-
     private val exceptionHandler =
         CoroutineExceptionHandler { _, throwable ->
             Log.e(TAG, "JoystickOverlayService coroutine crashed", throwable)
@@ -123,9 +119,6 @@ class JoystickOverlayService : OverlayService() {
 
     /** Single movement job used for both touch-active and locked-release motion. */
     private var movementJob: Job? = null
-
-    /** Deduplicates requests to turn Follow leader off while the setting is being persisted. */
-    private var followerExitJob: Job? = null
 
     inner class LocalBinder : Binder() {
         fun getService(): JoystickOverlayService = this@JoystickOverlayService
@@ -279,7 +272,8 @@ class JoystickOverlayService : OverlayService() {
             // Positive force comes from live touches; centered input stops steps without
             // changing the lock state or taking over an automatic movement.
             if (input.force > 0f) {
-                takeOverAutomatedMovementIfActive()
+                // Synchronous and idempotent: a later map action cannot be cancelled by an old touch.
+                mapController.pauseAutomatedMovement()
                 if (movementJob == null || !movementJob!!.isActive) startMovement()
             }
         }
@@ -336,29 +330,6 @@ class JoystickOverlayService : OverlayService() {
                 x = (screenW - sizePx).coerceAtLeast(0)
                 y = ((screenH - sizePx) / 2).coerceAtLeast(0)
             }
-    }
-
-    /**
-     * Moving the stick pauses automation in place so the existing Resume action can continue it.
-     * A follower leaves Follow leader instead; it has no resumable local movement to preserve.
-     */
-    private fun takeOverAutomatedMovementIfActive() {
-        val mode = locationRepository.currentMode.value
-        if (mode == MockMode.FOLLOWER) {
-            if (followerExitJob?.isActive == true) return
-            followerExitJob = serviceScope.launch { stopFollowingLeader() }
-        } else {
-            // Synchronous and idempotent: a later map action cannot be cancelled by an old touch.
-            mapController.pauseAutomatedMovement()
-        }
-    }
-
-    /** Same as turning Follow leader off on the Group Sync screen; the device stays in the group. */
-    private suspend fun stopFollowingLeader() {
-        groupRepository.setFollowerModeEnabled(false)
-        startService(
-            Intent(this, MockLocationService::class.java).setAction(AppConstants.ServiceConstants.ACTION_EXIT_FOLLOWER),
-        )
     }
 
     private fun startMovement() {

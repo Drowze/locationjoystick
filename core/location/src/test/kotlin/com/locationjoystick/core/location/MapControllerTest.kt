@@ -133,6 +133,7 @@ class MapControllerTest {
                     ephemeralReplayController = ephemeralController,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
+                    groupRepository = mockk(relaxed = true),
                     appScope = backgroundScope,
                 )
 
@@ -239,6 +240,7 @@ class MapControllerTest {
                     ephemeralReplayController = ephemeralController,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
+                    groupRepository = mockk(relaxed = true),
                     appScope = backgroundScope,
                 )
 
@@ -339,6 +341,7 @@ class MapControllerTest {
                     ephemeralReplayController = ephemeralController,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
+                    groupRepository = mockk(relaxed = true),
                     appScope = backgroundScope,
                 )
 
@@ -435,6 +438,7 @@ class MapControllerTest {
                     ephemeralReplayController = ephemeralController,
                     osrmClient = osrmClient,
                     routingErrorReporter = routingErrorReporter,
+                    groupRepository = mockk(relaxed = true),
                     appScope = backgroundScope,
                 )
 
@@ -622,6 +626,7 @@ class MapControllerTest {
                 EphemeralReplayController(locationRepository, settingsRepository, walkCoordinator, osrmClient, routingErrorReporter),
             osrmClient = osrmClient,
             routingErrorReporter = routingErrorReporter,
+            groupRepository = mockk(relaxed = true),
             appScope = scope,
         )
     }
