@@ -136,6 +136,7 @@ object LjIcons {
     val Home = Icons.Rounded.Home
     val Info = Icons.Rounded.Info
     val Joystick = Icons.Rounded.SportsEsports
+    val JoystickToggle = materialJoystickIcon
     val Layers = Icons.Rounded.Layers
     val Lock = Icons.Rounded.Lock
     val LockOpen = Icons.Rounded.LockOpen

@@ -189,12 +189,15 @@ class RoamingEngine
         ): Job {
             val previous = activeJob
             activeJob = null
+            previous?.cancel()
+            // Reset for this request before launching: a joystick pause after startRoaming
+            // returns must survive scheduling and the previous job's asynchronous cleanup.
+            isPaused = false
             currentSpeedMs = speedMs
 
             val job =
                 engineScope.launch {
-                    previous?.cancelAndJoin()
-                    isPaused = false
+                    previous?.join()
 
                     val route = config.plannedWaypoints?.takeIf { it.size >= 2 } ?: planRoute(config)
                     onRouteUpdate(route)

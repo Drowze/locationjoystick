@@ -30,6 +30,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import io.mockk.verifyOrder
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -89,12 +90,201 @@ class ReplayOrchestratorTest {
 
     @Test
     fun handlePause_pausesEngine_and_emitsState() {
+        locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
         orchestrator.handlePause()
 
         verify { routeReplayEngine.pause() }
         assertEquals(MockLocationState.PAUSED, stateChanges.last())
         assertEquals(MockLocationState.PAUSED, locationRepository.mockLocationState.value)
     }
+
+    @Test
+    fun handlePause_whenIdleOrNewWalkOwnsMovement_doesNothing() {
+        orchestrator.handlePause()
+        locationRepository.setWalkTarget(LatLng(1.0, 1.0))
+        locationRepository.startSpoofing()
+
+        orchestrator.handlePause()
+
+        verify(exactly = 0) { routeReplayEngine.pause() }
+        assertTrue(stateChanges.isEmpty())
+        assertEquals(MockMode.WALK_TO, locationRepository.currentMode.value)
+        assertEquals(MockLocationState.RUNNING, locationRepository.mockLocationState.value)
+        assertFalse(locationRepository.isWalkPaused.value)
+    }
+
+    @Test
+    fun handlePause_duringPlanning_keepsRoutePausedAfterRoadResult_untilResume() =
+        runTest {
+            val planned = CompletableDeferred<List<LatLng>>()
+            val first = LatLng(1.0, 1.0)
+            val last = LatLng(2.0, 2.0)
+            val route = Route("pending", "Pending", waypoints = listOf(Waypoint("a", first, 0), Waypoint("b", last, 1)))
+            locationRepository.setPositionInternal(first)
+            coEvery { routeRepository.getRouteWithWaypoints("pending") } returns flowOf(route)
+            coEvery { osrmClient.resolveRoute(any(), first, last, true, any()) } coAnswers { planned.await() }
+
+            orchestrator.handleStart("pending", 1.4, RouteStartConfig(followRoadsToStart = true, teleportToStart = true))
+            // The joystick marks the repository paused before the service processes its intent.
+            locationRepository.pauseSpoofing()
+            orchestrator.handlePause()
+            val manualPosition = LatLng(5.0, 5.0)
+            locationRepository.setPositionInternal(manualPosition)
+            planned.complete(listOf(first, last))
+
+            assertEquals(MockLocationState.PAUSED, locationRepository.mockLocationState.value)
+            assertEquals(manualPosition, locationRepository.currentPosition.value)
+            assertEquals("pending", locationRepository.activeRouteId.value)
+            verify(exactly = 0) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+            coVerify(exactly = 0) { walkToEngine.walkToOnce(any(), any(), any(), any()) }
+
+            orchestrator.handleResume(1.4)
+
+            verify(exactly = 1) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.resume(any(), any()) }
+            assertEquals(MockMode.ROUTE_REPLAY, locationRepository.currentMode.value)
+            assertEquals(MockLocationState.RUNNING, locationRepository.mockLocationState.value)
+        }
+
+    @Test
+    fun handleResume_beforePlanningFinishes_doesNotResumeAnEmptyEngine() =
+        runTest {
+            val planned = CompletableDeferred<List<LatLng>>()
+            val first = LatLng(1.0, 1.0)
+            val last = LatLng(2.0, 2.0)
+            val route = Route("pending", "Pending", waypoints = listOf(Waypoint("a", first, 0), Waypoint("b", last, 1)))
+            locationRepository.setPositionInternal(first)
+            coEvery { routeRepository.getRouteWithWaypoints("pending") } returns flowOf(route)
+            coEvery { osrmClient.resolveRoute(any(), first, last, true, any()) } coAnswers { planned.await() }
+
+            orchestrator.handleStart("pending", 1.4, RouteStartConfig(followRoadsToStart = true, teleportToStart = true))
+            orchestrator.handlePause()
+            orchestrator.handleResume(1.4)
+
+            verify(exactly = 0) { routeReplayEngine.resume(any(), any()) }
+            assertEquals(MockMode.ROUTE_REPLAY, locationRepository.currentMode.value)
+            planned.complete(listOf(first, last))
+            verify(exactly = 1) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+        }
+
+    @Test
+    fun handlePause_duringApproach_keepsManualPositionUntilResume_withoutStartingEmptyReplay() =
+        runTest {
+            val nextTick = CompletableDeferred<Unit>()
+            val firstTick = LatLng(0.1, 0.1)
+            val secondTick = LatLng(0.2, 0.2)
+            locationRepository.setPositionInternal(LatLng(0.0, 0.0))
+            coEvery { walkToEngine.walkToOnce(any(), any(), any(), any()) } coAnswers {
+                val onPosition = arg<suspend (LatLng) -> Unit>(3)
+                onPosition(firstTick)
+                nextTick.await()
+                onPosition(secondTick)
+            }
+
+            orchestrator.handleEphemeralStart(listOf(LatLng(1.0, 1.0), LatLng(2.0, 2.0)), 1.4)
+            assertEquals(firstTick, locationRepository.currentPosition.value)
+            orchestrator.handlePause()
+            val manualPosition = LatLng(5.0, 5.0)
+            locationRepository.setPositionInternal(manualPosition)
+            nextTick.complete(Unit)
+
+            assertEquals(manualPosition, locationRepository.currentPosition.value)
+            assertEquals(MockLocationState.PAUSED, locationRepository.mockLocationState.value)
+            verify(exactly = 0) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+
+            orchestrator.handleResume(1.4)
+
+            assertEquals(secondTick, locationRepository.currentPosition.value)
+            verify(exactly = 1) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.resume(any(), any()) }
+        }
+
+    @Test
+    fun pausedReplay_rejectsLateTick_preservesRoute_andResumesExistingEngine() =
+        runTest {
+            val onPosition = slot<(LatLng) -> Unit>()
+            val first = LatLng(1.0, 1.0)
+            val last = LatLng(2.0, 2.0)
+            val route = Route("saved", "Saved", waypoints = listOf(Waypoint("a", first, 0), Waypoint("b", last, 1)))
+            coEvery { routeRepository.getRouteWithWaypoints("saved") } returns flowOf(route)
+            every {
+                routeReplayEngine.start(any(), any(), any(), capture(onPosition), any(), any(), any(), any())
+            } returns Unit
+            orchestrator.handleStart("saved", 1.4, RouteStartConfig(teleportToStart = true))
+            orchestrator.handlePause()
+            val manualPosition = LatLng(5.0, 5.0)
+            locationRepository.setPositionInternal(manualPosition)
+
+            onPosition.captured.invoke(LatLng(1.5, 1.5))
+
+            assertEquals(manualPosition, locationRepository.currentPosition.value)
+            assertEquals("saved", locationRepository.activeRouteId.value)
+            assertEquals(listOf(first, last), locationRepository.routeWaypoints.value)
+            orchestrator.handleResume(1.4)
+            verify(exactly = 1) { routeReplayEngine.pause() }
+            verify(exactly = 1) { routeReplayEngine.resume(any(), any()) }
+            verify(exactly = 0) { routeReplayEngine.jumpToNextWaypoint(any(), any()) }
+        }
+
+    @Test
+    fun newStart_afterPausedApproach_dropsOldPauseWithoutRevivingOldApproach() =
+        runTest {
+            val nextTick = CompletableDeferred<Unit>()
+            var firstApproach = true
+            locationRepository.setPositionInternal(LatLng(0.0, 0.0))
+            coEvery { walkToEngine.walkToOnce(any(), any(), any(), any()) } coAnswers {
+                if (firstApproach) {
+                    firstApproach = false
+                    nextTick.await()
+                    arg<suspend (LatLng) -> Unit>(3).invoke(LatLng(9.0, 9.0))
+                }
+            }
+            orchestrator.handleEphemeralStart(listOf(LatLng(1.0, 1.0), LatLng(2.0, 2.0)), 1.4)
+            orchestrator.handlePause()
+
+            orchestrator.handleEphemeralStart(listOf(LatLng(3.0, 3.0), LatLng(4.0, 4.0)), 1.4)
+            nextTick.complete(Unit)
+
+            assertEquals(MockLocationState.RUNNING, locationRepository.mockLocationState.value)
+            assertNotEquals(LatLng(9.0, 9.0), locationRepository.currentPosition.value)
+            verify(exactly = 1) { routeReplayEngine.start(any(), any(), any(), any(), any(), any(), any(), any()) }
+        }
+
+    @Test
+    fun newStart_releasesPausedReturnWalk_withoutLettingItFinishTheNewRoute() =
+        runTest {
+            val nextReturnTick = CompletableDeferred<Unit>()
+            var returnFinished = false
+            val first = LatLng(1.0, 1.0)
+            val last = LatLng(2.0, 2.0)
+            val route = Route("returning", "Returning", waypoints = listOf(Waypoint("a", first, 0), Waypoint("b", last, 1)))
+            coEvery { routeRepository.getRouteWithWaypoints("returning") } returns flowOf(route)
+            coEvery { routeRepository.getRouteWithWaypoints("new") } returns flowOf(route.copy(id = "new"))
+            val onComplete = slot<() -> Unit>()
+            every {
+                routeReplayEngine.start(any(), any(), any(), any(), capture(onComplete), any(), any(), any())
+            } returns Unit
+            coEvery { walkToEngine.walkToOnce(any(), any(), any(), any()) } coAnswers {
+                try {
+                    nextReturnTick.await()
+                    arg<suspend (LatLng) -> Unit>(3).invoke(LatLng(9.0, 9.0))
+                } finally {
+                    returnFinished = true
+                }
+            }
+            orchestrator.handleStart("returning", 1.4, RouteStartConfig(teleportToStart = true), LatLng(0.0, 0.0))
+            onComplete.captured.invoke()
+            orchestrator.handlePause()
+            nextReturnTick.complete(Unit)
+            assertFalse(returnFinished)
+
+            orchestrator.handleStart("new", 1.4, RouteStartConfig(teleportToStart = true))
+
+            assertTrue("the old return coroutine must leave its paused callback", returnFinished)
+            assertEquals("new", locationRepository.activeRouteId.value)
+            assertEquals(MockMode.ROUTE_REPLAY, locationRepository.currentMode.value)
+            assertEquals(first, locationRepository.currentPosition.value)
+        }
 
     @Test
     fun handleResume_emitsRunningState_and_startsEngine() {

@@ -576,9 +576,15 @@ internal fun MapFloatingView(
                             routePlaying -> stringResource(R.string.overlay_roaming_ignored_route_playing_cd)
                             else -> stringResource(R.string.overlay_start_roaming_cd)
                         },
-                    containerColor = if (isRoaming) LjSuccess else MaterialTheme.colorScheme.tertiaryContainer,
+                    containerColor =
+                        when {
+                            isRoaming && isRoamingPaused -> MaterialTheme.colorScheme.surfaceVariant
+                            isRoaming -> LjSuccess
+                            else -> MaterialTheme.colorScheme.tertiaryContainer
+                        },
                     contentColor =
                         when {
+                            isRoaming && isRoamingPaused -> MaterialTheme.colorScheme.onSurfaceVariant
                             isRoaming -> LjBg
                             routePlaying -> MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.22f)
                             else -> MaterialTheme.colorScheme.onTertiaryContainer

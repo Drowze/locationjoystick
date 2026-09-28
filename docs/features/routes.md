@@ -115,17 +115,19 @@ The temp row appears in the Routes list until the next paste Start replaces it, 
   fix goes stale and some location consumers fall back to the device's real
   GPS position until the replay resumes.
 - Playing route replay takes precedence over roaming: starting
-  roam is a no-op (widget/map roam and joystick controls fade toward their
-  background). Widget joystick show/hide and lock still
-  open and lock the overlay while faded. Pause or stop the route first to start roaming (walk-around
+  roam is a no-op (widget/map roam controls fade toward their background).
+  Widget joystick show/hide and lock still open and lock the overlay. The lock
+  icon stays orange when locked and grey when unlocked during both playback and pause.
+  Pause or stop the route first to start roaming (walk-around
   or planting). A paused route is stopped before roam starts so the two engines
   never write together.
-- Moving the joystick stick ends the replay — playing, paused, or still planning
-  its Follow-roads path — and hands control to the stick at the current position
-  (docs/features/joystick.md, "Manual takeover"). The saved route is kept. A
-  retained locked-stick direction does not end it: it is ignored while playing
-  and steers while paused, and resume still jumps to the next named stop via
-  `jumpToNextWaypoint`, then continues interpolation from there.
+- Moving the joystick pauses replay and retains its route and progress, including
+  Follow-roads planning and the approach to the first waypoint
+  (docs/features/joystick.md, "Manual takeover"). Releasing it leaves replay paused.
+  Resume during planning/approach releases the existing start job; it does not start an
+  empty replay engine. Ordinary replay resumes its saved progress; teleport-between
+  mode keeps its existing next-stop behavior. A retained locked-stick direction is
+  ignored while playing and steers while paused without ending the route.
 
 ### Route progress (`current/total`)
 

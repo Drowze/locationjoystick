@@ -11,6 +11,7 @@ import com.locationjoystick.core.data.TeleportUseCase
 import com.locationjoystick.core.data.WalkCoordinator
 import com.locationjoystick.core.data.WalkToEngine
 import com.locationjoystick.core.model.LatLng
+import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.RoamingDefaults
 import com.locationjoystick.core.model.SavedItemSortMode
@@ -24,6 +25,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.mockk.verify
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +33,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -60,6 +64,7 @@ class MapControllerWalkCancellationTest {
         every { MockLocationIntentBuilder.appendWaypoint(any(), any()) } returns mockk(relaxed = true)
         every { MockLocationIntentBuilder.cancelRouteReplay(any()) } returns mockk(relaxed = true)
         every { MockLocationIntentBuilder.updatePosition(any(), any(), any(), any(), any()) } returns mockk(relaxed = true)
+        every { MockLocationIntentBuilder.pauseRouteReplay(any()) } returns mockk(relaxed = true)
     }
 
     @After
@@ -183,10 +188,8 @@ class MapControllerWalkCancellationTest {
             assertFalse(harness.mapController.sharedState.value.walkMode is WalkMode.Walking)
         }
 
-    // Issue #96: moving the joystick cancels a walk still waiting on its road route, and stops
-    // any route/roam session through the same path a teleport uses.
     @Test
-    fun `joystick takeover drops a pending walk-via-roads and stops route and roam`() =
+    fun `joystick pauses a pending road walk and resume walks from the manual position`() =
         runTest(UnconfinedTestDispatcher()) {
             val routeResult = CompletableDeferred<Result<List<LatLng>>>()
             val osrmClient =
@@ -198,14 +201,105 @@ class MapControllerWalkCancellationTest {
             harness.locationRepository.setPositionInternal(start)
 
             harness.mapController.walkViaRoads(LatLng(48.9000, 2.3522))
-            harness.mapController.stopAutomatedMovement()
+            harness.mapController.pauseAutomatedMovement()
+            harness.mapController.pauseAutomatedMovement()
+            val manualPosition = LatLng(48.8600, 2.3530)
+            harness.locationRepository.setPositionInternal(manualPosition)
             routeResult.complete(Result.success(listOf(start, LatLng(48.9000, 2.3522))))
 
-            assertNull(harness.locationRepository.walkTarget.value)
-            assertNotEquals(MockMode.WALK_TO, harness.locationRepository.currentMode.value)
-            assertEquals(WalkMode.Idle, harness.mapController.sharedState.value.walkMode)
-            assertEquals(start, harness.locationRepository.currentPosition.value)
-            coVerify(exactly = 1) { harness.teleportUseCase.stopAutomatedMovement() }
+            assertEquals(LatLng(48.9000, 2.3522), harness.locationRepository.walkTarget.value)
+            assertEquals(MockMode.WALK_TO, harness.locationRepository.currentMode.value)
+            assertTrue(harness.locationRepository.isWalkPaused.value)
+            advanceTimeBy(2_000)
+            runCurrent()
+            assertEquals(manualPosition, harness.locationRepository.currentPosition.value)
+            harness.mapController.resumeWalk()
+            advanceTimeBy(1_000)
+            runCurrent()
+            assertNotEquals(manualPosition, harness.locationRepository.currentPosition.value)
+            coVerify(exactly = 0) { harness.teleportUseCase.stopAutomatedMovement() }
+        }
+
+    @Test
+    fun `manual pause retains destination and repeated map walks keep moving`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = buildHarness(backgroundScope, mockk(relaxed = true))
+            val repo = harness.locationRepository
+            repo.setPositionInternal(LatLng(48.8566, 2.3522))
+            val targets = listOf(LatLng(48.9000, 2.3522), LatLng(48.9100, 2.3600))
+            repeat(6) { index ->
+                val target = targets[index / 3]
+                harness.mapController.walkTo(target)
+                val generation = harness.walkCoordinator.currentGeneration()
+                harness.mapController.pauseAutomatedMovement()
+                harness.mapController.pauseAutomatedMovement()
+                assertEquals(generation, harness.walkCoordinator.currentGeneration())
+                assertEquals(target, repo.walkTarget.value)
+                assertTrue(repo.isWalkPaused.value)
+                assertEquals(MockMode.WALK_TO, repo.currentMode.value)
+
+                val manualPosition = LatLng(48.8600 + index * 0.001, 2.3500)
+                repo.setPositionInternal(manualPosition)
+                advanceTimeBy(2_000)
+                runCurrent()
+                assertEquals(manualPosition, repo.currentPosition.value)
+                harness.mapController.resumeWalk()
+                advanceTimeBy(1_000)
+                runCurrent()
+                assertNotEquals(manualPosition, repo.currentPosition.value)
+                assertEquals(target, repo.walkTarget.value)
+                assertFalse(repo.isWalkPaused.value)
+            }
+            coVerify(exactly = 0) { harness.teleportUseCase.stopAutomatedMovement() }
+        }
+
+    @Test
+    fun `new map destination replaces a paused walk for repeated same and different targets`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = buildHarness(backgroundScope, mockk(relaxed = true))
+            val repo = harness.locationRepository
+            repo.setPositionInternal(LatLng(48.8566, 2.3522))
+            val targets = listOf(LatLng(48.9000, 2.3522), LatLng(48.9100, 2.3600))
+            harness.mapController.walkTo(targets.first())
+
+            repeat(6) { index ->
+                harness.mapController.pauseAutomatedMovement()
+                val manualPosition = LatLng(48.8600 + index * 0.001, 2.3500)
+                repo.setPositionInternal(manualPosition)
+                advanceTimeBy(1_000)
+                runCurrent()
+                assertTrue(repo.isWalkPaused.value)
+                assertEquals(manualPosition, repo.currentPosition.value)
+
+                val target = targets[(index / 2) % targets.size]
+                harness.mapController.walkTo(target)
+                runCurrent()
+                assertFalse(repo.isWalkPaused.value)
+                assertEquals(target, repo.walkTarget.value)
+                assertEquals(MockMode.WALK_TO, repo.currentMode.value)
+                advanceTimeBy(1_000)
+                runCurrent()
+                assertNotEquals(manualPosition, repo.currentPosition.value)
+                assertEquals(target, repo.walkTarget.value)
+            }
+        }
+
+    @Test
+    fun `repeated joystick input requests route pause once without clearing progress`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val harness = buildHarness(backgroundScope, mockk(relaxed = true))
+            val repo = harness.locationRepository
+            repo.setMockMode(MockMode.ROUTE_REPLAY)
+            repo.startSpoofing()
+            repo.setActiveRouteId("saved-route")
+
+            repeat(3) { harness.mapController.pauseAutomatedMovement() }
+
+            assertEquals(MockLocationState.PAUSED, repo.mockLocationState.value)
+            assertEquals(MockMode.ROUTE_REPLAY, repo.currentMode.value)
+            assertEquals("saved-route", repo.activeRouteId.value)
+            verify(exactly = 1) { MockLocationIntentBuilder.pauseRouteReplay(any()) }
+            coVerify(exactly = 0) { harness.teleportUseCase.stopAutomatedMovement() }
         }
 
     private class Harness(

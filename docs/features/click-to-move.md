@@ -55,6 +55,7 @@ If a road-following leg falls back to a straight line (OSRM backend/profile ladd
 ## Edge Cases
 
 - New walk-here cancels the previous one.
-- Moving the joystick stick cancels a walk (running, paused, or still looking up its road route) and steers from the current position (docs/features/joystick.md, "Manual takeover").
+- Moving the joystick pauses a walk and retains its target, including during a road lookup (docs/features/joystick.md, "Manual takeover"). Releasing the stick does not resume it. Resume continues from the manually moved position. Choosing a new map destination replaces the paused walk and clears its pause flag.
+- Cancelled walk cleanup belongs to its generation: an old job finishing after a same-coordinate restart cannot clear the newer walk target. `WalkCoordinator` checks and clears under the same lock; standalone `WalkToEngine` callers retain their own cleanup contract.
 - Walk-here while route replay is active → show confirmation dialog to stop replay before proceeding.
 - "Add next point" while in roaming mode → no-op (only valid during walk-to or active ephemeral replay).

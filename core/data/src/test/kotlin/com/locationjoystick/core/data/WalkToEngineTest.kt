@@ -11,9 +11,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -237,6 +239,54 @@ class WalkToEngineTest {
             advanceTimeBy(AppConstants.LocationConstants.UPDATE_INTERVAL_MS + 1)
 
             assertTrue("onArrival should be called when within threshold", arrivalCalled)
+            assertNull("Standalone callers retain target cleanup on arrival", locationRepository.walkTarget.value)
+        }
+
+    @Test
+    fun `standalone cancellation clears its target by default`() =
+        runTest {
+            val target = LatLng(48.9000, 2.3522)
+            locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+            locationRepository.setWalkTarget(target)
+            val job =
+                with(engine) {
+                    backgroundScope.launchWalkAlongRoute(
+                        waypoints = listOf(target),
+                        onPositionUpdate = { pos, _, _ -> locationRepository.updatePosition(pos) },
+                        onArrival = {},
+                    )
+                }
+            runCurrent()
+
+            job.cancel()
+            runCurrent()
+
+            assertNull(locationRepository.walkTarget.value)
+        }
+
+    @Test
+    fun `owner cleanup replaces default target cleanup on cancellation`() =
+        runTest {
+            val target = LatLng(48.9000, 2.3522)
+            locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+            locationRepository.setWalkTarget(target)
+            var finishedCalls = 0
+            val job =
+                with(engine) {
+                    backgroundScope.launchWalkAlongRoute(
+                        waypoints = listOf(target),
+                        onPositionUpdate = { pos, _, _ -> locationRepository.updatePosition(pos) },
+                        onArrival = {},
+                        onFinished = { finishedCalls++ },
+                    )
+                }
+            runCurrent()
+
+            job.cancel()
+            runCurrent()
+
+            assertEquals(1, finishedCalls)
+            assertEquals("Only the session owner may clear this target", target, locationRepository.walkTarget.value)
         }
 
     @Test

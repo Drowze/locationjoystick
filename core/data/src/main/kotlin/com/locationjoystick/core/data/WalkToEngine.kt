@@ -49,10 +49,16 @@ class WalkToEngine
             onArrival: suspend () -> Unit,
         ): Job = launchWalkAlongRoute(listOf(target), onPositionUpdate, onArrival)
 
+        /**
+         * @param onFinished Optional owner-managed cleanup on completion or cancellation.
+         *   When supplied, replaces the default target cleanup; the owner must clear only
+         *   its own session, atomically with any replacement start.
+         */
         fun CoroutineScope.launchWalkAlongRoute(
             waypoints: List<LatLng>,
             onPositionUpdate: suspend (LatLng, Float, Float) -> Unit,
             onArrival: suspend () -> Unit,
+            onFinished: (() -> Unit)? = null,
         ): Job {
             require(waypoints.isNotEmpty()) { "Waypoints must not be empty" }
             val finalTarget = waypoints.last()
@@ -90,7 +96,13 @@ class WalkToEngine
                 } catch (e: Exception) {
                     Log.e(TAG, "Walk along route to $finalTarget interrupted", e)
                 } finally {
-                    if (locationRepository.walkTarget.value == finalTarget) {
+                    // A coordinator owns session identity, so it must clear the target under
+                    // the same lock as start/cancel. Target equality cannot distinguish two
+                    // successive walks to the same destination. Standalone callers retain
+                    // the default cleanup when no session owner is supplied.
+                    if (onFinished != null) {
+                        onFinished()
+                    } else if (locationRepository.walkTarget.value == finalTarget) {
                         locationRepository.setWalkTarget(null)
                     }
                 }

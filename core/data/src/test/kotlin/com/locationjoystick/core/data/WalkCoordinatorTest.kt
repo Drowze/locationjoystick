@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -217,6 +218,68 @@ class WalkCoordinatorTest {
                 locationRepository.walkTarget.value,
             )
             assertEquals(MockMode.WALK_TO, locationRepository.currentMode.value)
+        }
+
+    @Test
+    fun `cancel then immediately restart the same target keeps the new walk moving`() =
+        assertImmediateRestartMoves(LatLng(48.9000, 2.3522), LatLng(48.9000, 2.3522))
+
+    @Test
+    fun `cancel then immediately restart a different target keeps the new walk moving`() =
+        assertImmediateRestartMoves(LatLng(48.9000, 2.3522), LatLng(48.9100, 2.3522))
+
+    private fun assertImmediateRestartMoves(
+        firstTarget: LatLng,
+        nextTarget: LatLng,
+    ) = runTest {
+        locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+        var oldTicks = 0
+        walkCoordinator.startWalk(firstTarget, backgroundScope) { _, _, _ -> oldTicks++ }
+        runCurrent()
+        assertEquals("The old walk must have entered its try/finally before cancellation", 1, oldTicks)
+
+        walkCoordinator.cancel()
+        var newTicks = 0
+        val beforeRestart = locationRepository.currentPosition.value
+        // Do not drain cancellation: the old finally block must run after the new target is set.
+        walkCoordinator.startWalk(nextTarget, backgroundScope) { _, _, _ -> newTicks++ }
+        runCurrent()
+
+        assertEquals(1, newTicks)
+        assertTrue(locationRepository.currentPosition.value != beforeRestart)
+        assertEquals(nextTarget, locationRepository.walkTarget.value)
+        assertEquals(MockMode.WALK_TO, locationRepository.currentMode.value)
+        advanceTimeBy(AppConstants.LocationConstants.UPDATE_INTERVAL_MS)
+        runCurrent()
+        assertEquals("The replacement must keep moving beyond its first tick", 2, newTicks)
+        assertEquals("The cancelled walk must not publish another tick", 1, oldTicks)
+    }
+
+    @Test
+    fun `repeated immediate restarts to the same target survive every old cleanup`() =
+        runTest {
+            val target = LatLng(48.9000, 2.3522)
+            locationRepository.setPositionInternal(LatLng(48.8566, 2.3522))
+            walkCoordinator.startWalk(target, backgroundScope)
+            runCurrent()
+
+            repeat(5) {
+                walkCoordinator.cancel()
+                val beforeRestart = locationRepository.currentPosition.value
+                var ticks = 0
+                walkCoordinator.startWalk(target, backgroundScope) { _, _, _ -> ticks++ }
+                runCurrent()
+
+                assertEquals(1, ticks)
+                assertTrue(locationRepository.currentPosition.value != beforeRestart)
+                assertEquals(target, locationRepository.walkTarget.value)
+                assertEquals(MockMode.WALK_TO, locationRepository.currentMode.value)
+            }
+
+            walkCoordinator.cancel()
+            runCurrent()
+            assertNull(locationRepository.walkTarget.value)
+            assertEquals(MockMode.TELEPORT, locationRepository.currentMode.value)
         }
 
     @Test

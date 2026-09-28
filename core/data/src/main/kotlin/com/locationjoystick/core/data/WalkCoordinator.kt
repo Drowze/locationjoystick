@@ -118,6 +118,13 @@ class WalkCoordinator
                                     locationRepository.emitCompletion("Walk complete")
                                 }
                             },
+                            onFinished = {
+                                synchronized(lock) {
+                                    if (generation == walkGeneration) {
+                                        locationRepository.setWalkTarget(null)
+                                    }
+                                }
+                            },
                         )
                 }
                 return true

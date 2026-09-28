@@ -56,7 +56,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/** Tint for ignored joystick/roam icons: faded vs orange, still readable on the black circle. */
+/** Tint for disabled controls and ignored roam starts, still readable on the black circle. */
 private val WidgetIgnoredTint = Color.White.copy(alpha = 0.42f)
 
 /** Tint for inactive widget chrome icons. Mid-grey on the black circle is too close to the fill. */
@@ -318,7 +318,12 @@ internal fun WidgetPanel(
             val controlsEnabled = widgetControlsEnabled(masterToggle.spoofingActive)
             features.forEach { feature ->
                 if (feature == AppFeature.ROUTES) {
-                    val routeIconTint = if (routeControls.isActive) LjSuccess else MaterialTheme.colorScheme.primary
+                    val routeIconTint =
+                        when {
+                            routeControls.isActive && routeControls.isPaused -> WidgetInactiveTint
+                            routeControls.isActive -> LjSuccess
+                            else -> MaterialTheme.colorScheme.primary
+                        }
                     Box {
                         WidgetIconButton(
                             icon = LjIcons.Route,
@@ -379,6 +384,7 @@ internal fun WidgetPanel(
                 } else if (feature == AppFeature.ROAMING) {
                     val roamingTint =
                         when {
+                            roamingControls.isActive && roamingControls.isPaused -> WidgetInactiveTint
                             roamingControls.isActive -> LjSuccess
                             roamingStartIgnored -> WidgetIgnoredTint
                             else -> MaterialTheme.colorScheme.primary
@@ -434,13 +440,7 @@ internal fun WidgetPanel(
                             joystickLocked,
                             activeProfileId,
                         )
-                    val iconTint =
-                        when {
-                            (feature == AppFeature.JOYSTICK_TOGGLE || feature == AppFeature.JOYSTICK_LOCK) &&
-                                joystickInputIgnored -> WidgetIgnoredTint
-                            active -> MaterialTheme.colorScheme.primary
-                            else -> WidgetInactiveTint
-                        }
+                    val iconTint = if (active) MaterialTheme.colorScheme.primary else WidgetInactiveTint
                     Box {
                         WidgetIconButton(
                             icon = icon,
@@ -541,7 +541,7 @@ private fun featureIconAndState(
 ): Pair<ImageVector, Boolean> =
     when (feature) {
         AppFeature.JOYSTICK_TOGGLE -> {
-            Pair(LjIcons.Visibility, joystickVisible)
+            Pair(LjIcons.JoystickToggle, joystickVisible)
         }
 
         AppFeature.JOYSTICK_LOCK -> {
@@ -573,7 +573,7 @@ private fun featureIconAndState(
         }
 
         AppFeature.MAP_FLOATING -> {
-            Pair(LjIcons.LocationOn, true)
+            Pair(LjIcons.Map, true)
         }
 
         AppFeature.PASTE_COORDINATES -> {

@@ -22,7 +22,6 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.shouldIgnoreJoystickInput
-import com.locationjoystick.core.model.shouldJoystickTakeOver
 import com.locationjoystick.core.overlay.OverlayService
 import com.locationjoystick.core.overlay.OverlayServiceHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -125,9 +124,8 @@ class JoystickOverlayService : OverlayService() {
     /** Single movement job used for both touch-active and locked-release motion. */
     private var movementJob: Job? = null
 
-    /** In-flight cancellation of automated movement; joystick ticks wait for it (issue #96). */
-    @Volatile
-    private var takeoverJob: Job? = null
+    /** Deduplicates requests to turn Follow leader off while the setting is being persisted. */
+    private var followerExitJob: Job? = null
 
     inner class LocalBinder : Binder() {
         fun getService(): JoystickOverlayService = this@JoystickOverlayService
@@ -166,8 +164,10 @@ class JoystickOverlayService : OverlayService() {
                 locationRepository.currentMode,
                 locationRepository.mockLocationState,
                 roamingRepository.isRoamingPaused,
-            ) { mode, state, roamPaused -> shouldIgnoreJoystickInput(mode, state, roamPaused) }
-                .distinctUntilChanged()
+                locationRepository.isWalkPaused,
+            ) { mode, state, roamPaused, walkPaused ->
+                shouldIgnoreJoystickInput(mode, state, roamPaused, walkPaused)
+            }.distinctUntilChanged()
                 .collect { ignored ->
                     withContext(Dispatchers.Main) {
                         (overlayView as? JoystickView)?.inputIgnored = ignored
@@ -207,25 +207,38 @@ class JoystickOverlayService : OverlayService() {
     fun setIsLocked(value: Boolean) {
         _isLocked.value = value
         (overlayView as? JoystickView)?.isLocked = value
-        if (!value) {
-            movementJob?.cancel()
-            movementJob = null
-            if (!shouldPreserveEngineMode(locationRepository.currentMode.value)) {
-                locationRepository.setMockMode(MockMode.TELEPORT)
-            }
+        if (!value) stopJoystickMovement()
+        Log.d(TAG, "Joystick locked: $value")
+    }
+
+    private fun stopJoystickMovement() {
+        lastInput = null
+        movementJob?.cancel()
+        movementJob = null
+        // A new automatic movement may have started before the finger is released or unlocked.
+        // Its mode and motion vector belong to that engine, not to the old joystick gesture.
+        val mode = locationRepository.currentMode.value
+        if (!shouldPreserveEngineMode(mode)) {
+            locationRepository.setMockMode(MockMode.TELEPORT)
+        }
+        val engineOwnsMovement =
+            shouldIgnoreJoystickInput(
+                mode,
+                locationRepository.mockLocationState.value,
+                roamingRepository.isRoamingPaused.value,
+                locationRepository.isWalkPaused.value,
+            )
+        if (!engineOwnsMovement) {
             mockLocationService?.clearMotionVector()
         }
-        Log.d(TAG, "Joystick locked: $value")
     }
 
     fun showJoystick() {
         showOverlay()
-        _isVisible.value = overlayView?.isAttachedToWindow == true
     }
 
     fun hideJoystick() {
         hideOverlay()
-        _isVisible.value = false
     }
 
     fun toggleOverlay() {
@@ -238,6 +251,19 @@ class JoystickOverlayService : OverlayService() {
 
     override fun createOverlayView(): View {
         val view = JoystickView(this)
+        // addView can return before attachment. Publish the actual window lifecycle,
+        // including show/hide commands sent directly through the base overlay service.
+        view.addOnAttachStateChangeListener(
+            object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) {
+                    _isVisible.value = true
+                }
+
+                override fun onViewDetachedFromWindow(v: View) {
+                    _isVisible.value = false
+                }
+            },
+        )
 
         view.isLocked = _isLocked.value
         view.inputIgnored =
@@ -245,12 +271,13 @@ class JoystickOverlayService : OverlayService() {
                 locationRepository.currentMode.value,
                 locationRepository.mockLocationState.value,
                 roamingRepository.isRoamingPaused.value,
+                locationRepository.isWalkPaused.value,
             )
 
         view.onInputChanged = { input ->
             lastInput = input
-            // Only live touches reach here: dead-zone touches report zero force, and the drag
-            // handle and a retained locked direction never call onInputChanged.
+            // Positive force comes from live touches; centered input stops steps without
+            // changing the lock state or taking over an automatic movement.
             if (input.force > 0f) {
                 takeOverAutomatedMovementIfActive()
                 if (movementJob == null || !movementJob!!.isActive) startMovement()
@@ -265,12 +292,7 @@ class JoystickOverlayService : OverlayService() {
                 // by JoystickView when shouldResetOnRelease returns false).
                 Log.d(TAG, "Joystick released (locked) — continuing movement")
             } else {
-                movementJob?.cancel()
-                movementJob = null
-                if (!shouldPreserveEngineMode(locationRepository.currentMode.value)) {
-                    locationRepository.setMockMode(MockMode.TELEPORT)
-                }
-                mockLocationService?.clearMotionVector()
+                stopJoystickMovement()
                 Log.d(TAG, "Joystick released — movement stopped")
             }
         }
@@ -317,26 +339,18 @@ class JoystickOverlayService : OverlayService() {
     }
 
     /**
-     * Moving the stick cancels walk-to, route replay, roaming or follower sync and hands control
-     * to the joystick at the current position (issue #96). Uses the same stops as a teleport.
+     * Moving the stick pauses automation in place so the existing Resume action can continue it.
+     * A follower leaves Follow leader instead; it has no resumable local movement to preserve.
      */
     private fun takeOverAutomatedMovementIfActive() {
-        if (takeoverJob?.isActive == true) return
         val mode = locationRepository.currentMode.value
-        val shouldTakeOver =
-            shouldJoystickTakeOver(
-                mode = mode,
-                isRoaming = roamingRepository.isRoaming.value,
-                hasWalkTarget = locationRepository.walkTarget.value != null,
-                isRoadRouteFetchInFlight = locationRepository.isRoadRouteFetchInFlight.value,
-            )
-        if (!shouldTakeOver) return
-        takeoverJob =
-            serviceScope.launch {
-                if (mode == MockMode.FOLLOWER) stopFollowingLeader()
-                mapController.stopAutomatedMovement()
-                Log.i(TAG, "Joystick took over from $mode")
-            }
+        if (mode == MockMode.FOLLOWER) {
+            if (followerExitJob?.isActive == true) return
+            followerExitJob = serviceScope.launch { stopFollowingLeader() }
+        } else {
+            // Synchronous and idempotent: a later map action cannot be cancelled by an old touch.
+            mapController.pauseAutomatedMovement()
+        }
     }
 
     /** Same as turning Follow leader off on the Group Sync screen; the device stays in the group. */
@@ -364,12 +378,20 @@ class JoystickOverlayService : OverlayService() {
     private suspend fun applyJoystickInput(input: JoystickInput) {
         val currentPos = locationRepository.currentPosition.value ?: return
         val speedMs = _cachedProfile.value?.speedMetersPerSecond ?: return
-        if (takeoverJob?.isActive == true) return
         val mode = locationRepository.currentMode.value
         val mockState = locationRepository.mockLocationState.value
         // Don't let a stray drag tick steal mode from an engine (route replay, roaming, walk-to,
         // follower sync) that's independently advancing position this same tick.
-        if (shouldIgnoreJoystickInput(mode, mockState, roamingRepository.isRoamingPaused.value)) return
+        if (
+            shouldIgnoreJoystickInput(
+                mode,
+                mockState,
+                roamingRepository.isRoamingPaused.value,
+                locationRepository.isWalkPaused.value,
+            )
+        ) {
+            return
+        }
         if (!shouldPreserveEngineMode(mode)) {
             locationRepository.setMockMode(MockMode.JOYSTICK)
         }

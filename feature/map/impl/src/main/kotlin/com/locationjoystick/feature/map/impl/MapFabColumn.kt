@@ -89,8 +89,9 @@ internal fun MapFabColumn(
                 LjMapIconButton(
                     icon = LjIcons.DirectionsWalk,
                     contentDescription = stringResource(R.string.map_fab_walk_in_progress_cd),
-                    containerColor = LjAccent,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = if (uiState.isWalkPaused) MaterialTheme.colorScheme.surfaceVariant else LjAccent,
+                    contentColor =
+                        if (uiState.isWalkPaused) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimary,
                     onClick = { onAction(MapAction.ToggleWalkControls) },
                 )
             }
@@ -129,9 +130,17 @@ internal fun MapFabColumn(
                                         },
                                     ),
                                 containerColor =
-                                    if (uiState.isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
+                                    when {
+                                        uiState.isRouteReplay && uiState.isRoutePaused -> MaterialTheme.colorScheme.surfaceVariant
+                                        uiState.isRouteReplay -> LjSuccess
+                                        else -> MaterialTheme.colorScheme.primaryContainer
+                                    },
                                 contentColor =
-                                    if (uiState.isRouteReplay) LjBg else MaterialTheme.colorScheme.onPrimaryContainer,
+                                    when {
+                                        uiState.isRouteReplay && uiState.isRoutePaused -> MaterialTheme.colorScheme.onSurfaceVariant
+                                        uiState.isRouteReplay -> LjBg
+                                        else -> MaterialTheme.colorScheme.onPrimaryContainer
+                                    },
                                 onClick = {
                                     if (uiState.isRouteReplay) {
                                         onAction(MapAction.ToggleRouteControls)
@@ -249,6 +258,7 @@ internal fun MapFabColumn(
                                     },
                                 contentColor =
                                     when {
+                                        uiState.isRoaming && uiState.isRoamingPaused -> MaterialTheme.colorScheme.onSurfaceVariant
                                         uiState.isRoaming -> LjSuccess
                                         routePlaying -> MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.22f)
                                         uiState.isRoamingSheetMinimized -> MaterialTheme.colorScheme.onTertiary

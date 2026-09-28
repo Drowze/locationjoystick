@@ -94,8 +94,18 @@ internal fun MapFloatingRouteControlsRow(
                             R.string.overlay_open_routes_cd
                         },
                     ),
-                containerColor = if (isRouteReplay) LjSuccess else MaterialTheme.colorScheme.primaryContainer,
-                contentColor = if (isRouteReplay) LjBg else MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor =
+                    when {
+                        isRouteReplay && isRoutePaused -> MaterialTheme.colorScheme.surfaceVariant
+                        isRouteReplay -> LjSuccess
+                        else -> MaterialTheme.colorScheme.primaryContainer
+                    },
+                contentColor =
+                    when {
+                        isRouteReplay && isRoutePaused -> MaterialTheme.colorScheme.onSurfaceVariant
+                        isRouteReplay -> LjBg
+                        else -> MaterialTheme.colorScheme.onPrimaryContainer
+                    },
                 onClick = {
                     if (isRouteReplay) {
                         onRouteControlsExpandedChange(!isRouteControlsExpanded)

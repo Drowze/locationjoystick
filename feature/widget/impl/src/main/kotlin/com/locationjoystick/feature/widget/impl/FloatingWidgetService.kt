@@ -457,6 +457,7 @@ class FloatingWidgetService :
                             currentMode,
                             mockLocationState,
                             isRoamingPaused = currentMode == MockMode.ROAMING && isActivityPaused,
+                            isWalkPaused = currentMode == MockMode.WALK_TO && isActivityPaused,
                         ),
                     roamingStartIgnored = isRoutePlaying(currentMode, mockLocationState),
                     isPanelExpanded = isPanelExpanded,

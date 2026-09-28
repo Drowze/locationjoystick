@@ -13,13 +13,15 @@ Key files: `:feature:joystick:impl/JoystickOverlayService.kt`, `:feature:joystic
 
 ## Movement
 
-- Drag → direction vector × speed (m/s).
+- Drag → direction vector × speed (m/s) × force. Pulling farther increases speed; the central 15% is a dead zone.
 - Release eases the knob back to center (180 ms overshoot) then reports zero force.
 - New lat/lon via Haversine.
 - Pushed to `MockLocationService`.
 - Overlay reposition: `View.OnTouchListener` → `WindowManager.LayoutParams`.
-- **Manual takeover** (issue #96): moving the stick past the dead zone cancels any walk-to, route replay, roaming/planting or follower sync — playing or paused — plus a road route still being planned for one, then steers from the current position. `JoystickOverlayService` checks `shouldJoystickTakeOver` (`:core:model/MovementPriority.kt`) on each live touch and runs `MapController.stopAutomatedMovement()` (the same `stopWalk()` + `TeleportUseCase.stopAutomatedMovement()` stops a teleport uses); ticks wait for it so nothing competes. A follower also turns **Follow leader** off (same as the Group Sync switch) and stays in the group. Saved routes and preferences are untouched. Releasing an unlocked stick stops at the current position; nothing resumes. Dead-zone touches, release, and dragging the overlay handle never take over, and a retained locked direction is not a new gesture.
-- Without a new touch, the stick's ticks (e.g. a locked direction) are still ignored while a **playing** route, **running** roam, walk-to, or follower owns the tick, and steer a paused route or roam without ending it (`shouldIgnoreJoystickInput`). Controls in that state fade toward their background circle instead of changing colour, but stay readable (widget chrome uses ~42% white on black, not a near-match). The widget eye (show/hide) opens or closes the overlay on its own; lock is not required. Lock still shows-then-locks if the overlay is hidden.
+- **Manual takeover**: a new touch past the dead zone calls `MapController.pauseAutomatedMovement()` synchronously. Walk-to, route replay, and roaming/planting pause with their destination and progress retained. Pending road lookups may finish, but movement waits for explicit Resume. Repeated input while paused does not restart the activity. A follower instead turns **Follow leader** off and stays in the group; following has no route pause/resume session.
+- While paused, the joystick can steer without changing the activity's mode. Releasing an unlocked stick stops manual movement and leaves the activity paused; the existing Resume control restarts it. A walk resumes from the current position toward its retained target. Choosing another map destination replaces the old walk and starts moving, including when the target coordinates are the same.
+- **Lock at center**: a touch or drag into the dead zone reports zero force, so manual stepping stops while lock stays enabled. Pulling outward resumes locked movement; releasing outside the dead zone retains the direction. Only the widget lock button toggles locking. Dragging the overlay handle does not unlock or pause an activity.
+- Without a new touch, a retained locked direction is ignored while a route, roam, walk-to, or follower owns the tick. Paused walk-to, route, and roam sessions yield to the joystick (`shouldIgnoreJoystickInput`). The stick fades while input is ignored. While spoofing is active, the widget lock icon reflects only `joystickLocked`: primary orange when locked, `WidgetInactiveTint` grey when unlocked, including during activity playback and pause. The widget joystick icon shows/hides the overlay independently and uses orange for visible or grey for hidden, regardless of movement ownership; lock still shows-then-locks a hidden overlay.
 
 ## Cleanup
 
@@ -29,3 +31,7 @@ Call `windowManager.removeView` in `onDestroy`, null/attached check.
 
 - Revoke `SYSTEM_ALERT_WINDOW` while showing → `removeView` throws. Wrap in try/catch.
 - MIUI/ColorOS: overlay perms reset on reboot. Show startup reminder.
+
+## Visibility synchronization
+
+`JoystickOverlayService.isVisible` follows the overlay view's attach/detach callbacks. `WindowManager.addView()` may return before attachment, so reading `isAttachedToWindow` immediately after showing can leave the widget stale. The callbacks also cover base overlay show/hide broadcasts. `JoystickVisibilityTest` exercises delayed attachment, repeated show/hide, and those base commands.

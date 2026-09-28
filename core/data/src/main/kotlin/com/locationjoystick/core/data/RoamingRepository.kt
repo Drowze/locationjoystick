@@ -86,6 +86,7 @@ class RoamingRepository
                 TAG,
                 "Starting roaming: radius=${config.radiusMeters}m, distance=${config.distanceMeters}m, profile=${config.speedProfileId}",
             )
+            _isRoamingPaused.value = false
             _isRoaming.value = true
             locationRepository.setMockMode(MockMode.ROAMING)
             locationRepository.setSpeedInternal(speedMs.toFloat())

@@ -335,6 +335,20 @@ class RoamingRepositoryTest {
     // pauseRoaming / resumeRoaming
 
     @Test
+    fun `starting a new roam clears the previous pause state`() =
+        runTest {
+            repository.startRoaming(createDefaultConfig(), speedMs = 1.4)
+            repository.pauseRoaming()
+            assertTrue(repository.isRoamingPaused.value)
+
+            repository.startRoaming(createDefaultConfig(), speedMs = 1.4)
+
+            assertTrue(repository.isRoaming.value)
+            assertFalse(repository.isRoamingPaused.value)
+            assertEquals(MockMode.ROAMING, fakeLocationRepository.currentMode.value)
+        }
+
+    @Test
     fun `pauseRoaming sets isRoamingPaused to true`() =
         runTest {
             repository.pauseRoaming()
