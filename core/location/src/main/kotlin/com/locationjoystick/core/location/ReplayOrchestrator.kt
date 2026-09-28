@@ -25,15 +25,12 @@ import com.locationjoystick.core.routing.RouteReplayer
 import com.locationjoystick.core.routing.RoutingErrorReporter
 import com.locationjoystick.core.routing.TeleportRouteEngine
 import com.locationjoystick.core.routing.osrmFailureMessage
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicInteger
 
 private const val TAG = "ReplayOrchestrator"
 
@@ -87,19 +84,7 @@ internal class ReplayOrchestrator(
      */
     @Volatile private var activeReplayer: RouteReplayer = routeReplayEngine
 
-    private val startGeneration = AtomicInteger(0)
-
-    /** Pause survives planning and the approach walk without cancelling their saved progress. */
-    private class StartState(
-        val generation: Int,
-    ) {
-        val paused = MutableStateFlow(false)
-        var engineStarted = false
-    }
-
-    private val lifecycleLock = Any()
-
-    @Volatile private var startState: StartState? = null
+    private val lifecycle = ReplayStartLifecycle()
 
     private val bearingTracker = BearingTracker()
 
@@ -111,25 +96,9 @@ internal class ReplayOrchestrator(
      * start would snap GPS back to the route after the user already teleported.
      */
     fun abortInFlightStart() {
-        synchronized(lifecycleLock) {
-            startGeneration.incrementAndGet()
-            val previous = startState
-            startState = null
-            // A return walk runs in the completion job, not activeReplayJob. Wake its
-            // paused callback so the generation check can discard it too.
-            previous?.paused?.value = false
-        }
+        lifecycle.abort()
         activeReplayJob?.cancel()
     }
-
-    private fun beginStart(): StartState =
-        synchronized(lifecycleLock) {
-            val previous = startState
-            StartState(startGeneration.incrementAndGet()).also {
-                startState = it
-                previous?.paused?.value = false
-            }
-        }
 
     fun handleStart(
         routeId: String,
@@ -138,7 +107,7 @@ internal class ReplayOrchestrator(
         returnPosition: LatLng? = null,
     ) {
         val previous = activeReplayJob
-        val state = beginStart()
+        val state = lifecycle.begin()
         val generation = state.generation
         activeReplayJob =
             scope.launch {
@@ -212,7 +181,7 @@ internal class ReplayOrchestrator(
 
     /** Shared `onComplete` builder for [handleStart]'s two route-type branches. */
     private fun buildStartOnComplete(
-        state: StartState,
+        state: ReplayStartLifecycle.Session,
         returnPosition: LatLng?,
         speedMs: Double,
     ): suspend () -> Unit =
@@ -220,7 +189,7 @@ internal class ReplayOrchestrator(
             locationRepository.setRouteWaypoints(null)
             locationRepository.setActiveRouteId(null)
             if (returnPosition != null) {
-                synchronized(lifecycleLock) { state.engineStarted = false }
+                lifecycle.locked { state.engineStarted = false }
                 walkToPosition(returnPosition, speedMs, state = state)
             }
             finishReplay()
@@ -232,7 +201,7 @@ internal class ReplayOrchestrator(
         speedMs: Double,
     ) {
         val previous = activeReplayJob
-        val state = beginStart()
+        val state = lifecycle.begin()
         val generation = state.generation
         activeReplayJob =
             scope.launch {
@@ -253,7 +222,7 @@ internal class ReplayOrchestrator(
 
     private suspend fun isStartStillCurrent(generation: Int): Boolean {
         kotlin.coroutines.coroutineContext.ensureActive()
-        return generation == startGeneration.get()
+        return lifecycle.isCurrent(generation)
     }
 
     /**
@@ -267,13 +236,13 @@ internal class ReplayOrchestrator(
     }
 
     fun handlePause() {
-        synchronized(lifecycleLock) {
+        lifecycle.locked {
             val mode = locationRepository.currentMode.value
-            val state = startState
-            val isStarting = state != null && !state.engineStarted && activeReplayJob?.isActive == true
+            val state = lifecycle.current
+            val isStarting = lifecycle.isStarting(activeReplayJob?.isActive == true)
             if (mode == MockMode.WALK_TO || (mode != MockMode.ROUTE_REPLAY && !isStarting)) return
             state?.paused?.value = true
-            if (state?.engineStarted != false) activeReplayer.pause()
+            if (state == null || state.engineStarted) activeReplayer.pause()
             locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
             onStateChange(MockLocationState.PAUSED)
             locationRepository.pauseSpoofing()
@@ -283,9 +252,9 @@ internal class ReplayOrchestrator(
     }
 
     fun handleResume(speedMs: Double) {
-        synchronized(lifecycleLock) {
-            val state = startState
-            val isStarting = state != null && !state.engineStarted
+        lifecycle.locked {
+            val state = lifecycle.current
+            val isStarting = lifecycle.isStarting()
             locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
             onStateChange(MockLocationState.RUNNING)
             locationRepository.startSpoofing()
@@ -312,34 +281,10 @@ internal class ReplayOrchestrator(
         }
     }
 
-    private suspend fun awaitResume(state: StartState) {
-        state.paused.first { !it }
-        if (!isStartStillCurrent(state.generation)) throw CancellationException("Replay replaced")
-    }
-
-    private suspend fun runWhenResumed(
-        state: StartState,
-        action: () -> Unit,
-    ) {
-        while (true) {
-            awaitResume(state)
-            val started =
-                synchronized(lifecycleLock) {
-                    if (state !== startState || state.paused.value) {
-                        false
-                    } else {
-                        action()
-                        true
-                    }
-                }
-            if (started) return
-        }
-    }
-
     private fun tickReplayPosition(pos: LatLng) {
-        synchronized(lifecycleLock) {
+        lifecycle.locked {
             // A tick already in flight when pause lands must not overwrite manual steering.
-            if (startState?.paused?.value == true ||
+            if (lifecycle.current?.paused?.value == true ||
                 locationRepository.mockLocationState.value == MockLocationState.PAUSED
             ) {
                 return
@@ -429,7 +374,7 @@ internal class ReplayOrchestrator(
 
     /** Shared teardown for a completed/reset replay: clear route waypoints, zero speed, go idle. */
     private fun finishReplay() {
-        startState = null
+        lifecycle.clear()
         locationRepository.setRouteWaypoints(null)
         locationRepository.setRouteProgress(null)
         onSpeedChange(0f)
@@ -445,7 +390,7 @@ internal class ReplayOrchestrator(
      * the caller start its own engine.
      */
     private suspend fun startReplaySetup(
-        state: StartState,
+        state: ReplayStartLifecycle.Session,
         waypointCount: Int,
         reportedSpeedMs: Float,
         persistMetadata: (suspend () -> Unit)?,
@@ -462,7 +407,7 @@ internal class ReplayOrchestrator(
         locationRepository.setMockMode(MockMode.ROUTE_REPLAY)
         persistMetadata?.invoke()
         // A pause requested while OSRM or the route lookup was pending must survive setup.
-        synchronized(lifecycleLock) {
+        lifecycle.locked {
             if (state.paused.value) {
                 onStateChange(MockLocationState.PAUSED)
                 locationRepository.pauseSpoofing()
@@ -472,7 +417,7 @@ internal class ReplayOrchestrator(
             }
         }
 
-        awaitResume(state)
+        lifecycle.awaitResume(state)
         walkToStart?.invoke()
 
         startEngine()
@@ -495,7 +440,7 @@ internal class ReplayOrchestrator(
      * @param onComplete Invoked on the service scope when the replay engine signals completion.
      */
     private suspend fun startReplayWithWaypoints(
-        state: StartState,
+        state: ReplayStartLifecycle.Session,
         waypoints: List<LatLng>,
         speedMs: Double,
         isLooping: Boolean,
@@ -519,7 +464,7 @@ internal class ReplayOrchestrator(
             walkToStart = {
                 if (isStartStillCurrent(state.generation)) {
                     if (teleportToStart) {
-                        awaitResume(state)
+                        lifecycle.awaitResume(state)
                         tickReplayPosition(waypoints.first())
                     } else {
                         walkToPosition(waypoints.first(), speedMs, followRoadsToStart, state)
@@ -528,7 +473,7 @@ internal class ReplayOrchestrator(
             },
             startEngine = startEngine@{
                 if (!isStartStillCurrent(state.generation)) return@startEngine
-                runWhenResumed(state) {
+                lifecycle.runWhenResumed(state) {
                     state.engineStarted = true
                     routeReplayEngine.start(
                         waypoints = waypoints,
@@ -558,7 +503,7 @@ internal class ReplayOrchestrator(
      * @param onComplete Invoked on the service scope when the replay engine signals completion.
      */
     private suspend fun startTeleportReplayWithWaypoints(
-        state: StartState,
+        state: ReplayStartLifecycle.Session,
         waypoints: List<Waypoint>,
         isLooping: Boolean,
         randomizeOrder: Boolean = false,
@@ -575,7 +520,7 @@ internal class ReplayOrchestrator(
             persistMetadata = persistMetadata,
             walkToStart = null,
             startEngine = {
-                runWhenResumed(state) {
+                lifecycle.runWhenResumed(state) {
                     state.engineStarted = true
                     teleportRouteEngine.start(
                         waypoints = waypoints,
@@ -660,12 +605,12 @@ internal class ReplayOrchestrator(
         target: LatLng,
         speedMs: Double,
         followRoads: Boolean = false,
-        state: StartState,
+        state: ReplayStartLifecycle.Session,
     ) {
-        awaitResume(state)
+        lifecycle.awaitResume(state)
         val startPos = locationRepository.currentPosition.value ?: return
         val onPosition: suspend (LatLng) -> Unit = { position ->
-            runWhenResumed(state) { tickReplayPosition(position) }
+            lifecycle.runWhenResumed(state) { tickReplayPosition(position) }
         }
         if (!followRoads) {
             walkToEngine.walkToOnce(startPos, target, speedMs, onPosition)
@@ -683,7 +628,7 @@ internal class ReplayOrchestrator(
         // keep the UI showing a loading state.
         locationRepository.setRoadRouteFetchInFlight(false)
         for (i in 0 until legs.size - 1) {
-            awaitResume(state)
+            lifecycle.awaitResume(state)
             walkToEngine.walkToOnce(legs[i], legs[i + 1], speedMs, onPosition)
         }
     }
