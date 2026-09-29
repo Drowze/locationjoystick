@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.QrCode
 import androidx.compose.material.icons.rounded.QrCodeScanner
@@ -40,11 +41,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -62,11 +65,13 @@ import com.locationjoystick.core.designsystem.component.LjOutlinedButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.WideContentClamp
+import com.locationjoystick.core.designsystem.component.writePlainText
 import com.locationjoystick.core.location.rememberSpoofToggleState
 import com.locationjoystick.core.model.GroupRole
 import com.locationjoystick.core.model.GroupState
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.feature.group.impl.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun GroupSyncRoute(
@@ -82,6 +87,8 @@ fun GroupSyncRoute(
     val leaderPosition by viewModel.leaderPosition.collectAsStateWithLifecycle()
     val currentPosition by viewModel.currentPosition.collectAsStateWithLifecycle()
     val cooldownState by viewModel.cooldownState.collectAsStateWithLifecycle()
+    val apiEnabled by viewModel.apiEnabled.collectAsStateWithLifecycle()
+    val apiKey by viewModel.apiKey.collectAsStateWithLifecycle()
     val spoofToggle = rememberSpoofToggleState()
 
     var showQrScanner by remember { mutableStateOf(false) }
@@ -130,6 +137,10 @@ fun GroupSyncRoute(
             leaderPosition = leaderPosition,
             currentPosition = currentPosition,
             cooldownState = cooldownState,
+            apiEnabled = apiEnabled,
+            apiKey = apiKey,
+            onSetApiEnabled = viewModel::setApiEnabled,
+            onRegenerateApiKey = viewModel::regenerateApiKey,
         )
     }
 }
@@ -158,6 +169,10 @@ internal fun GroupSyncScreen(
     leaderPosition: LatLng? = null,
     currentPosition: LatLng? = null,
     cooldownState: CooldownState = CooldownState.Ready,
+    apiEnabled: Boolean = false,
+    apiKey: String? = null,
+    onSetApiEnabled: (Boolean) -> Unit = {},
+    onRegenerateApiKey: () -> Unit = {},
 ) {
     LjScaffold(
         title = stringResource(R.string.group_sync_group_sync),
@@ -192,6 +207,10 @@ internal fun GroupSyncScreen(
                         onSetSharingEnabled = onSetSharingEnabled,
                         onLeaveGroup = onLeaveGroup,
                         onRegenerateQr = onRegenerateQr,
+                        apiEnabled = apiEnabled,
+                        apiKey = apiKey,
+                        onSetApiEnabled = onSetApiEnabled,
+                        onRegenerateApiKey = onRegenerateApiKey,
                     )
                 }
 
@@ -350,6 +369,10 @@ private fun LeaderContent(
     onSetSharingEnabled: (Boolean) -> Unit,
     onLeaveGroup: () -> Unit,
     onRegenerateQr: () -> Unit,
+    apiEnabled: Boolean,
+    apiKey: String?,
+    onSetApiEnabled: (Boolean) -> Unit,
+    onRegenerateApiKey: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -436,6 +459,15 @@ private fun LeaderContent(
             description = stringResource(R.string.group_sync_sends_your_location_to_followers),
             checked = groupState.sharingEnabled,
             onCheckedChange = onSetSharingEnabled,
+        )
+
+        ApiAccessSection(
+            host = groupState.leaderHost,
+            port = groupState.leaderPort,
+            apiEnabled = apiEnabled,
+            apiKey = apiKey,
+            onSetApiEnabled = onSetApiEnabled,
+            onRegenerateApiKey = onRegenerateApiKey,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -549,6 +581,7 @@ private fun SwitchRow(
     description: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true,
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -566,7 +599,63 @@ private fun SwitchRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
+            Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+        }
+    }
+}
+
+@Composable
+private fun ApiAccessSection(
+    host: String?,
+    port: Int?,
+    apiEnabled: Boolean,
+    apiKey: String?,
+    onSetApiEnabled: (Boolean) -> Unit,
+    onRegenerateApiKey: () -> Unit,
+) {
+    SwitchRow(
+        label = stringResource(R.string.group_sync_control_api),
+        description = stringResource(R.string.group_sync_control_api_description),
+        checked = apiEnabled,
+        onCheckedChange = onSetApiEnabled,
+        enabled = host != null && port != null,
+    )
+    if (apiEnabled) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                ApiCredentialRow(stringResource(R.string.group_sync_api_host), host.orEmpty())
+                ApiCredentialRow(stringResource(R.string.group_sync_api_port), port?.toString().orEmpty())
+                ApiCredentialRow(stringResource(R.string.group_sync_api_key), apiKey.orEmpty())
+                LjTextButton(onClick = onRegenerateApiKey) {
+                    Text(stringResource(R.string.group_sync_api_regenerate_key))
+                }
+                Text(
+                    text = stringResource(R.string.group_sync_api_warning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ApiCredentialRow(
+    label: String,
+    value: String,
+) {
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = value, style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Monospace)
+        }
+        IconButton(onClick = { scope.launch { clipboard.writePlainText(value) } }) {
+            Icon(Icons.Rounded.ContentCopy, contentDescription = stringResource(R.string.group_sync_api_copy_cd, label))
         }
     }
 }

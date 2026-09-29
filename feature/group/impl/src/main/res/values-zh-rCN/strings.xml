@@ -44,4 +44,12 @@
     <plurals name="group_sync_followers_in_group">
         <item quantity="other">"%1$d 名成员在此群组中"</item>
     </plurals>
+    <string name="group_sync_control_api">"控制 API"</string>
+    <string name="group_sync_control_api_description">"允许同一 Wi-Fi 下的其他应用凭密钥控制此设备。"</string>
+    <string name="group_sync_api_host">"主机"</string>
+    <string name="group_sync_api_port">"端口"</string>
+    <string name="group_sync_api_key">"API 密钥"</string>
+    <string name="group_sync_api_copy_cd">"复制%1$s"</string>
+    <string name="group_sync_api_regenerate_key">"重新生成密钥"</string>
+    <string name="group_sync_api_warning">"同一 Wi-Fi 下持有此密钥的任何人都可以控制你的位置。连接未加密。"</string>
 </resources>

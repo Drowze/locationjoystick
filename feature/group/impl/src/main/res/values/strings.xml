@@ -46,4 +46,12 @@
         <item quantity="one">"%1$d follower in this group"</item>
         <item quantity="other">"%1$d followers in this group"</item>
     </plurals>
+    <string name="group_sync_control_api">"Control API"</string>
+    <string name="group_sync_control_api_description">"Lets other apps on your Wi-Fi control this device with a key."</string>
+    <string name="group_sync_api_host">"Host"</string>
+    <string name="group_sync_api_port">"Port"</string>
+    <string name="group_sync_api_key">"API key"</string>
+    <string name="group_sync_api_copy_cd">"Copy %1$s"</string>
+    <string name="group_sync_api_regenerate_key">"Regenerate key"</string>
+    <string name="group_sync_api_warning">"Anyone on your Wi-Fi with this key can control your location. The connection is not encrypted."</string>
 </resources>

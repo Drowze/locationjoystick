@@ -67,6 +67,11 @@ class GroupSyncViewModel
         private val _isDiscovering = MutableStateFlow(false)
         val isDiscovering: StateFlow<Boolean> = _isDiscovering.asStateFlow()
 
+        val apiEnabled: StateFlow<Boolean> = leaderSyncServer.apiEnabled
+
+        private val _apiKey = MutableStateFlow<String?>(null)
+        val apiKey: StateFlow<String?> = _apiKey.asStateFlow()
+
         val hideTeleportFeatures: StateFlow<Boolean> =
             settingsRepository
                 .getHideTeleportFeatures()
@@ -113,6 +118,11 @@ class GroupSyncViewModel
                 var followerExistenceChecked = false
                 groupRepository.groupState.collect { state ->
                     _groupState.value = state
+                    if (state.role != GroupRole.LEADER) {
+                        _apiKey.value = null
+                    } else if (_apiKey.value == null) {
+                        _apiKey.value = groupRepository.getOrCreateApiKey()
+                    }
                     if (state.role != GroupRole.FOLLOWER) {
                         // Leaving the group must re-arm the one-shot follower checks below so a rejoin starts following.
                         followerRestoreSent = false
@@ -281,6 +291,29 @@ class GroupSyncViewModel
         fun setSharingEnabled(enabled: Boolean) {
             viewModelScope.launch {
                 groupRepository.setSharingEnabled(enabled)
+            }
+        }
+
+        fun setApiEnabled(enabled: Boolean) {
+            if (_groupState.value.role != GroupRole.LEADER) return
+            viewModelScope.launch {
+                if (enabled) {
+                    val key = groupRepository.getOrCreateApiKey()
+                    _apiKey.value = key
+                    leaderSyncServer.enableApi(key)
+                } else {
+                    leaderSyncServer.disableApi()
+                }
+            }
+        }
+
+        fun regenerateApiKey() {
+            if (_groupState.value.role != GroupRole.LEADER) return
+            viewModelScope.launch {
+                val key = groupRepository.regenerateApiKey()
+                _apiKey.value = key
+                // enableApi on a running API rotates the key.
+                if (leaderSyncServer.apiEnabled.value) leaderSyncServer.enableApi(key)
             }
         }
 

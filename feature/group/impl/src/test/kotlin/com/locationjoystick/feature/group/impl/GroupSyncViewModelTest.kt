@@ -55,6 +55,7 @@ class GroupSyncViewModelTest {
     private lateinit var followerFollowerCount: MutableStateFlow<Int>
     private lateinit var leaderPositionFlow: MutableStateFlow<LatLng?>
     private lateinit var currentPositionFlow: MutableStateFlow<LatLng?>
+    private lateinit var apiEnabledFlow: MutableStateFlow<Boolean>
     private lateinit var lastTeleportTimeFlow: MutableStateFlow<Long>
 
     private lateinit var viewModel: GroupSyncViewModel
@@ -99,6 +100,10 @@ class GroupSyncViewModelTest {
         leaderPositionFlow = MutableStateFlow(null)
         currentPositionFlow = MutableStateFlow(null)
 
+        apiEnabledFlow = MutableStateFlow(false)
+        every { leaderSyncServer.apiEnabled } returns apiEnabledFlow
+        coEvery { groupRepository.getOrCreateApiKey() } returns "key1"
+        coEvery { groupRepository.regenerateApiKey() } returns "key2"
         every { groupRepository.groupState } returns groupStateFlow
         every { groupRepository.pendingGroupInvite } returns pendingInviteFlow
         every { groupRepository.groupLostEvent } returns MutableSharedFlow()
@@ -367,6 +372,49 @@ class GroupSyncViewModelTest {
             viewModel.clearError()
 
             assertNull(viewModel.errorMessage.value)
+        }
+
+    @Test
+    fun `apiKey is null for NONE and FOLLOWER, stored key for LEADER`() =
+        runTest {
+            assertNull(viewModel.apiKey.value)
+            groupStateFlow.value = GroupState(role = GroupRole.FOLLOWER)
+            assertNull(viewModel.apiKey.value)
+            groupStateFlow.value = GroupState(role = GroupRole.LEADER)
+            assertEquals("key1", viewModel.apiKey.value)
+        }
+
+    @Test
+    fun `setApiEnabled as leader enables with stored key and disables`() =
+        runTest {
+            groupStateFlow.value = GroupState(role = GroupRole.LEADER)
+            viewModel.setApiEnabled(true)
+            verify { leaderSyncServer.enableApi("key1") }
+            viewModel.setApiEnabled(false)
+            verify { leaderSyncServer.disableApi() }
+        }
+
+    @Test
+    fun `setApiEnabled as follower does nothing`() =
+        runTest {
+            groupStateFlow.value = GroupState(role = GroupRole.FOLLOWER)
+            viewModel.setApiEnabled(true)
+            viewModel.setApiEnabled(false)
+            verify(exactly = 0) { leaderSyncServer.enableApi(any()) }
+            verify(exactly = 0) { leaderSyncServer.disableApi() }
+        }
+
+    @Test
+    fun `regenerateApiKey updates key and rotates live API only when enabled`() =
+        runTest {
+            groupStateFlow.value = GroupState(role = GroupRole.LEADER)
+            viewModel.regenerateApiKey()
+            assertEquals("key2", viewModel.apiKey.value)
+            verify(exactly = 0) { leaderSyncServer.enableApi(any()) }
+
+            apiEnabledFlow.value = true
+            viewModel.regenerateApiKey()
+            verify { leaderSyncServer.enableApi("key2") }
         }
 
     @Test

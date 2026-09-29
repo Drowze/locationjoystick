@@ -150,6 +150,13 @@ The leader's sync server (same socket, same port) also serves a versioned contro
 - Errors always use `{"error":{"code":"<snake_case>","message":"..."}}`.
 - Transport is plain HTTP on the local network only. No TLS, no internet exposure.
 
+### Group Sync screen toggle
+
+- The leader card has a **Control API** switch under Sharing (`ApiAccessSection` in `GroupSyncScreen.kt`), off by default and enabled only once the server's host and port are known. Followers and the no-group screen show nothing new.
+- While on, it lists host, port and API key with copy buttons, a **Regenerate key** action (rotates the live key, so the old one stops working at once) and a plain-language LAN/unencrypted warning.
+- `GroupSyncViewModel.setApiEnabled` / `regenerateApiKey` are leader-only. The switch state is `LeaderSyncServer.apiEnabled`, so it resets to off on leave group or app restart; the key persists.
+- Wiki screenshot gallery has no leader-screen shot (17_group_sync is taken with no group), so no refresh is needed.
+
 ## Edge Cases
 
 - Leader pauses its route/roaming/walk → broadcasting to followers continues (frozen position, refreshed each tick) instead of going stale. `MockLocationService.observeLocationState` keeps the update loop alive on `PAUSED` when `leaderSharingEnabled` is true.

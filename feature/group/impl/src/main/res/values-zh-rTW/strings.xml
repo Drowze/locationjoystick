@@ -44,4 +44,12 @@
     </plurals>
     <string name="group_sync_follow_leader_teleports">"跟隨隊長瞬移"</string>
     <string name="group_sync_follow_leader_teleports_description">"隊長瞬移時，你也會直接跳轉過去。關閉後，你將步行前往。"</string>
+    <string name="group_sync_control_api">"控制 API"</string>
+    <string name="group_sync_control_api_description">"允許同一 Wi-Fi 下的其他應用程式憑金鑰控制此裝置。"</string>
+    <string name="group_sync_api_host">"主機"</string>
+    <string name="group_sync_api_port">"連接埠"</string>
+    <string name="group_sync_api_key">"API 金鑰"</string>
+    <string name="group_sync_api_copy_cd">"複製%1$s"</string>
+    <string name="group_sync_api_regenerate_key">"重新產生金鑰"</string>
+    <string name="group_sync_api_warning">"同一 Wi-Fi 下持有此金鑰的任何人都可以控制你的位置。連線未加密。"</string>
 </resources>
