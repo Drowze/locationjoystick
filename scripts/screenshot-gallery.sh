@@ -1294,13 +1294,17 @@ if should_run_step "20"; then
   if [[ "$(switch_is_on "Enable Tap to Walk")" != "True" ]]; then
     tap_switch_for "Enable Tap to Walk"
     wait_s 1 "Warning dialog opening"
-    # Button label depends on device API level: "Enable anyway" below API 30,
-    # "Agree" on API 30+ when the Accessibility disclosure is shown instead.
+    # Button label is "Agree" when the Accessibility disclosure is unanswered
+    # (API 30+), else "Enable anyway" (below API 30, or already answered).
     # Exact match: the disclosure body contains "Tap Agree to open…", and the
     # buttons sit below the fold, so scroll first.
     $ADB shell input swipe 540 1800 540 400
     wait_s 1 "Scrolling to dialog buttons"
-    if tap_text_exact "Agree"; then
+    dump=$(ui_dump)
+    agree=$(grep -c 'text="Agree"' "$dump" || true)
+    rm -f "$dump"
+    if (( agree > 0 )); then
+      tap_text_exact "Agree"
       # Agree opens Android's Accessibility settings; return to the app.
       wait_s 2 "Accessibility settings opening"
       back
