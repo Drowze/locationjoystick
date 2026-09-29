@@ -463,65 +463,48 @@ start_joystick_overlay() {
   done
 }
 
+# Tap an overlay button by content-desc substring. Plain `uiautomator dump` only
+# sees the focused app window; --windows also lists overlay windows, and their
+# on-screen position shifts (the panel clamps to the screen edge), so pixel math drifts.
+tap_overlay() {
+  local desc="${1//\//\\/}" centre x y
+  $ADB shell uiautomator dump --windows /sdcard/uidump_w.xml >/dev/null 2>&1
+  centre=$($ADB shell cat /sdcard/uidump_w.xml | perl -lne '
+    while (/<node [^>]*content-desc="[^"]*'"${desc}"'[^"]*"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"/g) {
+      printf "%d %d\n", int(($1+$3)/2), int(($2+$4)/2);
+      last;
+    }
+  ')
+  if [[ -z "$centre" ]]; then
+    warn "Could not find overlay button \"$desc\" — skipping tap."
+    return 1
+  fi
+  read -r x y <<< "$centre"
+  log "Tapping overlay \"$desc\" at ($x, $y)"
+  $ADB shell input tap "$x" "$y"
+}
+
 # Show joystick via widget panel toggle.
 # EXTRA_SHOW_OVERLAY via am startservice is unreliable when the service is already
 # running (the extra is not re-delivered). The correct flow is:
 #   1. Start FloatingWidgetService (collapsed FAB appears)
 #   2. Tap the master FAB to expand the panel
-#   3. Tap JOYSTICK_TOGGLE (2nd feature icon, after MAP_FLOATING)
-# Widget FAB position is read from the live overlay window bounds via dumpsys.
+#   3. Tap the joystick toggle
 show_joystick_via_widget() {
   log "Starting widget service and toggling joystick..."
   $ADB shell am startservice \
     -n "${PACKAGE}/com.locationjoystick.feature.widget.impl.FloatingWidgetService" 2>/dev/null || true
   wait_s 2 "Widget overlay appearing"
-
-  # Read overlay window position from WindowManager
-  local wx wy
-  read -r wx wy < <(
-    $ADB shell dumpsys window windows 2>/dev/null \
-      | perl -lne 'if (/mAttrs=\{\((-?\d+),(\d+)\)\(wrapxwrap\).*APPLICATION_OVERLAY/) { print "$1 $2"; last; }'
-  ) || true
-  if [[ -z "$wx" || -z "$wy" ]]; then
-    warn "Widget window not found via dumpsys — using calculated fallback"
-    local screen_h
-    screen_h=$($ADB shell wm size | awk '{print $NF}' | cut -dx -f2)
-    wx=0; wy=$(( (screen_h - 136 - 66) / 2 ))  # appHeight/2 ≈ layout y
-  fi
-
-  # 440 dpi: 1dp = 2.75px. FAB = 36dp + 4dp padding each side = 44dp = 121px.
-  # Overlay y in LayoutParams is relative to the content area (below status bar).
-  local STATUS_BAR=136
-  local FAB_PX=121
-  local cx=$(( wx + FAB_PX / 2 ))
-  local fab_cy=$(( STATUS_BAR + wy + FAB_PX / 2 ))
-  # MAP_FLOATING is icon 0, JOYSTICK_TOGGLE is icon 1 → offset = (1+1)*FAB_PX + FAB_PX/2
-  local toggle_y=$(( STATUS_BAR + wy + FAB_PX * 2 + FAB_PX / 2 ))
-
-  log "Expanding widget at ($cx, $fab_cy)"
-  $ADB shell input tap "$cx" "$fab_cy"
+  tap_overlay "Expand widget"
   wait_s 1 "Panel expanding"
-
-  log "Tapping JOYSTICK_TOGGLE at ($cx, $toggle_y)"
-  $ADB shell input tap "$cx" "$toggle_y"
+  tap_overlay "Show/hide joystick"
   wait_s 2 "Joystick appearing"
 }
 
-# Collapse widget panel (tap master FAB to toggle).
+# Toggle the widget panel (the master FAB is "Collapse widget" when open, "Expand widget" when closed).
 collapse_widget_panel() {
-  local wx wy
-  read -r wx wy < <(
-    $ADB shell dumpsys window windows 2>/dev/null \
-      | perl -lne 'if (/mAttrs=\{\((-?\d+),(\d+)\)\(wrapxwrap\).*APPLICATION_OVERLAY/) { print "$1 $2"; last; }'
-  ) || true
-  [[ -z "$wx" ]] && wx=0
-  [[ -z "$wy" ]] && wy=1069
-  local STATUS_BAR=136 FAB_PX=121
-  local cx=$(( wx + FAB_PX / 2 ))
-  local cy=$(( STATUS_BAR + wy + FAB_PX / 2 ))
-  log "Collapsing widget panel at ($cx, $cy)"
-  $ADB shell input tap "$cx" "$cy"
-  wait_s 1 "Panel collapsing"
+  tap_overlay "Collapse widget" || tap_overlay "Expand widget"
+  wait_s 1 "Panel toggling"
 }
 
 # Generate the two distinct Play Store marketing assets from the current
@@ -758,12 +741,17 @@ go_idle() {
   $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
   wait_s 4 "App starting"
   # A session running at kill time is restored on launch and opens the map, not the idle hub.
-  # Relaunching would restore it again, so stop it and back out to Home instead.
+  # Relaunching would restore it again, so stop it and go Home instead.
   if tap_text_exact "Stop"; then
     wait_s 3 "Stopping restored session"
-    # Back on Home would leave the app, so only back out of the map.
+    # The restored map is the nav root, so back would leave the app; use the drawer.
     local dump; dump=$(ui_dump)
-    grep -q 'Favorites' "$dump" || { back; wait_s 2 "Backing out to Home"; }
+    if ! grep -q 'Replay saved routes' "$dump"; then
+      tap_text "Open navigation menu"
+      wait_s 1 "Drawer opening"
+      tap_text_exact "Home"
+      wait_s 2 "Home loading"
+    fi
     rm -f "$dump"
   fi
 }
