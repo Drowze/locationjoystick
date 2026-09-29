@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
@@ -44,6 +45,13 @@ import com.locationjoystick.core.designsystem.component.ListSearchField
 import com.locationjoystick.core.designsystem.component.SavedItemSortMenu
 import com.locationjoystick.core.model.SavedItemSortMode
 import com.locationjoystick.feature.widget.impl.R
+
+@Composable
+internal fun overlaySheetShape(): CornerBasedShape =
+    MaterialTheme.shapes.large.copy(
+        bottomStart = ZeroCornerSize,
+        bottomEnd = ZeroCornerSize,
+    )
 
 @Composable
 internal fun FloatingPickerShell(
@@ -150,7 +158,7 @@ private fun CompactFloatingPickerShell(
                 .fillMaxWidth()
                 .background(
                     colors.background,
-                    RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                    overlaySheetShape(),
                 ).navigationBarsPadding()
                 .imePadding()
                 .padding(horizontal = 16.dp, vertical = 8.dp),

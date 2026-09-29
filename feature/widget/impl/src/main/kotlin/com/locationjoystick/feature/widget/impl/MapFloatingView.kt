@@ -736,7 +736,7 @@ private fun BoxScope.OverlayRoamingSheet(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f)
-                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .background(MaterialTheme.colorScheme.surface, overlaySheetShape())
                 .clickable {},
     ) {
         // Drag handle — matches ModalBottomSheet visual
@@ -803,7 +803,7 @@ private fun BoxScope.OverlayPasteCoordinatesSheet(
             Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .background(MaterialTheme.colorScheme.surface, overlaySheetShape())
                 .clickable {}
                 .imePadding(),
     ) {
