@@ -143,6 +143,8 @@ earlier than that.
 
 The leader's sync server (same socket, same port) also serves a versioned control API under `/api/v1/`. Only the leader can expose it.
 
+**Public API reference:** See `docs/wiki/group.html#control-api` for the full endpoint documentation. Any endpoint change must update that reference — it is the public contract for integrators.
+
 - Off by default. `LeaderSyncServer.enableApi(key)` turns it on (only while the server runs); `stop()` (leave group, app exit) turns it off. While off, every `/api/v1/` path returns 404.
 - Auth: `Authorization: Bearer <api key>`. The key is a persisted 32-char random string (`GroupRepository.getOrCreateApiKey()` / `regenerateApiKey()`), separate from the group code, and kept across leave-group. It is never exported. `/api/v1/` paths skip the `?token=` check; `/position` and `/health` are unchanged.
 - Routes: `registerApiRoute(method, path, handler)`, exact-path match first, then a one-segment `{id}` pattern (`/api/v1/favorites/{id}`; the segment reaches the handler as `ApiRequest.pathParam`). Built in: `GET /api/v1/status` returns `{"apiVersion":1,"role":"leader","followers":N}`.

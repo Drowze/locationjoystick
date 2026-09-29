@@ -22,6 +22,17 @@ All wiki pages are read by **app users, not developers**. Write every sentence a
 
 ---
 
+## Developer reference sections
+
+A wiki page may include one clearly labelled "For developers" reference section, such as an API reference for integrators. This section is an exception to the general rules above: it may contain code symbols, HTTP paths, JSON fields, and wire-level protocol details. All other content on the page must follow the general writing guidelines.
+
+Each reference section must:
+- Be headed with "(for developers)" to set expectations
+- Open with a plain-language paragraph explaining what users need to know (even if they never read the reference), linking to related app features
+- Keep technical detail to endpoints, request/response format, and error codes — no class names, module paths, or implementation details
+
+---
+
 ## Writing or editing wiki prose
 
 Whenever a change adds or edits prose on a `docs/wiki/*.html` page, run the `/no-ai-slop`

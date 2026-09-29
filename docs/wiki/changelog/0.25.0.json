@@ -2,6 +2,7 @@
   "version": "0.25.0",
   "date": "2026-09-27",
   "entries": [
+    { "category": "feat", "scope": "Group Sync", "summary": "Leader devices can now be controlled from other apps on your Wi-Fi through a Control API, switched on in Group Sync. The wiki has the full reference." },
     { "category": "feat", "scope": "Location Links (Automatic & Capture)", "summary": "Capture mode, its List/Jump action, and the pass-through browser choice are now also available inline in Settings > Menus, not only on the dedicated Capture screen." },
     { "category": "fix", "scope": "Location Links (Automatic & Capture)", "summary": "Opening a map link now always shows the Teleport, Walk, or Do nothing choice, even with Capture mode off. Before, that link jumped straight to Maps or the browser instead." }
   ]
