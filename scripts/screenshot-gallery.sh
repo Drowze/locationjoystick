@@ -703,8 +703,11 @@ for fname, caption_lines in SHOTS:
 PYTHON_EOF
 }
 
-# Expand widget panel (same tap — toggles).
-expand_widget_panel() { collapse_widget_panel; }
+# Expand the widget panel (master FAB reads 'Expand widget' when closed).
+expand_widget_panel() {
+  tap_overlay "Expand widget"
+  wait_s 1 "Panel expanding"
+}
 
 # Stop JoystickOverlayService (removes the overlay).
 stop_joystick_overlay() {
