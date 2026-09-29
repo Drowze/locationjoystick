@@ -53,6 +53,11 @@ object MockLocationIntentBuilder {
             action = MockLocationService.ACTION_PARK_KEEP_WIDGET
         }
 
+    fun clearMotionVector(context: Context): Intent =
+        Intent(context, MockLocationService::class.java).apply {
+            action = MockLocationService.ACTION_CLEAR_MOTION_VECTOR
+        }
+
     fun startRouteReplay(
         context: Context,
         routeId: String,

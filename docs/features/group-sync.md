@@ -150,6 +150,30 @@ The leader's sync server (same socket, same port) also serves a versioned contro
 - Errors always use `{"error":{"code":"<snake_case>","message":"..."}}`.
 - Transport is plain HTTP on the local network only. No TLS, no internet exposure.
 
+### Control API commands
+
+`ControlApiRoutes` (`:core:location`, installed from `MockLocationService.enterLeaderMode`) registers the commands below. Every one calls the same `MapController` method the map screen and widget call, so followers see exactly the signals a UI-driven leader sends (`teleportSeq`, `active`, position ticks) and need no API-specific handling. Bodies are JSON; success is `{"ok":true}`. Bad input is 400 `bad_request`, no position is 409 `no_position`.
+
+| Route | Body | Calls |
+|---|---|---|
+| `GET /state` | | `spoofState`, `mode`, `position`, `bearing`, `speedMs`, `activeRouteId`, `walk{target,paused}`, `roaming{active,paused}`, `speedProfileId` |
+| `GET /position` | | `{"lat","lon"}` |
+| `POST /teleport` | `lat`, `lon` | `teleportTo` |
+| `POST /walk` | `lat`, `lon`, `viaRoads?` | `walkTo` / `walkViaRoads` |
+| `POST /walk/pause`, `/resume`, `/stop` | | `pauseWalk`, `resumeWalk`, `stopWalk` |
+| `POST /route/start` | `routeId`, `loop?`, `reverse?`, `returnToLocation?`, `followRoadsToStart?`, `planting?`, `teleportBetweenWaypoints?`, `teleportBetweenDelaySeconds?` | `startRouteReplay`; unknown route is 404 `route_not_found` |
+| `POST /route/pause`, `/resume`, `/stop` | | `pauseRouteReplay`, `resumeRouteReplay`, `stopRouteReplay` |
+| `POST /roam/start` | optional `lat`, `lon`, `radiusMeters`, `distanceMeters`, `speedProfileId`, `followRoads`, `returnToInitialLocation`, `kind`, planting fields | `startRoaming` over the saved roaming defaults; a playing route is 409 `conflict` |
+| `POST /roam/pause`, `/resume`, `/stop` | | `pauseRoaming`, `resumeRoaming`, `stopRoaming` |
+| `POST /speed-profile` | `id` | `setActiveProfileId`; unknown id is 400 |
+| `POST /spoofing/start`, `/stop` | | `startSpoofing`, `stopSpoofing` |
+| `POST /joystick` | `bearingDegrees` (0 north, clockwise), `force` (0..1), `durationMs` | timed stick hold |
+
+- Cooldown is advisory only. A teleport inside the suggested cooldown still runs and answers `{"ok":true,"warning":{"code":"teleport_cooldown","message":...,"remainingSeconds","totalSeconds","distanceMeters"}}`. No cooldown, no `warning` key.
+- Hide Teleport is bypassed: `startRouteReplay(..., bypassHideTeleport = true)` keeps "Teleport between waypoints" working. Teleport and walk never read the setting.
+- Joystick: one request is a hold, not a single step (HTTP cannot keep a finger down). It pauses automatic movement like a live touch, then steps every `JoystickConstants.STEP_MS` for `durationMs` (max `API_JOYSTICK_MAX_DURATION_MS` = 10 s) with the same mode and release handling as `JoystickOverlayService` (via `shouldPreserveEngineMode` / `shouldIgnoreJoystickInput` in `MovementPriority.kt`; the release clears the motion vector through `ACTION_CLEAR_MOTION_VECTOR`). A new request replaces the running hold; `force` 0 or `durationMs` 0 releases at once.
+- `teleportToStart` is not accepted on `/route/start`: the use case derives it from `teleportBetweenWaypoints`.
+
 ### Group Sync screen toggle
 
 - The leader card has a **Control API** switch under Sharing (`ApiAccessSection` in `GroupSyncScreen.kt`), off by default and enabled only once the server's host and port are known. Followers and the no-group screen show nothing new.

@@ -26,6 +26,7 @@ class StartRouteReplayUseCase
         suspend fun execute(
             routeId: String,
             config: RouteStartConfig = RouteStartConfig(),
+            bypassHideTeleport: Boolean = false,
         ) {
             val route = routeRepository.getRouteWithWaypoints(routeId).first()
             val speedMs = settingsRepository.activateSessionSpeed(route?.speedProfileId)
@@ -33,7 +34,7 @@ class StartRouteReplayUseCase
             // Walking to the first waypoint is the default (docs/features/routes.md "Start Flow").
             // Teleport between waypoints requires teleporting to the start too, since MockLocationService
             // only honors the hop mode when teleportToStart is also set.
-            val hop = config.teleportBetweenWaypoints && !settingsRepository.getHideTeleportFeatures().first()
+            val hop = config.teleportBetweenWaypoints && (bypassHideTeleport || !settingsRepository.getHideTeleportFeatures().first())
             val effective =
                 config.copy(
                     teleportToStart = hop,

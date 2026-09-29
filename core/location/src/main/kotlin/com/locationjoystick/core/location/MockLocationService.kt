@@ -76,6 +76,7 @@ class MockLocationService : Service() {
         const val ACTION_START = AppConstants.ServiceConstants.ACTION_START
         const val ACTION_STOP = AppConstants.ServiceConstants.ACTION_STOP
         const val ACTION_PARK_KEEP_WIDGET = AppConstants.ServiceConstants.ACTION_PARK_KEEP_WIDGET
+        const val ACTION_CLEAR_MOTION_VECTOR = AppConstants.ServiceConstants.ACTION_CLEAR_MOTION_VECTOR
         const val ACTION_UPDATE_POSITION = AppConstants.ServiceConstants.ACTION_UPDATE_POSITION
         const val ACTION_ROUTE_REPLAY_START = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_START
         const val ACTION_ROUTE_REPLAY_PAUSE = AppConstants.ServiceConstants.ACTION_ROUTE_REPLAY_PAUSE
@@ -132,6 +133,8 @@ class MockLocationService : Service() {
     @Inject lateinit var routingErrorReporter: RoutingErrorReporter
 
     @Inject lateinit var leaderSyncServer: LeaderSyncServer
+
+    @Inject lateinit var controlApiRoutes: ControlApiRoutes
 
     @Inject lateinit var followerSyncClient: FollowerSyncClient
 
@@ -572,6 +575,10 @@ class MockLocationService : Service() {
 
             ACTION_PARK_KEEP_WIDGET -> {
                 parkSpoofingKeepWidget()
+            }
+
+            ACTION_CLEAR_MOTION_VECTOR -> {
+                clearMotionVector()
             }
 
             ACTION_UPDATE_POSITION -> {
@@ -1031,6 +1038,7 @@ class MockLocationService : Service() {
                     } else {
                         leaderSyncServer.currentPort
                     }
+                controlApiRoutes.install()
                 // Always call createGroup to ensure the VM picks up the current host:port
                 // (covers both fresh start and idempotent re-entry when already running).
                 groupRepository.createGroup(host = host, port = port, groupId = groupId)

@@ -3,6 +3,7 @@ package com.locationjoystick.feature.joystick.impl
 import com.locationjoystick.core.model.MockLocationState
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.shouldIgnoreJoystickInput
+import com.locationjoystick.core.model.shouldPreserveEngineMode
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

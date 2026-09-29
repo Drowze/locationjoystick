@@ -21,6 +21,7 @@ import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.core.model.MockMode
 import com.locationjoystick.core.model.SpeedProfile
 import com.locationjoystick.core.model.shouldIgnoreJoystickInput
+import com.locationjoystick.core.model.shouldPreserveEngineMode
 import com.locationjoystick.core.overlay.OverlayService
 import com.locationjoystick.core.overlay.OverlayServiceHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,13 +49,6 @@ private fun Double.toRadians(): Double = Math.toRadians(this)
 private fun Double.toDegrees(): Double = Math.toDegrees(this)
 
 private const val TAG = "JoystickOverlayService"
-
-// Modes where another engine owns position updates for its own tick — a joystick drag must not
-// steal mode or overwrite position while one of these is active.
-private val ENGINE_OWNED_MODES = setOf(MockMode.ROUTE_REPLAY, MockMode.ROAMING, MockMode.WALK_TO, MockMode.FOLLOWER)
-
-/** True when releasing the stick must not reset [MockMode] — the engine still owns the session. */
-internal fun shouldPreserveEngineMode(mode: MockMode): Boolean = mode in ENGINE_OWNED_MODES
 
 /**
  * Converts a screen angle (0=east, CCW positive) to a geographic bearing in degrees (0=north, CW positive).

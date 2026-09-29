@@ -584,9 +584,10 @@ class MapController
         fun startRouteReplay(
             routeId: String,
             config: RouteStartConfig = RouteStartConfig(),
+            bypassHideTeleport: Boolean = false,
         ) {
             appScope.launch {
-                startRouteReplayUseCase.execute(routeId = routeId, config = config)
+                startRouteReplayUseCase.execute(routeId = routeId, config = config, bypassHideTeleport = bypassHideTeleport)
             }
         }
 

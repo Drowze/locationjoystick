@@ -302,6 +302,7 @@ object AppConstants {
         const val ACTION_START = "com.locationjoystick.core.location.ACTION_START"
         const val ACTION_STOP = "com.locationjoystick.core.location.ACTION_STOP"
         const val ACTION_PARK_KEEP_WIDGET = "com.locationjoystick.core.location.ACTION_PARK_KEEP_WIDGET"
+        const val ACTION_CLEAR_MOTION_VECTOR = "com.locationjoystick.core.location.ACTION_CLEAR_MOTION_VECTOR"
         const val ACTION_UPDATE_POSITION = "com.locationjoystick.core.location.ACTION_UPDATE_POSITION"
         const val ACTION_ROUTE_REPLAY_START = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_START"
         const val ACTION_ROUTE_REPLAY_PAUSE = "com.locationjoystick.core.location.ACTION_ROUTE_REPLAY_PAUSE"
@@ -529,6 +530,9 @@ object AppConstants {
         const val GROUP_CODE_LENGTH = 6
         const val API_KEY_LENGTH = 32
         const val API_MAX_BODY_BYTES = 65_536
+
+        /** Cap on one API joystick hold, so a dead client cannot leave the position drifting. */
+        const val API_JOYSTICK_MAX_DURATION_MS = 10_000L
 
         /**
          * At [POLL_INTERVAL_MS] (1s) + up to [POLL_TIMEOUT_MS] per attempt, 5 failures gave up

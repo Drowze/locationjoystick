@@ -35,9 +35,11 @@ fun apiError(
 private val REASONS =
     mapOf(
         200 to "OK",
+        400 to "Bad Request",
         401 to "Unauthorized",
         404 to "Not Found",
         405 to "Method Not Allowed",
+        409 to "Conflict",
         413 to "Payload Too Large",
         500 to "Internal Server Error",
     )

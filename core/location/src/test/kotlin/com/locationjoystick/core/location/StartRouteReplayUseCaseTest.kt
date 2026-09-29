@@ -105,6 +105,16 @@ class StartRouteReplayUseCaseTest {
         }
 
     @Test
+    fun execute_bypassHideTeleport_stillTeleportsBetweenWaypoints() =
+        runTest {
+            every { settingsRepository.getHideTeleportFeatures() } returns flowOf(true)
+
+            useCase.execute("route-1", RouteStartConfig(teleportBetweenWaypoints = true), bypassHideTeleport = true)
+
+            coVerify { teleportUseCase.execute(start, resetMovement = false) }
+        }
+
+    @Test
     fun execute_pinnedSpeed_activatesThatProfile() =
         runTest {
             every { routeRepository.getRouteWithWaypoints("route-1") } returns

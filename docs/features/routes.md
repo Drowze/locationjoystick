@@ -185,6 +185,8 @@ disable the 48.dp Material checkbox min-size (`LocalMinimumInteractiveComponentS
 = 0.dp) so the rows sit at ~24.dp each and Cancel / Start stay on a phone
 without dragging the sheet up. Settings checkboxes keep the 48.dp target.
 
+The Control API starts routes with the Hide Teleport setting bypassed, so Teleport between waypoints still applies there (docs/features/group-sync.md, "Control API commands").
+
 - **Loop** — checked by default. After the last stop, replay starts over until
   the user stops it. Exclusive with Return to location. Forced on (and Return
   off) while Planting is checked.

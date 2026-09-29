@@ -37,3 +37,10 @@ fun shouldIgnoreJoystickInput(
         MockMode.WALK_TO -> !isWalkPaused
         MockMode.FOLLOWER -> true
     }
+
+// Modes where another engine owns position updates for its own tick — a joystick drag must not
+// steal mode or overwrite position while one of these is active.
+private val ENGINE_OWNED_MODES = setOf(MockMode.ROUTE_REPLAY, MockMode.ROAMING, MockMode.WALK_TO, MockMode.FOLLOWER)
+
+/** True when releasing the stick must not reset [MockMode] — the engine still owns the session. */
+fun shouldPreserveEngineMode(mode: MockMode): Boolean = mode in ENGINE_OWNED_MODES
