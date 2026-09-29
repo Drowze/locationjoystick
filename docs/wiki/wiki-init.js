@@ -102,11 +102,18 @@
     pageLink.after(outline);
 
     var activeLink = null;
+    // Near page end the target heading cannot reach the top, so later headings also pass the line; pin the hash target until the user scrolls.
+    var pinned = -1;
+    var pinHash = function () {
+      var id = decodeURIComponent(location.hash.slice(1));
+      pinned = Array.prototype.findIndex.call(outlineHeads, function (h) { return h.id === id; });
+    };
     var spy = function () {
       var idx = 0;
       outlineHeads.forEach(function (h, i) {
         if (h.getBoundingClientRect().top <= window.innerHeight * 0.3) idx = i;
       });
+      if (pinned >= 0) idx = pinned;
       var next = outlineLinks[idx];
       if (next === activeLink) return;
       if (activeLink) {
@@ -120,6 +127,11 @@
     };
     var io = new IntersectionObserver(spy, { rootMargin: '0px 0px -70% 0px' });
     outlineHeads.forEach(function (h) { io.observe(h); });
+    window.addEventListener('hashchange', function () { pinHash(); spy(); });
+    ['wheel', 'touchmove', 'keydown'].forEach(function (e) {
+      window.addEventListener(e, function () { pinned = -1; }, { passive: true });
+    });
+    pinHash();
     spy();
   }
 
