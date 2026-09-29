@@ -57,7 +57,7 @@ class ControlApiRoutes
                 ApiResponse(200, latLngJson(p).toString())
             }
             post("teleport") { json ->
-                val target = latLng(json) ?: return@post BAD_COORDS
+                val target = parseLatLng(json) ?: return@post BAD_COORDS
                 // Read before teleporting: teleportTo overwrites the last-teleport time.
                 val cooldown = runCatching { runBlocking { mapController.cooldownForPosition(target).first() } }.getOrNull()
                 mapController.teleportTo(target)
@@ -76,7 +76,7 @@ class ControlApiRoutes
                 ApiResponse(200, body.toString())
             }
             post("walk") { json ->
-                val target = latLng(json) ?: return@post BAD_COORDS
+                val target = parseLatLng(json) ?: return@post BAD_COORDS
                 if (json.optBoolean("viaRoads", false)) mapController.walkViaRoads(target) else mapController.walkTo(target)
                 OK
             }
@@ -187,7 +187,7 @@ class ControlApiRoutes
                 }
             val position =
                 if (json.has("lat") || json.has("lon")) {
-                    latLng(json) ?: return BAD_COORDS
+                    parseLatLng(json) ?: return BAD_COORDS
                 } else {
                     locationRepository.currentPosition.value ?: return NO_POSITION
                 }
@@ -293,12 +293,6 @@ class ControlApiRoutes
             if (!engineOwnsMovement) context.startService(MockLocationIntentBuilder.clearMotionVector(context))
         }
 
-        private fun latLng(json: JSONObject): LatLng? {
-            val lat = json.optDouble("lat", Double.NaN)
-            val lon = json.optDouble("lon", Double.NaN)
-            return if (lat in -90.0..90.0 && lon in -180.0..180.0) LatLng(lat, lon) else null
-        }
-
         private fun latLngJson(p: LatLng) = JSONObject().put("lat", p.latitude).put("lon", p.longitude)
 
         private fun Float.finiteOrNull(): Double? = if (isFinite()) toDouble() else null
@@ -309,3 +303,9 @@ class ControlApiRoutes
             val BAD_COORDS = apiError(400, "bad_request", "lat must be -90..90 and lon -180..180")
         }
     }
+
+internal fun parseLatLng(json: JSONObject): LatLng? {
+    val lat = json.optDouble("lat", Double.NaN)
+    val lon = json.optDouble("lon", Double.NaN)
+    return if (lat in -90.0..90.0 && lon in -180.0..180.0) LatLng(lat, lon) else null
+}

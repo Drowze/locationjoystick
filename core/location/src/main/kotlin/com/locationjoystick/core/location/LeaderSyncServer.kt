@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.PrintWriter
 import java.net.Socket
+import java.net.URLDecoder
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -35,6 +36,7 @@ fun apiError(
 private val REASONS =
     mapOf(
         200 to "OK",
+        201 to "Created",
         400 to "Bad Request",
         401 to "Unauthorized",
         404 to "Not Found",
@@ -56,7 +58,7 @@ class LeaderSyncServer
         val followerCount: StateFlow<Int> = _followerCount.asStateFlow()
         private var cleanupExecutor: ScheduledExecutorService? = null
 
-        // Path -> method -> handler. Exact-path match only; later tasks register here.
+        // Path -> method -> handler. Exact match first, then a one-segment `{id}` pattern (e.g. /api/v1/favorites/{id}).
         // ponytail: handlers are non-suspend, run on the connection thread; bridge coroutines with runBlocking.
         private val routes = ConcurrentHashMap<String, MutableMap<String, (ApiRequest) -> ApiResponse>>()
 
@@ -137,7 +139,7 @@ class LeaderSyncServer
             val extra =
                 when (response.status) {
                     401 -> "WWW-Authenticate: Bearer\r\n"
-                    405 -> "Allow: ${routes[request.path]?.keys?.sorted()?.joinToString(", ")}\r\n"
+                    405 -> "Allow: ${resolve(request.path)?.first?.keys?.sorted()?.joinToString(", ")}\r\n"
                     else -> ""
                 }
             writer.print(
@@ -147,6 +149,16 @@ class LeaderSyncServer
             writer.flush()
         }
 
+        /** Exact path, else the same path with its last segment replaced by `{id}`. Returns methods + captured segment. */
+        private fun resolve(path: String): Pair<Map<String, (ApiRequest) -> ApiResponse>, String?>? {
+            routes[path]?.let { return it to null }
+            val segment = path.substringAfterLast('/')
+            if (segment.isEmpty()) return null
+            val methods = routes[path.substringBeforeLast('/') + "/{id}"] ?: return null
+            val decoded = if ('%' in segment) runCatching { URLDecoder.decode(segment, "UTF-8") }.getOrNull() ?: return null else segment
+            return methods to decoded
+        }
+
         private fun routeApi(request: ApiRequest): ApiResponse {
             val key = apiKey
             if (key == null) return apiError(404, "not_found", "Not found")
@@ -154,10 +166,10 @@ class LeaderSyncServer
             val given = (request.headers["authorization"] ?: "").toByteArray(Charsets.UTF_8)
             if (!MessageDigest.isEqual(expected, given)) return apiError(401, "unauthorized", "Missing or invalid API key")
             if (request.body == null) return apiError(413, "payload_too_large", "Request body too large")
-            val methods = routes[request.path] ?: return apiError(404, "not_found", "Not found")
+            val (methods, pathParam) = resolve(request.path) ?: return apiError(404, "not_found", "Not found")
             val handler = methods[request.method] ?: return apiError(405, "method_not_allowed", "Method not allowed")
             return try {
-                handler(request)
+                handler(if (pathParam == null) request else request.copy(pathParam = pathParam))
             } catch (e: Exception) {
                 Log.w(TAG, "API handler failed for ${request.path}", e)
                 apiError(500, "internal_error", "Internal error")

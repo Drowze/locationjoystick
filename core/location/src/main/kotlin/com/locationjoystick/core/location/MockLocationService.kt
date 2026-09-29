@@ -136,6 +136,8 @@ class MockLocationService : Service() {
 
     @Inject lateinit var controlApiRoutes: ControlApiRoutes
 
+    @Inject lateinit var contentApiRoutes: ContentApiRoutes
+
     @Inject lateinit var followerSyncClient: FollowerSyncClient
 
     @Inject lateinit var groupRepository: GroupRepository
@@ -1039,6 +1041,7 @@ class MockLocationService : Service() {
                         leaderSyncServer.currentPort
                     }
                 controlApiRoutes.install()
+                contentApiRoutes.install()
                 // Always call createGroup to ensure the VM picks up the current host:port
                 // (covers both fresh start and idempotent re-entry when already running).
                 groupRepository.createGroup(host = host, port = port, groupId = groupId)

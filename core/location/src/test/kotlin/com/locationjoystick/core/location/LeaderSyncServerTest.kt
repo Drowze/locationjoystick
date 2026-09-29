@@ -222,6 +222,18 @@ class LeaderSyncServerTest {
     }
 
     @Test
+    fun `id pattern route passes decoded segment and 405 Allow reads the pattern`() {
+        val port = server.start("gid")
+        server.enableApi("k")
+        server.registerApiRoute("GET", "/api/v1/things/{id}") { ApiResponse(200, it.pathParam!!) }
+        assertEquals("a b", call(port, "/api/v1/things/a%20b").second)
+        assertEquals(404, call(port, "/api/v1/things/").first)
+        val (code, _, conn) = call(port, "/api/v1/things/x", method = "POST", body = "x")
+        assertEquals(405, code)
+        assertEquals("GET", conn.getHeaderField("Allow"))
+    }
+
+    @Test
     fun `registered route gets exact utf8 body, oversize is 413, throwing handler is 500`() {
         val port = server.start("gid")
         server.enableApi("k")

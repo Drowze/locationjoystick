@@ -19,6 +19,8 @@ data class ApiRequest(
     val query: String,
     val headers: Map<String, String>,
     val body: String?,
+    /** Value of the trailing `{id}` segment when a pattern route matched, else null. */
+    val pathParam: String? = null,
 )
 
 /**

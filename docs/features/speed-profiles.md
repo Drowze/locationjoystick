@@ -36,3 +36,7 @@ Settings → Menus → "Speed Cycle" lets the user choose which of the five pres
 
 - Speed clamped to `AppConstants.ProfileConstants.MIN_SPEED_MS`–`AppConstants.ProfileConstants.MAX_SPEED_MS`.
 - Inline warning shown below speed input when speed exceeds `AppConstants.ProfileConstants.ANTI_CHEAT_WARNING_THRESHOLD_MS`. Warning uses generic language — no specific game names. Drive's default speed exceeds this threshold by design.
+
+## API
+
+Speeds can be read and updated over the leader Control API; see docs/features/group-sync.md, "Content API".

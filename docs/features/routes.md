@@ -353,3 +353,7 @@ Route assets are bundled GPX files under `assets/hot_routes/`. All hot routes ar
 
 - <2 waypoints → replay disabled.
 - Resume after restart: persist waypoint index in DataStore.
+
+## API
+
+Routes can be listed, created, replaced and deleted over the leader Control API; see docs/features/group-sync.md, "Content API".

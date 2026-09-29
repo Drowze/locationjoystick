@@ -145,7 +145,7 @@ The leader's sync server (same socket, same port) also serves a versioned contro
 
 - Off by default. `LeaderSyncServer.enableApi(key)` turns it on (only while the server runs); `stop()` (leave group, app exit) turns it off. While off, every `/api/v1/` path returns 404.
 - Auth: `Authorization: Bearer <api key>`. The key is a persisted 32-char random string (`GroupRepository.getOrCreateApiKey()` / `regenerateApiKey()`), separate from the group code, and kept across leave-group. It is never exported. `/api/v1/` paths skip the `?token=` check; `/position` and `/health` are unchanged.
-- Routes: `registerApiRoute(method, path, handler)`, exact-path match. Built in: `GET /api/v1/status` returns `{"apiVersion":1,"role":"leader","followers":N}`.
+- Routes: `registerApiRoute(method, path, handler)`, exact-path match first, then a one-segment `{id}` pattern (`/api/v1/favorites/{id}`; the segment reaches the handler as `ApiRequest.pathParam`). Built in: `GET /api/v1/status` returns `{"apiVersion":1,"role":"leader","followers":N}`.
 - Check order: disabled 404, bad key 401 (`WWW-Authenticate: Bearer`), body over 64 KiB 413, unknown path 404, wrong method 405 (`Allow`), handler exception 500.
 - Errors always use `{"error":{"code":"<snake_case>","message":"..."}}`.
 - Transport is plain HTTP on the local network only. No TLS, no internet exposure.
@@ -173,6 +173,23 @@ The leader's sync server (same socket, same port) also serves a versioned contro
 - Hide Teleport is bypassed: `startRouteReplay(..., bypassHideTeleport = true)` keeps "Teleport between waypoints" working. Teleport and walk never read the setting.
 - Joystick: one request is a hold, not a single step (HTTP cannot keep a finger down). It pauses automatic movement like a live touch, then steps every `JoystickConstants.STEP_MS` for `durationMs` (max `API_JOYSTICK_MAX_DURATION_MS` = 10 s) with the same mode and release handling as `JoystickOverlayService` (via `shouldPreserveEngineMode` / `shouldIgnoreJoystickInput` in `MovementPriority.kt`; the release clears the motion vector through `ACTION_CLEAR_MOTION_VECTOR`). A new request replaces the running hold; `force` 0 or `durationMs` 0 releases at once.
 - `teleportToStart` is not accepted on `/route/start`: the use case derives it from `teleportBetweenWaypoints`.
+
+### Content API (favorites, routes, speed profiles)
+
+JSON CRUD, same Bearer auth and error body, registered by `ContentApiRoutes`. Field names follow the export format (`docs/domain-models.md`); coordinates are flat `lat`/`lon`.
+
+| Route | Behaviour |
+|---|---|
+| `GET /favorites`, `GET /favorites/{id}` | List / get. Shape `{id,name,lat,lon,createdAt,category}`. |
+| `POST /favorites` | Body `{name,lat,lon,category?}`. 201 with the created object. |
+| `PUT /favorites/{id}`, `DELETE /favorites/{id}` | Replace (keeps `id`, `createdAt`) / delete. 404 `favorite_not_found`. |
+| `GET /routes`, `GET /routes/{id}` | List / get with `waypoints:[{id,lat,lon,orderIndex,waitSeconds}]`. The paste-temp scratch route is hidden (404). |
+| `POST /routes` | Body `{name,routeType?,isLooping?,speedProfileId?,randomizeTeleportOrder?,waypoints:[{lat,lon,waitSeconds?}]}`. At least 2 waypoints; `routeType` is `STRAIGHT`/`GUIDED`/`TELEPORT`. 201. |
+| `PUT /routes/{id}`, `DELETE /routes/{id}` | Replace (whole waypoint list, keeps `id`, `createdAt`) / delete. 404 `route_not_found`; 409 `conflict` while that route is playing. |
+| `GET /speed-profiles`, `GET /speed-profiles/{id}` | The five built-ins with `active` and `enabled` flags. |
+| `PUT /speed-profiles/{id}` | Body `{speedMetersPerSecond}` in 0.01..15.0, else 400. Name and id are fixed; no create or delete (405). |
+
+Invalid input is 400 `bad_request`. `hot_*` favorites and routes are ordinary rows and can be edited or deleted.
 
 ### Group Sync screen toggle
 
