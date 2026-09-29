@@ -154,14 +154,14 @@
       real phone. An emulator that is already running needs no cable.
     </p>
 
-    <h3>Turn on USB debugging</h3>
+    <h3 id="turn-on-usb-debugging">Turn on USB debugging</h3>
     <ol>
       <li>Open <strong>Settings → About phone</strong> and tap <strong>Build number</strong> seven times. This turns on developer options.</li>
       <li>Open <strong>Settings → System → Developer options</strong> and turn on <strong>USB debugging</strong>.</li>
       <li>Connect the phone to the computer. Tap <strong>Allow</strong> if the phone asks to trust the computer.</li>
     </ol>
 
-    <h3>Capture the log</h3>
+    <h3 id="capture-the-log">Capture the log</h3>
     <ol>
       <li>On the computer, run <code>adb logcat -c</code>. This clears the old log.</li>
       <li>Repeat the steps that crash the app.</li>
@@ -173,7 +173,7 @@
       instead and copy the last 200 lines.
     </p>
 
-    <h3>Send the report</h3>
+    <h3 id="send-the-report">Send the report</h3>
     <ol>
       <li><a href="https://github.com/shortcuts/locationjoystick/issues/new?template=bug_report.yml">Open the bug report form</a>.</li>
       <li>Paste the log into the <strong>Logcat output</strong> box.</li>

@@ -61,6 +61,10 @@ Steps:
 
 External links (GitHub, issue tracker) go in `EXT_ITEMS` below `NAV_ITEMS`, not in `NAV_ITEMS`.
 
+### Section headings
+
+Every `h2` and `h3` needs a unique `id`. The sidebar builds its outline of the current page from them, and a heading without an `id` is left out.
+
 ---
 
 ## Maintaining `changelog.html`

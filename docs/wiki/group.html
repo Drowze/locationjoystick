@@ -146,7 +146,7 @@
       See the reference below for endpoints and authentication.
     </p>
 
-    <h3>Overview</h3>
+    <h3 id="overview">Overview</h3>
     <p>
       The Control API is a local HTTP server running only on the group leader. It listens on the host and port shown in the app.
       All requests must include <code>Authorization: Bearer &lt;api-key&gt;</code> (from the Control API toggle).
@@ -154,7 +154,7 @@
       The base URL is <code>http://&lt;host&gt;:&lt;port&gt;/api/v1/</code>.
     </p>
 
-    <h3>Authentication</h3>
+    <h3 id="authentication">Authentication</h3>
     <p>
       Every request requires an <code>Authorization</code> header:
     </p>
@@ -168,7 +168,7 @@
     <pre><code>curl -H "Authorization: Bearer abcdef123456..." \
   http://192.168.1.100:8080/api/v1/status</code></pre>
 
-    <h3>Errors</h3>
+    <h3 id="errors">Errors</h3>
     <p>
       All error responses use the same structure: a JSON object with an <code>error</code> object containing <code>code</code> (machine-readable identifier) and <code>message</code> (human-readable description).
       Example:
@@ -187,7 +187,7 @@
       <li><code>500 Internal Error</code> — Server error; try again later.</li>
     </ul>
 
-    <h3>State and Status</h3>
+    <h3 id="state-and-status">State and Status</h3>
     <div class="endpoint" id="ep-get-status">
       <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/status</code></div>
       <p>Returns the API version, the device's role (always <code>"leader"</code>), and the number of active followers.</p>
@@ -203,7 +203,7 @@
       <p>Current position only.</p>
       <p class="endpoint-returns">Returns <code>{"lat":double,"lon":double}</code>. Returns <code>409 Conflict</code> if spoofing is not running.</p>
     </div>
-    <h3>Movement Commands</h3>
+    <h3 id="movement-commands">Movement Commands</h3>
     <div class="endpoint" id="ep-post-teleport">
       <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/teleport</code></div>
       <p>Teleport to the given coordinates. Followers will follow or walk there depending on their <strong>Follow leader teleports</strong> setting. Cooldown is advisory only — the request succeeds and returns a <code>warning</code> field (see example below) if you are within the suggested teleport cooldown, but the teleport runs anyway.</p>
@@ -318,7 +318,7 @@
         <div class="param"><dt><code>durationMs</code></dt><dd><span class="param-type">long</span> <span class="param-flag">required</span> Milliseconds. The maximum duration is 10 seconds.</dd></div>
       </dl>
     </div>
-    <h3>Content API (Favorites, Routes, Speed Profiles)</h3>
+    <h3 id="content-api">Content API (Favorites, Routes, Speed Profiles)</h3>
     <div class="endpoint" id="ep-get-favorites">
       <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/favorites</code></div>
       <p>List all favorites.</p>
@@ -416,7 +416,7 @@
       <p class="endpoint-returns">Returns <code>200 OK</code> with the updated profile. Returns <code>400 Bad Request</code> if the speed is out of range, or <code>404 Not Found</code> if the profile does not exist.</p>
     </div>
 
-    <h3>Security Limits</h3>
+    <h3 id="security-limits">Security Limits</h3>
     <ul class="section-bullets">
       <li><strong>Local network only:</strong> The API is accessible only over the same Wi-Fi network. It does not work over the internet or mobile data.</li>
       <li><strong>Plain HTTP, no encryption:</strong> Requests travel in clear text. Do not send the API key over an untrusted network.</li>
@@ -428,7 +428,7 @@
       <li><strong>Cooldown is advisory:</strong> Teleport requests that violate the suggested cooldown still execute; they return a <code>warning</code> field but do not fail.</li>
     </ul>
 
-    <h3>Example: Teleport via curl</h3>
+    <h3 id="example-teleport-via-curl">Example: Teleport via curl</h3>
     <p>
       Here is a complete example using <code>curl</code> to teleport the leader to Times Square in New York:
     </p>

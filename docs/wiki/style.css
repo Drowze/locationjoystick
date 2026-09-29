@@ -543,6 +543,11 @@ ul.trouble li{
 .sidebar-foot-lic{margin-left:4px}
 
 /* ── Nav extras ── */
+.nav-outline{display:flex;flex-direction:column;margin:2px 0 6px}
+.nav-outline a{padding:4px 20px 4px 34px;font-size:0.7rem;border-left:2px solid transparent}
+.nav-outline a.nav-h3{padding-left:48px}
+.nav-outline a.active{color:var(--accent);border-left-color:var(--accent);background:none}
+h2[id],h3[id]{scroll-margin-top:16px}
 .nav-sep{
   display:block;
   height:1px;
@@ -614,6 +619,9 @@ nav a.nav-ext{
   nav a.active{
     border-left-color:var(--accent);
   }
+
+  .nav-outline a{padding:7px 20px 7px 34px}
+  .nav-outline a.nav-h3{padding-left:48px}
 
   .sidebar-foot{display:none}
 

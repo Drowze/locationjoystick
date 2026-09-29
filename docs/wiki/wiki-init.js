@@ -85,6 +85,44 @@
   };
   document.head.appendChild(ds);
 
+  var pageLink = document.querySelector('nav a.active');
+  var outlineHeads = document.querySelectorAll('main h2[id], main h3[id]');
+  if (pageLink && outlineHeads.length) {
+    var outline = document.createElement('div');
+    outline.className = 'nav-outline';
+    var outlineLinks = [];
+    outlineHeads.forEach(function (h) {
+      var a = document.createElement('a');
+      a.className = 'nav-' + h.tagName.toLowerCase();
+      a.href = '#' + h.id;
+      a.textContent = h.textContent.trim();
+      outline.appendChild(a);
+      outlineLinks.push(a);
+    });
+    pageLink.after(outline);
+
+    var activeLink = null;
+    var spy = function () {
+      var idx = 0;
+      outlineHeads.forEach(function (h, i) {
+        if (h.getBoundingClientRect().top <= window.innerHeight * 0.3) idx = i;
+      });
+      var next = outlineLinks[idx];
+      if (next === activeLink) return;
+      if (activeLink) {
+        activeLink.classList.remove('active');
+        activeLink.removeAttribute('aria-current');
+      }
+      next.classList.add('active');
+      next.setAttribute('aria-current', 'true');
+      activeLink = next;
+      if (window.innerWidth > 680) next.scrollIntoView({ block: 'nearest' });
+    };
+    var io = new IntersectionObserver(spy, { rootMargin: '0px 0px -70% 0px' });
+    outlineHeads.forEach(function (h) { io.observe(h); });
+    spy();
+  }
+
   document.querySelectorAll('main h1[id], main h2[id], main h3[id]').forEach(function (heading) {
     var btn = document.createElement('button');
     btn.className = 'heading-link';
