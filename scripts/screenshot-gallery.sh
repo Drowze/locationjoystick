@@ -1179,53 +1179,60 @@ if should_run_step "17"; then
   screenshot "17_group_sync"
 fi
 
-# ── 18. Debug stats (widget panel) ───────────────────────────────────────────
-
-if should_run_step "18"; then
-  log "=== 18 DEBUG STATS ==="
-  if $AUTO; then
-    go_idle
-    tap_text_below "Settings" "$CARD_Y_MIN"
-    wait_s 2 "Settings loading"
-    tap_text "Menus"
-    wait_s 2 "Menus loading"
-    # Debug section is last on the Menus page, well below the fold (Theme,
-    # App Features, Speed Cycle, Tap to Walk, Privacy all come first) — keep
-    # scrolling until the row actually appears.
-    for _ in 1 2 3 4 5 6 7; do
-      dump=$(ui_dump)
-      # Row must clear the gesture-nav strip; a tap on the clipped bottom row is swallowed.
-      found=$(perl -lne 'print 1 if /text="Debug stats"[^>]*bounds="\[\d+,\d+\]\[\d+,(\d+)\]"/ && $1 < '"$(( SCREEN_H * 90 / 100 ))"'' "$dump" | head -1)
-      rm -f "$dump"
-      (( found > 0 )) && break
-      $ADB shell input swipe 540 1800 540 400
-      wait_s 1 "Scrolling to Debug section"
-    done
-    # Idempotent: only tap if currently unchecked — the row is a toggle, so
-    # tapping an already-enabled setting (e.g. left on from a prior run) would
-    # disable it instead. The dump is one giant single line, so a line-based
-    # grep -B1 can't isolate the checkbox next to "Debug stats" — walk the
-    # raw text backwards from that label to its nearest preceding checked= instead.
+# Set Settings → Menus → Debug stats to $1 (True|False). Idempotent: taps only on mismatch.
+# Step 18 turns it on for its shot and back off afterwards so steps 13/14 never capture the stats block.
+set_debug_stats() {
+  local want="$1" current
+  go_idle
+  tap_text_below "Settings" "$CARD_Y_MIN"
+  wait_s 2 "Settings loading"
+  tap_text "Menus"
+  wait_s 2 "Menus loading"
+  # Debug section is last on the Menus page, well below the fold (Theme,
+  # App Features, Speed Cycle, Tap to Walk, Privacy all come first) — keep
+  # scrolling until the row actually appears.
+  for _ in 1 2 3 4 5 6 7; do
     dump=$(ui_dump)
-    already_on=$(python3 -c '
+    # Row must clear the gesture-nav strip; a tap on the clipped bottom row is swallowed.
+    found=$(perl -lne 'print 1 if /text="Debug stats"[^>]*bounds="\[\d+,\d+\]\[\d+,(\d+)\]"/ && $1 < '"$(( SCREEN_H * 90 / 100 ))"'' "$dump" | head -1)
+    rm -f "$dump"
+    (( found > 0 )) && break
+    $ADB shell input swipe 540 1800 540 400
+    wait_s 1 "Scrolling to Debug section"
+  done
+  # Idempotent: only tap if state differs — the row is a toggle, so
+  # tapping an already-matching setting (e.g. left on from a prior run) would
+  # flip it the wrong way. The dump is one giant single line, so a line-based
+  # grep -B1 can't isolate the checkbox next to "Debug stats" — walk the
+  # raw text backwards from that label to its nearest preceding checked= instead.
+  dump=$(ui_dump)
+  current=$(python3 -c '
 data = open("'"$dump"'").read()
 idx = data.find("text=\"Debug stats\"")
 prefix = data[:idx]
 last = prefix.rfind("checked=\"")
 print(prefix[last+9:last+13] == "true")
 ')
-    if [[ "$already_on" == "True" ]]; then
-      log "Debug stats already enabled — skipping toggle tap."
-    else
-      tap_text "Debug stats"
-      wait_s 2 "Enabling debug stats"
-      # This settings page buffers changes behind a Save/Discard FAB —
-      # force-stopping via go_idle without saving would discard the toggle.
-      # The FAB exposes no text or content-desc to uiautomator, so tap its fixed spot.
-      $ADB shell input tap "$(( SCREEN_W * 83 / 100 ))" "$(( SCREEN_H * 92 / 100 ))"
-      wait_s 1 "Saving setting"
-    fi
-    rm -f "$dump"
+  if [[ "$current" == "$want" ]]; then
+    log "Debug stats already $want — skipping toggle tap."
+  else
+    tap_text "Debug stats"
+    wait_s 2 "Setting debug stats to $want"
+    # This settings page buffers changes behind a Save/Discard FAB —
+    # force-stopping via go_idle without saving would discard the toggle.
+    # The FAB exposes no text or content-desc to uiautomator, so tap its fixed spot.
+    $ADB shell input tap "$(( SCREEN_W * 83 / 100 ))" "$(( SCREEN_H * 92 / 100 ))"
+    wait_s 1 "Saving setting"
+  fi
+  rm -f "$dump"
+}
+
+# ── 18. Debug stats (widget panel) ───────────────────────────────────────────
+
+if should_run_step "18"; then
+  log "=== 18 DEBUG STATS ==="
+  if $AUTO; then
+    set_debug_stats True
     go_idle
     tap_text_below "Map" "$CARD_Y_MIN"
     wait_s 3 "Map loading"
@@ -1263,6 +1270,7 @@ print(prefix[last+9:last+13] == "true")
   fi
   go_idle_keep_overlays
   screenshot "18_debug_stats"
+  if $AUTO; then set_debug_stats False; fi
 fi
 
 # ── 20. Settings → Menus → Tap to Walk section ───────────────────────────────
