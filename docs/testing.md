@@ -39,6 +39,7 @@ Covers every nav path in `LjNavHost`:
 | `PasteCoordinatesSmokeTest` | Paste coordinates loads via "Add route" → "Paste coordinates"; coordinate field and Planting mode visible; back returns to Routes |
 | `RouteDetailSmokeTest` | Detail loads via overflow "Menu" → Edit (waitUntil route visible); back returns to Routes; delete button, name field, waypoint list visible |
 | `SettingsSmokeTest` | Settings loads; speed unit toggle; "More actions" overflow menu opens without crash; all section headers visible; Roaming sub-screen shows planting defaults (starting radius) |
+| `ControlApiDocsSmokeTest` | Leader exposes exactly the endpoints in `docs/wiki/group.html`: API off → 404, bad key → 401, error body shape; every documented path answers 405 with an `Allow` header equal to its documented methods (no handler runs). Never asserts endpoint behaviour. The build copies `group.html` into the test APK assets |
 
 Helpers in `SmokeTestHelpers.kt`: `waitForIdleScreen()`, `openDrawer()`, `navigateViaDrawer()`, `navigateFromIdle()`.
 

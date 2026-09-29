@@ -80,6 +80,9 @@ class LeaderSyncServer
             routes.getOrPut(path) { ConcurrentHashMap() }[method] = handler
         }
 
+        /** Registered API routes as path -> methods, for the docs-vs-code smoke test. */
+        fun registeredApiRoutes(): Map<String, Set<String>> = routes.mapValues { it.value.keys.toSet() }
+
         /** Enables the API with [key] (call again to rotate). No-op unless the server is running. */
         fun enableApi(key: String) {
             if (!isRunning) return

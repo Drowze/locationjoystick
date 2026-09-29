@@ -22,7 +22,20 @@ android {
             enableSplit = false
         }
     }
+    // The API smoke test diffs the live routes against the public reference, so ship that page (only) to the test APK.
+    sourceSets.getByName("androidTest").assets.srcDir(
+        layout.buildDirectory
+            .get()
+            .dir("generated/docsAssets")
+            .asFile,
+    )
 }
+
+val copyApiDocs by tasks.registering(Copy::class) {
+    from(rootProject.file("docs/wiki/group.html"))
+    into(layout.buildDirectory.dir("generated/docsAssets"))
+}
+tasks.matching { it.name.endsWith("AndroidTestAssets") }.configureEach { dependsOn(copyApiDocs) }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
