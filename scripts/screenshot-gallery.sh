@@ -22,7 +22,7 @@
 #
 # Overlay screens (joystick + widget) require manual activation — the script
 # will pause and prompt you at those steps. Overlay shots are taken over the
-# Android home screen so the app map does not show behind them.
+# app IdleScreen so the app map does not show behind them.
 #
 # Android Demo Mode is enabled for the duration of the run so screenshots show
 # a clean status bar (neutral clock, full battery/signal, no notifications).
@@ -768,11 +768,22 @@ go_idle() {
   fi
 }
 
-# Press HOME so overlay screenshots show the launcher, not the app map.
-go_home() {
-  log "Going to home screen..."
-  $ADB shell input keyevent KEYCODE_HOME
-  wait_s 1 "Launcher settling"
+# Back out to IdleScreen without killing the app: go_idle's force-stop would
+# also kill the overlay services the caller is about to photograph.
+go_idle_keep_overlays() {
+  log "Backing out to IdleScreen (overlays stay up)..."
+  local i dump
+  for (( i=0; i<4; i++ )); do
+    dump=$(ui_dump)
+    # "Favorites" only exists as a card on IdleScreen's hub.
+    if grep -q 'Favorites' "$dump" && ! grep -q 'Move to this location' "$dump"; then
+      rm -f "$dump"
+      break
+    fi
+    rm -f "$dump"
+    back
+    wait_s 2 "Backing out"
+  done
 }
 
 # Set an App Features checkbox (Settings → Menus) to on/off, by the checkbox's
@@ -1127,7 +1138,7 @@ if should_run_step "13"; then
     The joystick overlay should be visible on screen before you press ENTER.
     Tip: Map screen → start spoofing → enable joystick from widget or drawer."
   fi
-  go_home
+  go_idle_keep_overlays
   screenshot "14_joystick_overlay"
 fi
 
@@ -1142,7 +1153,7 @@ if should_run_step "14"; then
     pause_for_user "Dismiss the joystick (if open) and enable the Floating Widget instead.
     The widget bubble should be visible on screen before you press ENTER."
   fi
-  go_home
+  go_idle_keep_overlays
   screenshot "15_widget_overlay"
 fi
 
@@ -1262,7 +1273,7 @@ print(prefix[last+9:last+13] == "true")
     pause_for_user "Enable Settings → Menus → Debug → \"Debug stats\", start spoofing,
     then expand the floating widget panel so the live stats block is visible."
   fi
-  go_home
+  go_idle_keep_overlays
   screenshot "18_debug_stats"
 fi
 
