@@ -143,7 +143,7 @@ fun LjTopBar(
                                 imageVector = if (spoofing) LjIcons.Stop else LjIcons.PlayArrow,
                                 contentDescription = null,
                                 tint = tint,
-                                modifier = Modifier.size(12.dp).padding(end = 3.dp),
+                                modifier = Modifier.padding(end = 3.dp).size(14.dp),
                             )
                         }
                         Text(

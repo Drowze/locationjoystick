@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -200,7 +201,7 @@ private fun SpeedProfileInput(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(unit, modifier = Modifier.width(40.dp))
+            Text(unit, modifier = Modifier.widthIn(min = 40.dp))
         }
     }
 }

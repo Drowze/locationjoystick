@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -32,6 +31,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
+import com.locationjoystick.core.designsystem.LjOnScrim
 import com.locationjoystick.core.designsystem.LjTheme
 import com.locationjoystick.core.model.LatLng
 import com.locationjoystick.feature.widget.impl.R
@@ -171,7 +171,7 @@ private fun TapToWalkOverlayContent(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.05f))
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.05f))
                     .pointerInput(Unit) {
                         detectTapGestures(onTap = { offset ->
                             onTap(offset.x, offset.y, size.width, size.height)
@@ -182,13 +182,13 @@ private fun TapToWalkOverlayContent(
         Text(
             text = stringResource(R.string.tap_to_walk_overlay_tap_anywhere_to_walk_there),
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
+            color = LjOnScrim,
             textAlign = TextAlign.Center,
             modifier =
                 Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = 64.dp)
-                    .background(Color.Black.copy(alpha = 0.6f), MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f), MaterialTheme.shapes.small)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
         )
         // Cancel button — drawn on top; consumes taps in its bounds before background does
@@ -199,14 +199,14 @@ private fun TapToWalkOverlayContent(
                     .align(Alignment.BottomEnd)
                     .padding(24.dp)
                     .size(48.dp)
-                    .background(Color.Black.copy(alpha = 0.6f), CircleShape)
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f), CircleShape)
                     .clip(CircleShape)
                     .clickable(role = Role.Button, onClick = onDismiss),
         ) {
             Icon(
                 imageVector = LjIcons.Close,
                 contentDescription = stringResource(R.string.tap_to_walk_overlay_cancel_tap_to_walk_cd),
-                tint = Color.White,
+                tint = LjOnScrim,
             )
         }
     }

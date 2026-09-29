@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.data.DebugStats
+import com.locationjoystick.core.designsystem.LjError
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSuccess
 import com.locationjoystick.core.designsystem.UiConstants
@@ -307,7 +308,7 @@ internal fun WidgetPanel(
                         modifier =
                             Modifier
                                 .size(10.dp)
-                                .background(Color.Red, CircleShape),
+                                .background(LjError, CircleShape),
                     )
                 }
             }

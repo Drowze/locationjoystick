@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +16,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.locationjoystick.core.designsystem.LjBg
 import com.locationjoystick.core.designsystem.LjSuccess
 import com.locationjoystick.core.designsystem.R
@@ -45,7 +45,7 @@ fun RouteProgressBadge(
         Text(
             text = label,
             color = LjSuccess,
-            fontSize = 12.sp,
+            style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
         )
     }

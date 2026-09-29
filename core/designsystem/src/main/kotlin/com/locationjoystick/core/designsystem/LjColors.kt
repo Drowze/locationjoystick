@@ -21,6 +21,8 @@ val LjInactive = Color(0xFF757575)
 val LjWarning = Color(0xFFF59E0B)
 val LjWarningContainer = Color(0xFF451A03)
 
+val LjOnScrim = Color.White
+
 // Unchecked checkboxes / field outlines on dark surfaces. Must stay lighter than LjSurface
 // (#252530) or Material3 outlineVariant is nearly invisible.
 val LjDarkOutlineVariant = Color(0xFF8A8490)
