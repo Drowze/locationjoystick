@@ -27,7 +27,8 @@ val LjLightSurface = Color(0xFFFFFFFF)
 val LjLightSurfaceVariant = Color(0xFFF0E9E4)
 val LjLightText = Color(0xFF231E1B)
 val LjLightTextSecondary = Color(0xFF5C5259)
-val LjLightAccent = Color(0xFFB2531A)
+val LjLightAccent = Color(0xFF984313)
+val LjLightError = Color(0xFFB3261E)
 val LjLightOutlineVariant = Color(0xFFDDD3CB)
 
 object LjMapColors {
@@ -89,10 +90,10 @@ val LjLightColorScheme =
         onTertiary = Color.White,
         tertiaryContainer = Color(0xFFF3E5D8),
         onTertiaryContainer = LjLightAccent,
-        error = LjError,
+        error = LjLightError,
         onError = Color.White,
         errorContainer = Color(0xFFFFDAD6),
-        onErrorContainer = LjError,
+        onErrorContainer = LjLightError,
         background = LjLightBg,
         onBackground = LjLightText,
         surface = LjLightSurface,

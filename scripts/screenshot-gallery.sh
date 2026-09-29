@@ -547,7 +547,7 @@ if not os.path.isdir(src_dir):
 
 FONT_PATH = "/System/Library/Fonts/HelveticaNeue.ttc"
 BOLD_INDEX = 1
-ACCENT = (178, 83, 26)      # LjLightAccent 0xFFB2531A
+ACCENT = (152, 67, 19)      # LjLightAccent 0xFF984313
 TEXT_COLOR = (35, 30, 27)   # LjLightText 0xFF231E1B
 MASK_SS = 4  # supersample factor for rounded-corner masks only (cheap, localized)
 

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.pow
 
 class LjColorsContrastTest {
     @Test
@@ -20,6 +21,40 @@ class LjColorsContrastTest {
             assertNotEquals(scheme.surfaceVariant, scheme.surfaceContainerLow)
         }
     }
+
+    @Test
+    fun lightThemeTextContrast() {
+        // Light theme text pairs must meet WCAG AA 4.5:1 minimum for body text
+        val scheme = LjLightColorScheme
+        assertTrue("onPrimaryContainer on primaryContainer", contrast(scheme.onPrimaryContainer, scheme.primaryContainer) >= 4.5f)
+        assertTrue("onSecondaryContainer on secondaryContainer", contrast(scheme.onSecondaryContainer, scheme.secondaryContainer) >= 4.5f)
+        assertTrue("onTertiaryContainer on tertiaryContainer", contrast(scheme.onTertiaryContainer, scheme.tertiaryContainer) >= 4.5f)
+        assertTrue("primary on surfaceVariant", contrast(scheme.primary, scheme.surfaceVariant) >= 4.5f)
+        assertTrue("primary on surfaceContainerHighest", contrast(scheme.primary, scheme.surfaceContainerHighest) >= 4.5f)
+        assertTrue("onPrimary on primary", contrast(scheme.onPrimary, scheme.primary) >= 4.5f)
+        assertTrue("onErrorContainer on errorContainer", contrast(scheme.onErrorContainer, scheme.errorContainer) >= 4.5f)
+        assertTrue("onError on error", contrast(scheme.onError, scheme.error) >= 4.5f)
+    }
+
+    private fun contrast(
+        fg: Color,
+        bg: Color,
+    ): Float {
+        val fgLum = relativeLuminance(fg)
+        val bgLum = relativeLuminance(bg)
+        val lighter = maxOf(fgLum, bgLum)
+        val darker = minOf(fgLum, bgLum)
+        return (lighter + 0.05f) / (darker + 0.05f)
+    }
+
+    private fun relativeLuminance(color: Color): Float {
+        val r = linearize(color.red)
+        val g = linearize(color.green)
+        val b = linearize(color.blue)
+        return 0.2126f * r + 0.7152f * g + 0.0722f * b
+    }
+
+    private fun linearize(channel: Float): Float = if (channel <= 0.03928f) channel / 12.92f else (((channel + 0.055f) / 1.055f).pow(2.4f))
 
     private fun channelSum(color: Color): Float = color.red + color.green + color.blue
 }
