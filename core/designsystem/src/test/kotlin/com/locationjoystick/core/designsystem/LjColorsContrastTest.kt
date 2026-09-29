@@ -54,6 +54,13 @@ class LjColorsContrastTest {
         assertTrue("LjLightOutlineVariant on LjLightSurfaceVariant", contrast(LjLightOutlineVariant, LjLightSurfaceVariant) >= 3f)
     }
 
+    @Test
+    fun lightWarningPairMeetsContrast() {
+        // Light theme warning pair must meet WCAG AA 4.5:1 on the container and on white card surfaces
+        assertTrue("LjLightWarning on LjLightWarningContainer", contrast(LjLightWarning, LjLightWarningContainer) >= 4.5f)
+        assertTrue("LjLightWarning on LjLightSurface", contrast(LjLightWarning, LjLightSurface) >= 4.5f)
+    }
+
     private fun contrast(
         fg: Color,
         bg: Color,

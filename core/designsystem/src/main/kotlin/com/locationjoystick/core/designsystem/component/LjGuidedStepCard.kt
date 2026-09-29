@@ -32,8 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjTheme
-import com.locationjoystick.core.designsystem.LjWarning
-import com.locationjoystick.core.designsystem.LjWarningContainer
+import com.locationjoystick.core.designsystem.ljWarningColor
+import com.locationjoystick.core.designsystem.ljWarningContainerColor
 
 @Composable
 fun LjGuidedStepCard(
@@ -48,12 +48,12 @@ fun LjGuidedStepCard(
     onExtraAction: (() -> Unit)? = null,
 ) {
     val statusColor by animateColorAsState(
-        targetValue = if (isGranted) MaterialTheme.colorScheme.secondary else LjWarning,
+        targetValue = if (isGranted) MaterialTheme.colorScheme.secondary else ljWarningColor(),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "statusColor",
     )
     val statusContainerColor by animateColorAsState(
-        targetValue = if (isGranted) MaterialTheme.colorScheme.secondaryContainer else LjWarningContainer,
+        targetValue = if (isGranted) MaterialTheme.colorScheme.secondaryContainer else ljWarningContainerColor(),
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "statusContainerColor",
     )

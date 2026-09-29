@@ -34,6 +34,8 @@ val LjLightTextSecondary = Color(0xFF5C5259)
 val LjLightAccent = Color(0xFF984313)
 val LjLightError = Color(0xFFB3261E)
 val LjLightSuccess = Color(0xFF2E7D32)
+val LjLightWarning = Color(0xFF92400E)
+val LjLightWarningContainer = Color(0xFFFEF3C7)
 
 // Unchecked checkboxes / field outlines on light surfaces. Must meet 3:1 (WCAG 1.4.11 non-text)
 // on LjLightSurface, LjLightBg, and LjLightSurfaceVariant, as guarded by LjColorsContrastTest.
@@ -128,4 +130,22 @@ fun ljSuccessColor(): Color =
         LjLightSuccess
     } else {
         LjSuccess
+    }
+
+@Composable
+@ReadOnlyComposable
+fun ljWarningColor(): Color =
+    if (MaterialTheme.colorScheme.surface.luminance() > 0.5f) {
+        LjLightWarning
+    } else {
+        LjWarning
+    }
+
+@Composable
+@ReadOnlyComposable
+fun ljWarningContainerColor(): Color =
+    if (MaterialTheme.colorScheme.surface.luminance() > 0.5f) {
+        LjLightWarningContainer
+    } else {
+        LjWarningContainer
     }
