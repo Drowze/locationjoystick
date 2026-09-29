@@ -1,9 +1,11 @@
 package com.locationjoystick.app.smoke
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -42,6 +44,22 @@ class IdleSmokeTest : BaseSmokeTest() {
         composeRule.onNodeWithContentDescription("Close menu").performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithText("locationjoystick").assertIsDisplayed()
+    }
+
+    @Test
+    fun drawer_external_links_announce_hint() {
+        composeRule.openDrawer()
+        listOf("Website", "Discord", "Acknowledgements").forEach { label ->
+            val node =
+                composeRule
+                    .onAllNodesWithText(label)
+                    .filterToOne(hasAnyAncestor(hasTestTag("nav_drawer")))
+            node.assertIsDisplayed()
+            assert(node.fetchSemanticsNode().config[SemanticsProperties.StateDescription] == "Opens in browser")
+        }
+        composeRule.onAllNodesWithContentDescription("Website").assertCountEquals(0)
+        composeRule.onAllNodesWithContentDescription("Discord").assertCountEquals(0)
+        composeRule.onAllNodesWithContentDescription("Acknowledgements").assertCountEquals(0)
     }
 
     @Test

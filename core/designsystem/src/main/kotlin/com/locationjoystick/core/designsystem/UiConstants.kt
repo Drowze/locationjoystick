@@ -7,4 +7,5 @@ object UiConstants {
     val FAB_ICON_SIZE = 24.dp
     val FAB_SPACING = FAB_CONTAINER_SIZE / 4
     val WIDE_CONTENT_MAX_WIDTH = 600.dp
+    val SMALL_ICON_SIZE = 16.dp
 }
