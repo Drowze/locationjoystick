@@ -15,6 +15,9 @@ body:
     attributes:
       label: Android version
       options:
+        - Android 9
+        - Android 10
+        - Android 11
         - Android 12
         - Android 13
         - Android 14
@@ -58,7 +61,8 @@ body:
     id: logcat_output
     attributes:
       label: Logcat output
-      placeholder: Paste relevant logcat output (optional)
+      description: "For a crash, this is the most useful field. See how to capture it: https://locationjoystick.shrtcts.fr/troubleshooting.html#report-a-crash"
+      placeholder: Paste relevant logcat output
       render: shell
     validations:
       required: false
