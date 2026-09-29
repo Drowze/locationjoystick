@@ -778,7 +778,8 @@ set_app_feature() {
   wait_s 2 "Menus loading"
   for _ in 1 2 3 4 5; do
     dump=$(ui_dump)
-    state=$(perl -lne 'print $1 if /content-desc="'"$cd"'"[^>]*checked="(true|false)"/i; ' "$dump" | head -1)
+    # Only accept a row fully above the gesture-nav strip; a tap on the clipped bottom row is swallowed.
+    state=$(perl -lne 'print $1 if /content-desc="'"$cd"'"[^>]*checked="(true|false)"[^>]*bounds="\[\d+,\d+\]\[\d+,(\d+)\]"/i && $2 < '"$(( SCREEN_H * 90 / 100 ))"'; ' "$dump" | head -1)
     rm -f "$dump"
     [[ -n "$state" ]] && break
     $ADB shell input swipe 540 1600 540 900
@@ -1185,7 +1186,8 @@ if should_run_step "18"; then
     # scrolling until the row actually appears.
     for _ in 1 2 3 4 5 6 7; do
       dump=$(ui_dump)
-      found=$(grep -c 'text="Debug stats"' "$dump" || true)
+      # Row must clear the gesture-nav strip; a tap on the clipped bottom row is swallowed.
+      found=$(perl -lne 'print 1 if /text="Debug stats"[^>]*bounds="\[\d+,\d+\]\[\d+,(\d+)\]"/ && $1 < '"$(( SCREEN_H * 90 / 100 ))"'' "$dump" | head -1)
       rm -f "$dump"
       (( found > 0 )) && break
       $ADB shell input swipe 540 1800 540 400
@@ -1209,14 +1211,10 @@ print(prefix[last+9:last+13] == "true")
     else
       tap_text "Debug stats"
       wait_s 2 "Enabling debug stats"
-      # This settings page buffers changes behind a Save/Discard FAB (check icon,
-      # labeled "Save") — force-stopping via go_idle without saving would
-      # discard the toggle. Retry: the FAB's enter animation (fadeIn+slideIn,
-      # 200ms) plus recomposition can lag past a single wait on a slow device.
-      for _ in 1 2 3; do
-        tap_text "Save" && break
-        wait_s 1 "Waiting for Save FAB"
-      done
+      # This settings page buffers changes behind a Save/Discard FAB —
+      # force-stopping via go_idle without saving would discard the toggle.
+      # The FAB exposes no text or content-desc to uiautomator, so tap its fixed spot.
+      $ADB shell input tap "$(( SCREEN_W * 83 / 100 ))" "$(( SCREEN_H * 92 / 100 ))"
       wait_s 1 "Saving setting"
     fi
     rm -f "$dump"
@@ -1268,16 +1266,32 @@ if should_run_step "20"; then
   wait_s 2 "Settings loading"
   tap_text "Menus"
   wait_s 2 "Menus loading"
-  $ADB shell input swipe 540 1600 540 400
-  wait_s 1 "Scrolling to Tap to Walk"
-  $ADB shell input swipe 540 1600 540 400
-  wait_s 1 "Scrolling to Tap to Walk"
+  # Scroll until the row is on screen; a fixed swipe count overshoots on tall devices.
+  for _ in 1 2 3; do
+    dump=$(ui_dump)
+    found=$(grep -c 'text="Enable Tap to Walk"' "$dump" || true)
+    rm -f "$dump"
+    (( found > 0 )) && break
+    $ADB shell input swipe 540 1600 540 400
+    wait_s 1 "Scrolling to Tap to Walk"
+  done
   if [[ "$(switch_is_on "Enable Tap to Walk")" != "True" ]]; then
     tap_switch_for "Enable Tap to Walk"
     wait_s 1 "Warning dialog opening"
     # Button label depends on device API level: "Enable anyway" below API 30,
     # "Accept" on API 30+ when the Accessibility disclosure is shown instead.
-    tap_text "Enable anyway" || tap_text "Accept"
+    # Exact match: the disclosure body contains "Tap Accept to open…", and the
+    # buttons sit below the fold, so scroll first.
+    $ADB shell input swipe 540 1800 540 400
+    wait_s 1 "Scrolling to dialog buttons"
+    if tap_text_exact "Accept"; then
+      # Accept opens Android's Accessibility settings; return to the app.
+      wait_s 2 "Accessibility settings opening"
+      back
+      wait_s 2 "Returning to app"
+    else
+      tap_text_exact "Enable anyway"
+    fi
     wait_s 1 "Enabling Tap to Walk — Map scale / Compass sections expanding"
   fi
   screenshot "20_tap_to_walk_settings"
@@ -1386,6 +1400,9 @@ if should_run_step "25"; then
   screenshot "25_compass_disclosure"
   # Decline leaves the feature off and records nothing, so the device keeps the
   # state it had before this step.
+  # The disclosure is taller than the screen; Decline sits below the fold.
+  $ADB shell input swipe 540 1800 540 400
+  wait_s 1 "Scrolling to Decline"
   tap_text_exact "Decline"
   wait_s 1 "Dismissing disclosure"
 fi

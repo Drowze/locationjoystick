@@ -41,6 +41,7 @@ Work is NOT complete until affected docs are updated. These files must stay in s
 | `docs/features/export-import.md` | Any change to `ExportData` fields or import/export scope |
 | `README.md` — feature table | Adding or removing a user-visible feature |
 | `docs/wiki/<feature>.html` | Adding or changing any user-visible feature |
+| `scripts/screenshot-gallery.sh` | Renaming, moving, or reordering any UI element it taps (labels, content descriptions, screen flow, defaults such as a FAB or setting that ships off). Run the affected step with `make screenshot` args `--auto --steps <N>` and confirm no `Could not find UI element` warning. |
 | `docs/wiki/changelog.html` + `docs/wiki/changelog/<version>.json` (docs/features/whats-new.md) | Any release with user-visible changes — the JSON is now the sole authored source for both: it feeds the in-app What's New popup directly, and the HTML is generated from it via `make wiki-changelog` |
 
 Rules:
