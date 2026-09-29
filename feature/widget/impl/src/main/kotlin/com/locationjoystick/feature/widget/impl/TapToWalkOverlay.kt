@@ -5,6 +5,7 @@ import android.graphics.PixelFormat
 import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +18,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
@@ -197,9 +200,8 @@ private fun TapToWalkOverlayContent(
                     .padding(24.dp)
                     .size(48.dp)
                     .background(Color.Black.copy(alpha = 0.6f), CircleShape)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onTap = { _ -> onDismiss() })
-                    },
+                    .clip(CircleShape)
+                    .clickable(role = Role.Button, onClick = onDismiss),
         ) {
             Icon(
                 imageVector = LjIcons.Close,
