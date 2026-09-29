@@ -46,7 +46,7 @@ data class DestinationCardSpec(
 )
 
 /**
- * A tappable card: 44dp icon circle + title/description. Shared by IdleScreen and
+ * A tappable card: 40dp icon circle + title/description. Shared by IdleScreen and
  * SettingsHubScreen so they can't drift apart the way IdleDestinationCard/SettingsDestinationCard did.
  */
 @Composable
@@ -64,14 +64,14 @@ fun DestinationCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
         Row(
-            modifier = Modifier.padding(LjSpacing.md),
+            modifier = Modifier.padding(horizontal = LjSpacing.md, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(LjSpacing.md),
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(44.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center,
@@ -137,13 +137,13 @@ fun DestinationHub(
                     .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(LjSpacing.sm))
             DestinationHubHeaderText()
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(LjSpacing.md))
             cards.forEachIndexed { index, card ->
                 DestinationCard(card.icon, card.title, card.description, card.onClick)
                 if (index != cards.lastIndex) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(LjSpacing.sm))
                 }
             }
             Spacer(modifier = Modifier.height(LjSpacing.lg))
@@ -153,8 +153,8 @@ fun DestinationHub(
 
 @Composable
 private fun DestinationHubHeaderText() {
-    AppIcon()
-    Spacer(modifier = Modifier.height(LjSpacing.lg))
+    AppIcon(size = 56.dp)
+    Spacer(modifier = Modifier.height(LjSpacing.sm))
     Text(
         text = stringResource(R.string.destination_card_locationjoystick),
         style = MaterialTheme.typography.headlineSmall,

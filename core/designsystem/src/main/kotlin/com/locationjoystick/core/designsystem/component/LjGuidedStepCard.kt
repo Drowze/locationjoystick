@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,7 +63,7 @@ fun LjGuidedStepCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(12.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -71,7 +72,7 @@ fun LjGuidedStepCard(
                 Box(
                     modifier =
                         Modifier
-                            .size(44.dp)
+                            .size(36.dp)
                             .clip(CircleShape)
                             .background(statusContainerColor),
                     contentAlignment = Alignment.Center,
@@ -85,7 +86,7 @@ fun LjGuidedStepCard(
                             imageVector = if (granted) LjIcons.CheckCircle else icon,
                             contentDescription = null,
                             tint = statusColor,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
@@ -98,7 +99,7 @@ fun LjGuidedStepCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = description,
@@ -107,12 +108,13 @@ fun LjGuidedStepCard(
             )
 
             if (!isGranted) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
                         onClick = onAction,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).height(36.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
                     ) {
                         Text(
                             text = actionLabel,

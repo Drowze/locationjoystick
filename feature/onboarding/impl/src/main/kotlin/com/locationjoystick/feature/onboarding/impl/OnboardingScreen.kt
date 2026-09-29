@@ -44,7 +44,6 @@ import androidx.navigation.compose.composable
 import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjTheme
-import com.locationjoystick.core.designsystem.component.AppIcon
 import com.locationjoystick.core.designsystem.component.CompassDisclosureDialog
 import com.locationjoystick.core.designsystem.component.LjGuidedStepCard
 import com.locationjoystick.core.designsystem.component.LjLanguageDropdown
@@ -151,9 +150,7 @@ internal fun OnboardingScreen(
             contentModifier = Modifier.verticalScroll(remember { ScrollState(0) }).padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AppIcon()
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(R.string.onboarding_set_up_locationjoystick),
@@ -171,7 +168,7 @@ internal fun OnboardingScreen(
                 textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = stringResource(R.string.onboarding_complete_the_steps_below_to_start),
@@ -179,8 +176,6 @@ internal fun OnboardingScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -222,7 +217,7 @@ internal fun OnboardingScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             val grantedStepCount =
                 listOf(
@@ -247,7 +242,7 @@ internal fun OnboardingScreen(
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             LjGuidedStepCard(
                 title = stringResource(R.string.onboarding_location_permission),
@@ -258,7 +253,7 @@ internal fun OnboardingScreen(
                 onAction = { locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             LjGuidedStepCard(
                 title = stringResource(R.string.onboarding_display_over_other_apps),
@@ -276,7 +271,7 @@ internal fun OnboardingScreen(
                 },
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             LjGuidedStepCard(
                 title = stringResource(R.string.onboarding_set_as_fake_gps_app),
@@ -299,7 +294,7 @@ internal fun OnboardingScreen(
             // optional compass step lives here and always shows the disclosure right before Android's
             // Accessibility settings open.
             if (uiState.compassSupported) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = stringResource(R.string.onboarding_optional),
@@ -308,7 +303,7 @@ internal fun OnboardingScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 LjGuidedStepCard(
                     title = stringResource(R.string.onboarding_compass_orientation),
@@ -320,7 +315,7 @@ internal fun OnboardingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             LjPrimaryButton(
                 text = stringResource(R.string.onboarding_start_using_locationjoystick),
@@ -339,7 +334,7 @@ internal fun OnboardingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 
