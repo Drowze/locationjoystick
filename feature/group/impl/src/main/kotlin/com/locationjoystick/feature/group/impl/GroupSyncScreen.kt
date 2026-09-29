@@ -15,18 +15,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Groups
-import androidx.compose.material.icons.rounded.QrCode
-import androidx.compose.material.icons.rounded.QrCodeScanner
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,9 +52,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.locationjoystick.core.data.CooldownState
 import com.locationjoystick.core.data.toBadgeText
+import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.CooldownAdvisoryBadge
 import com.locationjoystick.core.designsystem.component.LjButton
 import com.locationjoystick.core.designsystem.component.LjOutlinedButton
+import com.locationjoystick.core.designsystem.component.LjPrimaryButton
 import com.locationjoystick.core.designsystem.component.LjScaffold
 import com.locationjoystick.core.designsystem.component.LjTextButton
 import com.locationjoystick.core.designsystem.component.WideContentClamp
@@ -250,7 +245,7 @@ private fun NoGroupContent(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Icon(
-            imageVector = Icons.Rounded.Groups,
+            imageVector = LjIcons.Groups,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.primary,
@@ -267,12 +262,10 @@ private fun NoGroupContent(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        FilledTonalButton(
+        LjPrimaryButton(
             onClick = onCreateGroup,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(stringResource(R.string.group_sync_create_group_i_m_the_leader))
-        }
+            text = stringResource(R.string.group_sync_create_group_i_m_the_leader),
+        )
 
         Text(
             text = stringResource(R.string.group_sync_or_join_an_existing_group),
@@ -289,8 +282,8 @@ private fun NoGroupContent(
                 modifier = Modifier.weight(1f),
                 enabled = !isDiscovering,
             ) {
-                Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.size(6.dp))
+                Icon(LjIcons.QrCodeScanner, contentDescription = null, modifier = Modifier.size(ButtonDefaults.IconSize))
+                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                 Text(stringResource(R.string.group_sync_scan_qr))
             }
             LjOutlinedButton(
@@ -438,7 +431,7 @@ private fun LeaderContent(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.semantics(mergeDescendants = true) {},
                         ) {
-                            Icon(Icons.Rounded.QrCode, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(LjIcons.QrCode, contentDescription = null, modifier = Modifier.size(16.dp))
                             Text(
                                 text = stringResource(R.string.group_sync_scan_to_join),
                                 style = MaterialTheme.typography.labelSmall,
@@ -447,7 +440,7 @@ private fun LeaderContent(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = onRegenerateQr) {
-                            Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.group_sync_regenerate_qr_cd))
+                            Icon(LjIcons.Refresh, contentDescription = stringResource(R.string.group_sync_regenerate_qr_cd))
                         }
                     }
                 }
@@ -655,7 +648,7 @@ private fun ApiCredentialRow(
             Text(text = value, style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Monospace)
         }
         IconButton(onClick = { scope.launch { clipboard.writePlainText(value) } }) {
-            Icon(Icons.Rounded.ContentCopy, contentDescription = stringResource(R.string.group_sync_api_copy_cd, label))
+            Icon(LjIcons.ContentCopy, contentDescription = stringResource(R.string.group_sync_api_copy_cd, label))
         }
     }
 }

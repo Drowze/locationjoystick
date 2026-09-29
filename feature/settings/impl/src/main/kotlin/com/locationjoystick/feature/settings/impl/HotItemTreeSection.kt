@@ -3,9 +3,6 @@ package com.locationjoystick.feature.settings.impl
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
+import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.component.LjCheckboxRow
 import com.locationjoystick.feature.settings.impl.R
 
@@ -83,7 +81,7 @@ internal fun HotItemTreeSection(
                 expandedCountries = if (isCountryExpanded) expandedCountries - country else expandedCountries + country
             }) {
                 Icon(
-                    imageVector = if (isCountryExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
+                    imageVector = if (isCountryExpanded) LjIcons.KeyboardArrowUp else LjIcons.KeyboardArrowDown,
                     contentDescription =
                         stringResource(
                             if (isCountryExpanded) {
@@ -128,7 +126,7 @@ internal fun HotItemTreeSection(
                             expandedCities = if (isCityExpanded) expandedCities - cityKey else expandedCities + cityKey
                         }) {
                             Icon(
-                                imageVector = if (isCityExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
+                                imageVector = if (isCityExpanded) LjIcons.KeyboardArrowUp else LjIcons.KeyboardArrowDown,
                                 contentDescription =
                                     stringResource(
                                         if (isCityExpanded) {

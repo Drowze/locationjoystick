@@ -31,9 +31,13 @@ import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Fullscreen
 import androidx.compose.material.icons.rounded.FullscreenExit
+import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Hiking
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.LocationOff
 import androidx.compose.material.icons.rounded.LocationOn
@@ -47,6 +51,9 @@ import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.NewReleases
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.QrCode
+import androidx.compose.material.icons.rounded.QrCodeScanner
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Route
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.Search
@@ -128,14 +135,18 @@ object LjIcons {
     val FullscreenExit = Icons.Rounded.FullscreenExit
     val Explore = Icons.Rounded.Explore
     val Favorite = Icons.Rounded.Favorite
+    val Groups = Icons.Rounded.Groups
     val FavoriteBorder = Icons.Rounded.FavoriteBorder
     val FileDownload = Icons.Rounded.FileDownload
     val FileUpload = Icons.Rounded.FileUpload
     val Forum = Icons.Rounded.Forum
     val Hiking = Icons.Rounded.Hiking
+    val History = Icons.Rounded.History
     val Home = Icons.Rounded.Home
     val Info = Icons.Rounded.Info
     val Joystick = Icons.Rounded.SportsEsports
+    val KeyboardArrowDown = Icons.Rounded.KeyboardArrowDown
+    val KeyboardArrowUp = Icons.Rounded.KeyboardArrowUp
     val JoystickToggle = materialJoystickIcon
     val Layers = Icons.Rounded.Layers
     val Lock = Icons.Rounded.Lock
@@ -150,6 +161,9 @@ object LjIcons {
     val MyLocation = Icons.Rounded.MyLocation
     val Pause = Icons.Rounded.Pause
     val PlayArrow = Icons.Rounded.PlayArrow
+    val QrCode = Icons.Rounded.QrCode
+    val QrCodeScanner = Icons.Rounded.QrCodeScanner
+    val Refresh = Icons.Rounded.Refresh
     val Route = Icons.Rounded.Route
     val Save = Icons.Rounded.Save
     val Search = Icons.Rounded.Search

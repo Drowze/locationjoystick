@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +34,7 @@ import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.NominatimResult
 import com.locationjoystick.core.common.util.NominatimSearchClient
 import com.locationjoystick.core.common.util.parseRawLatLng
+import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
 import com.locationjoystick.core.designsystem.R
 import com.locationjoystick.core.model.RecentSearch
@@ -104,7 +102,7 @@ fun NominatimSearchBar(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface),
             placeholder = { Text(stringResource(R.string.search_bar_search_location)) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            leadingIcon = { Icon(LjIcons.Search, contentDescription = null) },
             singleLine = true,
             shape =
                 if (showResults) {
@@ -136,7 +134,7 @@ fun NominatimSearchBar(
                                 }.padding(horizontal = LjSpacing.md, vertical = 12.dp),
                     ) {
                         Icon(
-                            imageVector = Icons.Default.History,
+                            imageVector = LjIcons.History,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp),
