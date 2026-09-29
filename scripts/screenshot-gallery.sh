@@ -758,13 +758,13 @@ go_idle() {
   $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
   wait_s 4 "App starting"
   # A session running at kill time is restored on launch and opens the map, not the idle hub.
-  # Stop it and relaunch so every caller lands on Idle.
+  # Relaunching would restore it again, so stop it and back out to Home instead.
   if tap_text_exact "Stop"; then
-    wait_s 2 "Stopping restored session"
-    $ADB shell am force-stop "$PACKAGE"
-    sleep 1
-    $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
-    wait_s 4 "App restarting"
+    wait_s 3 "Stopping restored session"
+    # Back on Home would leave the app, so only back out of the map.
+    local dump; dump=$(ui_dump)
+    grep -q 'Favorites' "$dump" || { back; wait_s 2 "Backing out to Home"; }
+    rm -f "$dump"
   fi
 }
 
@@ -775,8 +775,8 @@ go_idle_keep_overlays() {
   local i dump
   for (( i=0; i<4; i++ )); do
     dump=$(ui_dump)
-    # "Favorites" only exists as a card on IdleScreen's hub.
-    if grep -q 'Favorites' "$dump" && ! grep -q 'Move to this location' "$dump"; then
+    # Widget buttons and the closed map drawer reuse the card titles, so match a card description.
+    if grep -q 'Replay saved routes' "$dump"; then
       rm -f "$dump"
       break
     fi
