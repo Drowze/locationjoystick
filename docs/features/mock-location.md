@@ -6,7 +6,7 @@ Key files: `:core:location/MockLocationService.kt`, `:core:data/LocationReposito
 
 ## Global Start/Stop Control
 
-Every screen's top bar (`LjTopBar`/`LjScaffold`, `:core:designsystem`) shows a full-text toggle button — `> start` / `|| stop` — as a pill centered in the bar's middle column, driving spoofing from anywhere in the app, not just the Map screen. `LjTopBar` lays out a 3-equal-width-column `Row` (start: nav icon + title, middle: the pill, end: actions), so the pill sits at the true bar center regardless of title or action width.
+Every screen's top bar (`LjTopBar`/`LjScaffold`, `:core:designsystem`) shows a full-text toggle button — `> start` / `|| stop` — as a pill centered in the bar's middle column, driving spoofing from anywhere in the app, not just the Map screen. `LjTopBar` lays out a 3-equal-width-column `Row` (start: nav icon + title, middle: the pill, end: actions), so the pill sits at the true bar center regardless of title or action width. The pill uses theme-aware green (light theme) and red (light and dark) tints at 12sp SemiBold for contrast compliance.
 
 When spoofing is off and a reverse-geocoded place is known, the control reads `Start · <place>` (for example `Start · Paris, France`). The place is clipped to `AppConstants.TopBarConstants.LOCATION_LABEL_MAX_CHARS` and the button is padded clear of the menu and action icons so a long name cannot overlap them. While running, the control shows only `Stop`. The control uses an immediate `Modifier.clickable` — do not attach long-press (`combinedClickable`). Compose waits for the long-press timeout before firing click, so a firm first press shows a toast of the place name and never starts spoofing. The place is already on the button; a long-press toast is redundant.
 

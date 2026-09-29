@@ -40,11 +40,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.locationjoystick.core.designsystem.LjError
 import com.locationjoystick.core.designsystem.LjIcons
 import com.locationjoystick.core.designsystem.LjSpacing
-import com.locationjoystick.core.designsystem.LjSuccess
 import com.locationjoystick.core.designsystem.R
+import com.locationjoystick.core.designsystem.ljSuccessColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +101,7 @@ fun LjTopBar(
                 if (showSpoofToggle) {
                     val context = LocalContext.current
                     val interactionSource = remember { MutableInteractionSource() }
-                    val tint = if (isSpoofing) LjError else LjSuccess
+                    val tint = if (isSpoofing) MaterialTheme.colorScheme.error else ljSuccessColor()
                     val spoofToggleCd =
                         stringResource(
                             if (isSpoofing) {
@@ -149,7 +148,7 @@ fun LjTopBar(
                         }
                         Text(
                             text = spoofToggleLabel,
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = tint,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

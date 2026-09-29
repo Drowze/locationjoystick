@@ -6,7 +6,7 @@ Key files: `:core:designsystem/LjColors.kt`, `:core:designsystem/LjTheme.kt`, `:
 
 ## Modes
 
-`ThemeMode` (`:core:model`): `DARK` (default, orange-on-black) or `LIGHT` (high-contrast, dark text on a light background). Both share the same `LjTypography` and `LjShapes` — only colors differ; text/font scaling is a separate, unimplemented ask. The light theme text pairs (accent and error on their containers/surfaces) meet WCAG AA 4.5:1 minimum and are guarded by `LjColorsContrastTest`.
+`ThemeMode` (`:core:model`): `DARK` (default, orange-on-black) or `LIGHT` (high-contrast, dark text on a light background). Both share the same `LjTypography` and `LjShapes` — only colors differ; text/font scaling is a separate, unimplemented ask. The light theme text pairs (accent and error on their containers/surfaces) and the top-bar Start/Stop toggle tints meet WCAG AA 4.5:1 minimum and are guarded by `LjColorsContrastTest`.
 
 ## Storage
 

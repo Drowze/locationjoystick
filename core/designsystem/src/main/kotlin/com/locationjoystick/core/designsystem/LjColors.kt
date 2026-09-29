@@ -1,8 +1,12 @@
 package com.locationjoystick.core.designsystem
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 val LjBg = Color(0xFF1E1E24)
 val LjSurface = Color(0xFF252530)
@@ -29,6 +33,7 @@ val LjLightText = Color(0xFF231E1B)
 val LjLightTextSecondary = Color(0xFF5C5259)
 val LjLightAccent = Color(0xFF984313)
 val LjLightError = Color(0xFFB3261E)
+val LjLightSuccess = Color(0xFF2E7D32)
 val LjLightOutlineVariant = Color(0xFFDDD3CB)
 
 object LjMapColors {
@@ -112,3 +117,12 @@ val LjLightColorScheme =
         inversePrimary = LjAccent,
         scrim = Color(0x80000000),
     )
+
+@Composable
+@ReadOnlyComposable
+fun ljSuccessColor(): Color =
+    if (MaterialTheme.colorScheme.surface.luminance() > 0.5f) {
+        LjLightSuccess
+    } else {
+        LjSuccess
+    }
