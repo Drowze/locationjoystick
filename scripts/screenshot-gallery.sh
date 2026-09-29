@@ -757,6 +757,15 @@ go_idle() {
   sleep 1
   $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
   wait_s 4 "App starting"
+  # A session running at kill time is restored on launch and opens the map, not the idle hub.
+  # Stop it and relaunch so every caller lands on Idle.
+  if tap_text_exact "Stop"; then
+    wait_s 2 "Stopping restored session"
+    $ADB shell am force-stop "$PACKAGE"
+    sleep 1
+    $ADB shell am start -n "${PACKAGE}/${ACTIVITY}" >/dev/null
+    wait_s 4 "App restarting"
+  fi
 }
 
 # Press HOME so overlay screenshots show the launcher, not the app map.
@@ -1279,13 +1288,13 @@ if should_run_step "20"; then
     tap_switch_for "Enable Tap to Walk"
     wait_s 1 "Warning dialog opening"
     # Button label depends on device API level: "Enable anyway" below API 30,
-    # "Accept" on API 30+ when the Accessibility disclosure is shown instead.
-    # Exact match: the disclosure body contains "Tap Accept to open…", and the
+    # "Agree" on API 30+ when the Accessibility disclosure is shown instead.
+    # Exact match: the disclosure body contains "Tap Agree to open…", and the
     # buttons sit below the fold, so scroll first.
     $ADB shell input swipe 540 1800 540 400
     wait_s 1 "Scrolling to dialog buttons"
-    if tap_text_exact "Accept"; then
-      # Accept opens Android's Accessibility settings; return to the app.
+    if tap_text_exact "Agree"; then
+      # Agree opens Android's Accessibility settings; return to the app.
       wait_s 2 "Accessibility settings opening"
       back
       wait_s 2 "Returning to app"
@@ -1398,12 +1407,12 @@ if should_run_step "25"; then
   tap_switch_for "Enable Tap to Walk"
   wait_s 2 "Disclosure opening"
   screenshot "25_compass_disclosure"
-  # Decline leaves the feature off and records nothing, so the device keeps the
+  # Not now leaves the feature off and records nothing, so the device keeps the
   # state it had before this step.
-  # The disclosure is taller than the screen; Decline sits below the fold.
+  # The disclosure is taller than the screen; Not now sits below the fold.
   $ADB shell input swipe 540 1800 540 400
-  wait_s 1 "Scrolling to Decline"
-  tap_text_exact "Decline"
+  wait_s 1 "Scrolling to Not now"
+  tap_text_exact "Not now"
   wait_s 1 "Dismissing disclosure"
 fi
 

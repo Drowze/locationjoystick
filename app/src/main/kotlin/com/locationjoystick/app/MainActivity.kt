@@ -93,18 +93,23 @@ class MainActivity : ComponentActivity() {
             val themeViewModel: ThemeViewModel = hiltViewModel()
             val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
             LjTheme(darkTheme = themeMode == ThemeMode.DARK) {
+                val compassViewModel: CompassDisclosureViewModel = hiltViewModel()
                 val showCompassDisclosure by showCompassDisclosureFlow.collectAsStateWithLifecycle()
-                if (showCompassDisclosure) {
-                    val compassViewModel: CompassDisclosureViewModel = hiltViewModel()
+                val compassUnanswered by compassViewModel.unanswered.collectAsStateWithLifecycle()
+                // Play: reviewers must meet the disclosure on first launch, on any screen and API level.
+                if (showCompassDisclosure || compassUnanswered) {
                     val context = LocalContext.current
                     CompassDisclosureDialog(
                         onAccept = {
                             showCompassDisclosureFlow.value = false
                             compassViewModel.record(true)
-                            context.startActivity(
-                                Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                            )
+                            // Below API 30 the service is disabled, so the settings screen has nothing to turn on.
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                context.startActivity(
+                                    Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                                )
+                            }
                         },
                         onDecline = {
                             showCompassDisclosureFlow.value = false

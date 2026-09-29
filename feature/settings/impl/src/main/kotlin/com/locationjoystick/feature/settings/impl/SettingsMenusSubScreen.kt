@@ -361,7 +361,7 @@ private fun TapToWalkSection(
     if (showEnableDisclosure) {
         CompassDisclosureDialog(
             title = stringResource(R.string.settings_menus_enable_tap_to_walk_2),
-            // Play requires explicit Accept/Decline wording whenever the Accessibility disclosure
+            // Play requires Play-recommended Agree/Not now wording whenever the Accessibility disclosure
             // is on screen; the caveats-only variant (below API 30) keeps "Enable anyway".
             acceptLabel =
                 if (needsCompassDisclosure) {
