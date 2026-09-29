@@ -170,15 +170,16 @@ the first of them is onboarding, which every install walks through:
 
 | Entry point | Where |
 |---|---|
-| First launch | `MainActivity` shows the disclosure over whatever screen appears first, on every API level, until the user answers (`CompassDisclosureViewModel.unanswered`). Below API 30 Agree only records the choice: the service is disabled there, so no settings screen opens |
-| Onboarding | Optional "Compass orientation" card below the three required steps (API 30+, not counted in "Step X of 3", never blocks "Start"). "Review and turn on" reopens the disclosure; Agree records the choice and opens Android's Accessibility settings (`OnboardingScreen.kt`) |
+| Onboarding | Optional "Compass orientation" card below the three required steps (every API level, skip line first, not counted in "Step X of 3", never blocks "Start"). "Review and turn on" opens the disclosure; Agree records the choice and opens Android's Accessibility settings on API 30+ (`OnboardingScreen.kt`). Not now records nothing, so the Tap to Walk switch asks again until Agree. `MainActivity` no longer auto-shows it on launch |
 | Turning Tap to Walk on | The Tap to Walk switch opens the same screen, with the two overlay caveats above the disclosure text and "Agree" as the accept label (`SettingsMenusSubScreen.kt`). Below API 30 only the caveats are shown, with "Enable anyway" |
 | Tapping the widget crosshair | `FloatingWidgetService.onTapToWalkClicked()` launches `MainActivity` with `EXTRA_SHOW_COMPASS_DISCLOSURE`; the overlay opens on the next tap |
 | Settings compass row | "Open Settings" in `CompassOrientationSection` |
 
 Play Console side is done and needs no re-checking: declaration form, per-submission video,
 store-listing mention, and no stale artifacts on other tracks. Rejections after build 2400 came from
-reviewers not reaching the in-app disclosure, hence the automatic onboarding show.
+reviewers not reaching the in-app disclosure, hence the onboarding card. A skippable card still
+counts as an in-flow disclosure: it is on the first-run screen every install walks through, and
+the service stays gated on an in-app accept regardless.
 
 The answer is persisted in `COMPASS_DISCLOSURE_CHOICE`. The Tap to Walk switch and the crosshair
 prompt at most once — declining is remembered too, otherwise every crosshair tap would re-prompt.
@@ -198,7 +199,7 @@ Accessibility services running in the background are detectable by some games. T
 
 `android.permission.BIND_ACCESSIBILITY_SERVICE` — granted by Android when the user enables the service in system Accessibility Settings. No runtime prompt needed.
 
-API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section and the onboarding compass step are hidden, and the service itself is disabled in the manifest (`android:enabled="@bool/compass_accessibility_service_enabled"`, `false` in `values/bools.xml`, `true` in `values-v30/`), so it never appears in Android's Accessibility settings where it could be turned on without the in-app disclosure. `CompassAccessibilityService.onServiceConnected()` also skips binding as a second guard. The rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
+API 30 (`takeScreenshot`) — no fallback exists below it. On API 28–29, the "Compass orientation" Settings section is hidden, and the service itself is disabled in the manifest (`android:enabled="@bool/compass_accessibility_service_enabled"`, `false` in `values/bools.xml`, `true` in `values-v30/`), so it never appears in Android's Accessibility settings where it could be turned on without the in-app disclosure. `CompassAccessibilityService.onServiceConnected()` also skips binding as a second guard. The rest of Tap to Walk (Tier 1 quick-walk, Tier 2 overlay) works unchanged.
 
 The disclosure, the onboarding step and the service's system-settings description are localized in every supported locale with identical keys (docs/features/localization.md). The Chinese strings keep the English word "Accessibility" in parentheses next to 无障碍 so a reviewer testing in any locale sees the term Play asks for.
 

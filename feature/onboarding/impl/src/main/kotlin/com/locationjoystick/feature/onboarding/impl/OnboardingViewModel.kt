@@ -4,7 +4,6 @@ import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -57,8 +56,6 @@ class OnboardingViewModel
                             ) == PackageManager.PERMISSION_GRANTED,
                         overlayPermissionGranted = isOverlayPermissionGranted(context),
                         mockLocationEnabled = bypassMockLocationCheck || isMockLocationEnabled(context),
-                        // takeScreenshot needs API 30; below that compass tracking cannot run.
-                        compassSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
                         compassServiceEnabled = isCompassServiceEnabled(),
                     )
                 }
@@ -72,9 +69,9 @@ class OnboardingViewModel
                 ?.any { it.id.contains("CompassAccessibilityService") }
                 ?: false
 
-        /** Records the answer to the Accessibility disclosure shown from the optional compass step. */
-        fun recordCompassDisclosure(accepted: Boolean) {
-            viewModelScope.launch { settingsRepository.recordCompassDisclosure(accepted) }
+        /** Records acceptance of the Accessibility disclosure; Not now records nothing so Tap to Walk asks again. */
+        fun recordCompassDisclosureAccepted() {
+            viewModelScope.launch { settingsRepository.recordCompassDisclosure(true) }
         }
 
         fun onSetupComplete() {

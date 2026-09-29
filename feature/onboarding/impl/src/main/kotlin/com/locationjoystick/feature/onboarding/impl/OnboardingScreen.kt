@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -88,7 +89,7 @@ fun OnboardingRoute(
         uiState = uiState,
         onCheckPermissions = viewModel::checkPermissions,
         onSkipMockLocationCheck = viewModel::skipMockLocationCheck,
-        onCompassDisclosureAnswered = viewModel::recordCompassDisclosure,
+        onCompassDisclosureAccepted = viewModel::recordCompassDisclosureAccepted,
         onSetupComplete = {
             viewModel.onSetupComplete()
             onSetupComplete()
@@ -110,7 +111,7 @@ internal fun OnboardingScreen(
     uiState: OnboardingUiState,
     onCheckPermissions: () -> Unit,
     onSkipMockLocationCheck: () -> Unit = {},
-    onCompassDisclosureAnswered: (accepted: Boolean) -> Unit = {},
+    onCompassDisclosureAccepted: () -> Unit = {},
     onSetupComplete: () -> Unit,
     isSpoofing: Boolean = false,
     onToggleSpoofing: () -> Unit = {},
@@ -291,29 +292,27 @@ internal fun OnboardingScreen(
 
             // Play's Accessibility API policy wants the disclosure in the normal usage flow, not only
             // behind Settings menus. Onboarding is the one screen every install walks through, so the
-            // optional compass step lives here and always shows the disclosure right before Android's
-            // Accessibility settings open.
-            if (uiState.compassSupported) {
-                Spacer(modifier = Modifier.height(12.dp))
+            // optional compass step lives here (every API level; Not now records nothing) and shows the
+            // disclosure right before Android's Accessibility settings open.
+            Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = stringResource(R.string.onboarding_optional),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            Text(
+                text = stringResource(R.string.onboarding_optional),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-                Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-                LjGuidedStepCard(
-                    title = stringResource(R.string.onboarding_compass_orientation),
-                    description = stringResource(R.string.onboarding_compass_orientation_desc),
-                    isGranted = uiState.compassServiceEnabled,
-                    icon = LjIcons.Explore,
-                    actionLabel = stringResource(R.string.onboarding_compass_review),
-                    onAction = { showCompassDisclosure = true },
-                )
-            }
+            LjGuidedStepCard(
+                title = stringResource(R.string.onboarding_compass_orientation),
+                description = stringResource(R.string.onboarding_compass_orientation_desc),
+                isGranted = uiState.compassServiceEnabled,
+                icon = LjIcons.Explore,
+                actionLabel = stringResource(R.string.onboarding_compass_review),
+                onAction = { showCompassDisclosure = true },
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -342,15 +341,15 @@ internal fun OnboardingScreen(
         CompassDisclosureDialog(
             onAccept = {
                 showCompassDisclosure = false
-                onCompassDisclosureAnswered(true)
-                context.startActivity(
-                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
+                onCompassDisclosureAccepted()
+                // Below API 30 the service is disabled, so the settings screen has nothing to turn on.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    context.startActivity(
+                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                }
             },
-            onDecline = {
-                showCompassDisclosure = false
-                onCompassDisclosureAnswered(false)
-            },
+            onDecline = { showCompassDisclosure = false },
         )
     }
 
@@ -401,7 +400,6 @@ private fun OnboardingScreenPreview() {
                     locationPermissionGranted = true,
                     overlayPermissionGranted = false,
                     mockLocationEnabled = false,
-                    compassSupported = true,
                 ),
             onCheckPermissions = {},
             onSetupComplete = {},

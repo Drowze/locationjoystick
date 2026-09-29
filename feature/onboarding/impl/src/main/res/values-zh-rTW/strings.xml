@@ -26,6 +26,6 @@
     <string name="onboarding_start_using_locationjoystick">"開始使用 locationjoystick"</string>
     <string name="onboarding_optional">"選用"</string>
     <string name="onboarding_compass_orientation">"羅盤方向（選用）"</string>
-    <string name="onboarding_compass_orientation_desc">"讓「點擊行走」讀取遊戲中的羅盤，使每次點擊都朝正確方向行走。此功能使用 Android 無障礙（Accessibility）權限。你可以略過此步驟，其他功能不受影響。"</string>
+    <string name="onboarding_compass_orientation_desc">"如果你不想使用「點擊行走」，可以略過此步驟。它讓「點擊行走」讀取遊戲中的羅盤，使每次點擊都朝正確方向行走，並使用 Android 無障礙（Accessibility）權限。"</string>
     <string name="onboarding_compass_review">"查看並開啟"</string>
 </resources>

@@ -95,9 +95,8 @@ class MainActivity : ComponentActivity() {
             LjTheme(darkTheme = themeMode == ThemeMode.DARK) {
                 val compassViewModel: CompassDisclosureViewModel = hiltViewModel()
                 val showCompassDisclosure by showCompassDisclosureFlow.collectAsStateWithLifecycle()
-                val compassUnanswered by compassViewModel.unanswered.collectAsStateWithLifecycle()
-                // Play: reviewers must meet the disclosure on first launch, on any screen and API level.
-                if (showCompassDisclosure || compassUnanswered) {
+                // The first-run disclosure lives in onboarding; this serves the widget/intent path.
+                if (showCompassDisclosure) {
                     val context = LocalContext.current
                     CompassDisclosureDialog(
                         onAccept = {
