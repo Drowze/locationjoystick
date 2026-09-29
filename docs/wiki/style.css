@@ -300,6 +300,61 @@ blockquote p, blockquote em{margin:0}
   .option-table{min-width:340px}
 }
 
+/* ── API reference endpoint cards ── */
+.endpoint{
+  min-width:0;
+  margin:0 0 16px;
+  padding:14px 16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  scroll-margin-top:16px;
+}
+.endpoint > p{margin:8px 0 0;font-size:0.88rem;color:var(--muted);line-height:1.55}
+.endpoint-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.endpoint-path{
+  font-family:var(--mono);
+  font-size:0.9rem;
+  font-weight:600;
+  background:none;
+  border:none;
+  padding:0;
+  overflow-wrap:anywhere;
+}
+.method{
+  font-family:var(--mono);
+  font-size:0.66rem;
+  font-weight:700;
+  letter-spacing:0.06em;
+  padding:3px 8px;
+  border-radius:4px;
+}
+.method-get{background:rgba(154,154,170,0.16);color:var(--muted)}
+.method-post{background:rgba(247,157,92,0.16);color:var(--accent)}
+.method-put{background:rgba(110,168,254,0.16);color:#6ea8fe}
+.method-delete{background:rgba(240,113,107,0.16);color:#f0716b}
+.params{margin:12px 0 0;border-top:1px solid var(--border)}
+.param{
+  display:grid;
+  grid-template-columns:minmax(0,15rem) minmax(0,1fr);
+  gap:4px 16px;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  font-size:0.84rem;
+  color:var(--muted);
+}
+.param:last-child{border-bottom:none;padding-bottom:0}
+.param dt code{overflow-wrap:anywhere}
+.param dd{min-width:0;overflow-wrap:anywhere}
+.param-type{font-family:var(--mono);font-size:0.76rem;color:var(--text)}
+.param-flag{font-family:var(--mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;margin-right:6px}
+.endpoint-returns{padding-top:8px;border-top:1px solid var(--border)}
+.endpoint code{overflow-wrap:anywhere}
+#control-api pre{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:680px){
+  .param{grid-template-columns:minmax(0,1fr)}
+}
+
 /* ── Feature sections ── */
 .feature-section{
   display:flex;
