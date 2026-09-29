@@ -45,6 +45,15 @@ class LjColorsContrastTest {
         assertTrue("LjLightError on LjLightSurface", contrast(scheme.error, LjLightSurface) >= 4.5f)
     }
 
+    @Test
+    fun lightOutlineVariantMeetsNonTextContrast() {
+        // Light theme outlineVariant (unchecked checkboxes and outlined fields) must meet WCAG 1.4.11
+        // non-text minimum 3:1 on light surfaces
+        assertTrue("LjLightOutlineVariant on LjLightSurface", contrast(LjLightOutlineVariant, LjLightSurface) >= 3f)
+        assertTrue("LjLightOutlineVariant on LjLightBg", contrast(LjLightOutlineVariant, LjLightBg) >= 3f)
+        assertTrue("LjLightOutlineVariant on LjLightSurfaceVariant", contrast(LjLightOutlineVariant, LjLightSurfaceVariant) >= 3f)
+    }
+
     private fun contrast(
         fg: Color,
         bg: Color,

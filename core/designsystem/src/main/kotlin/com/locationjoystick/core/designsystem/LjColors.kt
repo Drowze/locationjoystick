@@ -34,7 +34,10 @@ val LjLightTextSecondary = Color(0xFF5C5259)
 val LjLightAccent = Color(0xFF984313)
 val LjLightError = Color(0xFFB3261E)
 val LjLightSuccess = Color(0xFF2E7D32)
-val LjLightOutlineVariant = Color(0xFFDDD3CB)
+
+// Unchecked checkboxes / field outlines on light surfaces. Must meet 3:1 (WCAG 1.4.11 non-text)
+// on LjLightSurface, LjLightBg, and LjLightSurfaceVariant, as guarded by LjColorsContrastTest.
+val LjLightOutlineVariant = Color(0xFF7A6F68)
 
 object LjMapColors {
     val ActiveButton = Color(0xFF43A047)

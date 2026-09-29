@@ -6,7 +6,7 @@ Key files: `:core:designsystem/LjColors.kt`, `:core:designsystem/LjTheme.kt`, `:
 
 ## Modes
 
-`ThemeMode` (`:core:model`): `DARK` (default, orange-on-black) or `LIGHT` (high-contrast, dark text on a light background). Both share the same `LjTypography` and `LjShapes` — only colors differ; text/font scaling is a separate, unimplemented ask. The light theme text pairs (accent and error on their containers/surfaces) and the top-bar Start/Stop toggle tints meet WCAG AA 4.5:1 minimum and are guarded by `LjColorsContrastTest`.
+`ThemeMode` (`:core:model`): `DARK` (default, orange-on-black) or `LIGHT` (high-contrast, dark text on a light background). Both share the same `LjTypography` and `LjShapes` — only colors differ; text/font scaling is a separate, unimplemented ask. The light theme text pairs (accent and error on their containers/surfaces), the top-bar Start/Stop toggle tints, and unchecked checkbox / outlined field outlines meet WCAG accessibility minima (4.5:1 for text, 3:1 for controls) and are guarded by `LjColorsContrastTest`.
 
 ## Storage
 
@@ -22,7 +22,7 @@ Settings → Menus → "Appearance" → **Light mode** switch.
 
 Overlay panels (`FloatingWidgetService`, `WidgetPanelPresenter`) collect the same `getThemeMode()` flow and pass it into `LjTheme`, so routes / favorites / paste / roaming sheets match the in-app Appearance switch. The round widget icon column stays black with bright icons so it remains visible over other apps in both modes.
 
-Unchecked checkboxes and outlined fields in dark mode use `LjDarkOutlineVariant` (`#8A8490`) plus `ljCheckboxColors()` (`uncheckedColor = onSurface`) so Loop / Planting / Reverse / Return / Follow roads / Teleport between waypoints stay visible on `LjSurface`. Filled Start / Teleport buttons inherit `onPrimary` / outline colours — hosts must not paint those labels with `LjText`.
+Unchecked checkboxes and outlined fields route through `outlineVariant`: dark theme uses `LjDarkOutlineVariant` (`#8A8490`), light theme uses `LjLightOutlineVariant` (`#7A6F68`), both meeting at least 3:1 contrast (WCAG 1.4.11) on their respective surfaces and guarded by `LjColorsContrastTest`. Filled Start / Teleport buttons inherit `onPrimary` / outline colours — hosts must not paint those labels with `LjText`.
 
 ## Surfaces, shapes and type
 
