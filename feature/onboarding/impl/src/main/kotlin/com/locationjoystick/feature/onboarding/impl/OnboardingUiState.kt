@@ -8,6 +8,7 @@ data class OnboardingUiState(
     // Optional step, not counted in "Step X of 3" and never required to proceed.
     val compassSupported: Boolean = false,
     val compassServiceEnabled: Boolean = false,
+    val compassDisclosureUnanswered: Boolean = false,
 )
 
 val OnboardingUiState.canProceed: Boolean

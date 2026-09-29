@@ -170,10 +170,14 @@ the first of them is onboarding, which every install walks through:
 
 | Entry point | Where |
 |---|---|
-| Onboarding | Optional "Compass orientation" card below the three required steps (API 30+ only, not counted in "Step X of 3", never blocks "Start"). "Review and turn on" opens the disclosure; Accept records the choice and opens Android's Accessibility settings (`OnboardingScreen.kt`) |
+| Onboarding | Opens automatically on first show (API 30+, until answered). Optional "Compass orientation" card below the three required steps (not counted in "Step X of 3", never blocks "Start"). "Review and turn on" reopens the disclosure; Accept records the choice and opens Android's Accessibility settings (`OnboardingScreen.kt`) |
 | Turning Tap to Walk on | The Tap to Walk switch opens the same screen, with the two overlay caveats above the disclosure text and "Accept" as the accept label (`SettingsMenusSubScreen.kt`). Below API 30 only the caveats are shown, with "Enable anyway" |
 | Tapping the widget crosshair | `FloatingWidgetService.onTapToWalkClicked()` launches `MainActivity` with `EXTRA_SHOW_COMPASS_DISCLOSURE`; the overlay opens on the next tap |
 | Settings compass row | "Open Settings" in `CompassOrientationSection` |
+
+Play Console side is done and needs no re-checking: declaration form, per-submission video,
+store-listing mention, and no stale artifacts on other tracks. Rejections after build 2400 came from
+reviewers not reaching the in-app disclosure, hence the automatic onboarding show.
 
 The answer is persisted in `COMPASS_DISCLOSURE_CHOICE`. The Tap to Walk switch and the crosshair
 prompt at most once — declining is remembered too, otherwise every crosshair tap would re-prompt.

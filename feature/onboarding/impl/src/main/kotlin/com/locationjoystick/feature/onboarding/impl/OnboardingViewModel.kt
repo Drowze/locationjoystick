@@ -9,6 +9,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.locationjoystick.core.common.constants.AppConstants
 import com.locationjoystick.core.common.util.LocaleContextWrapper
 import com.locationjoystick.core.common.util.isMockLocationEnabled
 import com.locationjoystick.core.common.util.isOverlayPermissionGranted
@@ -48,6 +49,7 @@ class OnboardingViewModel
         fun checkPermissions() {
             viewModelScope.launch {
                 val bypassMockLocationCheck = settingsRepository.getBypassMockLocationCheck().first()
+                val disclosureChoice = settingsRepository.getCompassDisclosureChoice().first()
                 _uiState.update { current ->
                     current.copy(
                         locationPermissionGranted =
@@ -60,6 +62,8 @@ class OnboardingViewModel
                         // takeScreenshot needs API 30; below that compass tracking cannot run.
                         compassSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
                         compassServiceEnabled = isCompassServiceEnabled(),
+                        compassDisclosureUnanswered =
+                            disclosureChoice == AppConstants.CompassTrackingConstants.DISCLOSURE_UNANSWERED,
                     )
                 }
             }
@@ -74,6 +78,8 @@ class OnboardingViewModel
 
         /** Records the answer to the Accessibility disclosure shown from the optional compass step. */
         fun recordCompassDisclosure(accepted: Boolean) {
+            // Flip the flag now so the auto-shown disclosure cannot re-open before DataStore round-trips.
+            _uiState.update { it.copy(compassDisclosureUnanswered = false) }
             viewModelScope.launch { settingsRepository.recordCompassDisclosure(accepted) }
         }
 

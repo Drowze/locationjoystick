@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -122,6 +123,11 @@ internal fun OnboardingScreen(
     val context = LocalContext.current
     var showSkipMockLocationDialog by remember { mutableStateOf(false) }
     var showCompassDisclosure by remember { mutableStateOf(false) }
+
+    // Play's Accessibility policy: reviewers must meet the disclosure in normal flow, not behind an optional card.
+    LaunchedEffect(uiState.compassSupported, uiState.compassDisclosureUnanswered) {
+        if (uiState.compassSupported && uiState.compassDisclosureUnanswered) showCompassDisclosure = true
+    }
 
     val locationPermissionLauncher =
         rememberLauncherForActivityResult(
