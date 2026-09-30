@@ -14,14 +14,5 @@ internal enum class WidgetMasterPopupMode {
 internal fun widgetMasterPopupMode(spoofingActive: Boolean): WidgetMasterPopupMode =
     if (spoofingActive) WidgetMasterPopupMode.PAUSE_AND_STOP else WidgetMasterPopupMode.START_AND_STOP
 
-/**
- * Feature icons, extra sections, and pickers only work while mock GPS is running.
- * Pause fades them and makes taps a no-op until the user taps Start.
- */
-internal fun widgetControlsEnabled(spoofingActive: Boolean): Boolean = spoofingActive
-
-/** Stop on the long-press popup is never faded or ignored, including while parked. */
-internal fun widgetStopEnabled(): Boolean = true
-
 /** Route icon (green, pause/stop popup) is for route replay or walk-to, never roaming; roaming has its own icon. */
 internal fun routeControlsActive(mode: MockMode): Boolean = mode == MockMode.ROUTE_REPLAY || mode == MockMode.WALK_TO

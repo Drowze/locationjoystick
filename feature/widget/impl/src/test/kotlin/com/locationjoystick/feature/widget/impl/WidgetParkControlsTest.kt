@@ -16,17 +16,6 @@ class WidgetParkControlsTest {
     }
 
     @Test
-    fun `feature controls work only while spoofing`() {
-        assertEquals(true, widgetControlsEnabled(spoofingActive = true))
-        assertEquals(false, widgetControlsEnabled(spoofingActive = false))
-    }
-
-    @Test
-    fun `Stop stays available while parked`() {
-        assertEquals(true, widgetStopEnabled())
-    }
-
-    @Test
     fun `route icon is active for route replay and walk-to only`() {
         assertEquals(true, routeControlsActive(MockMode.ROUTE_REPLAY))
         assertEquals(true, routeControlsActive(MockMode.WALK_TO))

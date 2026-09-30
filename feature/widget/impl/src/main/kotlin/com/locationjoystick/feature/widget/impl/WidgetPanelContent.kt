@@ -293,7 +293,7 @@ internal fun WidgetPanel(
                         icon = LjIcons.Stop,
                         contentDescription = stringResource(R.string.widget_panel_content_stop_spoofing),
                         tint = MaterialTheme.colorScheme.error,
-                        enabled = widgetStopEnabled(),
+                        enabled = true,
                         onClick = masterToggle.onStop,
                     )
                 }
@@ -316,7 +316,7 @@ internal fun WidgetPanel(
 
         // Feature icons — only shown when panel expanded
         if (isPanelExpanded) {
-            val controlsEnabled = widgetControlsEnabled(masterToggle.spoofingActive)
+            val controlsEnabled = masterToggle.spoofingActive
             features.forEach { feature ->
                 if (feature == AppFeature.ROUTES) {
                     val routeIconTint =
