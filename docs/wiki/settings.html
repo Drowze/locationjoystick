@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings & QR Transfer — locationjoystick</title>
+  <title>Settings — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="description" content="Configure speed profiles, widget features, and transfer your locationjoystick setup to another phone with a QR code.">
+  <meta name="description" content="Every setting in locationjoystick: speeds, GPS realism, menus, language, roaming defaults and external services.">
   <link rel="canonical" href="https://locationjoystick.shrtcts.fr/settings.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="locationjoystick">
-  <meta property="og:title" content="Settings & QR Transfer — locationjoystick">
-  <meta property="og:description" content="Configure speed profiles, widget features, and transfer your locationjoystick setup to another phone with a QR code.">
+  <meta property="og:title" content="Settings — locationjoystick">
+  <meta property="og:description" content="Every setting in locationjoystick: speeds, GPS realism, menus, language, roaming defaults and external services.">
   <meta property="og:url" content="https://locationjoystick.shrtcts.fr/settings.html">
   <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Settings & QR Transfer — locationjoystick">
-  <meta name="twitter:description" content="Configure speed profiles, widget features, and transfer your locationjoystick setup to another phone with a QR code.">
+  <meta name="twitter:title" content="Settings — locationjoystick">
+  <meta name="twitter:description" content="Every setting in locationjoystick: speeds, GPS realism, menus, language, roaming defaults and external services.">
   <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
@@ -25,24 +25,21 @@
 
   <main>
     <h1 id="settings">Settings</h1>
-    <p>Set movement speeds, make the fake GPS signal look more real, choose which controls appear in the widget, set roaming defaults, and back up your data. The settings hub has four sections: Movement &amp; GPS, Menus, Favorites &amp; Routes, and Roaming. Export, import, and reset are in the menu at the top right.</p>
+    <p>Every setting, grouped as in the app.</p>
+    <p>Export, import, and reset are on <a href="backup-transfer.html">Backup &amp; Transfer</a>.</p>
 
-    <p><a href="#speed-profiles">Movement & GPS</a> · <a href="#anti-cheat-warning">Anti-cheat warning</a> · <a href="#menus">Menus</a> · <a href="#favorites-routes">Favorites & Routes</a> · <a href="#roaming">Roaming</a> · <a href="#external-services">External services</a> · <a href="#qr-transfer">QR transfer</a> · <a href="#export-import">Export / import</a></p>
+    <p><a href="#speed-profiles">Movement & GPS</a> · <a href="#menus">Menus</a> · <a href="#language">Language</a> · <a href="#favorites-routes">Favorites & Routes</a> · <a href="#roaming">Roaming</a> · <a href="#external-services">External services</a> · <a href="#home-screen-badges">Home screen badges</a></p>
 
     <div class="feature-section" id="settings-main">
       <img class="phone-shot" src="screenshots/05_settings.png" alt="Settings screen">
-      <ul class="section-bullets">
-        <li>Movement & GPS: edit the five speeds and turn each GPS realism option on or off.</li>
-        <li>Menus: choose which features appear in the floating widget and on the map, and drag to reorder them.</li>
-        <li>Favorites & Routes: add ready-made locations and routes.</li>
-        <li>Roaming: set defaults for Walk around the block and Planting.</li>
-      </ul>
     </div>
 
     <h2 id="speed-profiles">Movement & GPS</h2>
 
     <h3 id="speed-profiles-list">Speed profiles</h3>
-    <p>Five speeds control the joystick, routes, and roaming. Edit any of them. The change applies right away, even during a route or roam. The <strong>km/h ↔ mph</strong> switch at the top changes every speed in the app.</p>
+    <p>Five speeds control the joystick, routes, and roaming.</p>
+    <p>Edit any speed and it applies right away, even during movement.</p>
+    <p>The <strong>km/h ↔ mph</strong> switch at the top changes every speed in the app.</p>
 
     <div class="table-wrap">
     <table class="option-table">
@@ -77,19 +74,20 @@
     </table>
     </div>
 
-    <p>There is no upper limit. The lowest allowed speed is <strong>0.04 km/h</strong>. Lower values are raised to it, because a speed of zero means the device never moves.</p>
+    <p>No upper limit. Minimum: <strong>0.04 km/h</strong>. Lower values raise to it (zero speed blocks movement).</p>
 
-    <p>Each speed has a checkbox. It sets whether the widget's <a href="#menus">Speed cycle</a> button includes that speed. <strong>Walk, Run, and Bike</strong> are on by default. Slow Walk and Drive are off. You can edit all five speeds either way.</p>
+    <p>Each speed has a checkbox for the <a href="#menus">Speed cycle</a> button.</p>
+    <p><strong>Walk, Run, and Bike</strong> are on by default. Slow Walk and Drive are off.</p>
 
-    <h2 id="anti-cheat-warning">Anti-cheat warning</h2>
-    <p>If you set a speed above <strong>28.8 km/h (17.9 mph)</strong>, this warning appears below the field:</p>
+    <h3 id="anti-cheat-warning">Anti-cheat warning</h3>
+    <p>Speeds above <strong>28.8 km/h (17.9 mph)</strong> show a warning:</p>
     <blockquote><em>"Speed exceeds 8 m/s, may trigger anti-cheat in some games"</em></blockquote>
-    <p>
-      The warning is informational. Nothing is blocked or changed. Each speed is checked on its own. Lower the speed to clear the warning, or ignore it.
-    </p>
+    <p>The warning is informational. It does not block or change anything.</p>
 
     <h3 id="gps-jitter">Location randomness</h3>
-    <p>Adds small random changes to each location update, like the drift of a real GPS chip. Set a value to 0 to turn that change off. The app sends one update every second. Wobble and altitude values show in feet when you pick mph.</p>
+    <p>Adds small random changes to each location update, like real GPS drift.</p>
+    <p>Set any value to 0 to turn it off.</p>
+    <p>Wobble and altitude show in feet when you use mph.</p>
 
     <div class="table-wrap">
     <table class="option-table">
@@ -135,7 +133,7 @@
     </div>
 
     <h3 id="gps-realism">GPS realism</h3>
-    <p>Each option makes the fake signal look more like a real GPS chip. Some apps check these details to spot fake locations. Turning on more options lowers the chance of detection.</p>
+    <p>Each option mimics real GPS behavior to avoid detection by app checks.</p>
 
     <div class="table-wrap">
     <table class="option-table">
@@ -181,16 +179,51 @@
     </div>
 
     <h3 id="location-memory">Location memory</h3>
-    <p><strong>Remember last location</strong> restores your last fake position when you reopen the app. The app saves it on your device after every update. If nothing is saved, the app starts from your real location, whether this option is on or off. On by default.</p>
+
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Remember last location</td>
+          <td class="default-cell">On</td>
+          <td>Restores your last fake position when you reopen the app. The app saves it after every update. If nothing is saved, the app starts from your real location.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
     <h2 id="menus">Menus</h2>
 
     <h3 id="appearance">Appearance</h3>
-    <p>The <strong>Light mode</strong> switch changes the app from the dark theme to a bright theme. The bright theme is easier to read in sunlight. It applies in the app and in the widget lists. The round buttons over other apps stay dark either way.</p>
+
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Light mode</td>
+          <td class="default-cell">Off</td>
+          <td>Switches the app from dark theme to bright. Easier to read in sunlight. Applies in app and widget lists. Overlay buttons stay dark.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
     <h3 id="map-source">Map source</h3>
-    <p>The <strong>Map source</strong> switch sets where map images come from. It applies to the map screen, the floating map, the favorites picker, and the route creator. <strong>OpenStreetMap</strong> is the default. <strong>Amap (高德)</strong> is faster and more detailed in mainland China, where OpenStreetMap is often slow or blocked.</p>
-    <p>Amap uses a map system that is shifted a few hundred meters from real GPS. The app corrects this, so markers, routes, and taps land on the right spot. Everything you save, share, or use as your fake location stays in standard GPS coordinates. Switching sources never moves your data. A small credit in the map corner shows the active source.</p>
+
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Map source</td>
+          <td class="default-cell">OpenStreetMap</td>
+          <td>OpenStreetMap or Amap (高德). Amap is faster and more detailed in mainland China. Amap coordinates are shifted a few hundred meters; the app corrects this automatically.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
     <h3 id="app-features">App Features</h3>
     <p>Choose which quick-access features appear in the floating widget and on the map screen. Each feature has one checkbox for the widget and one for the map. Drag the handle on the left to reorder. Both use the same order. See <a href="overlays.html#available-widget-controls">Overlays</a> for what each control does.</p>
@@ -255,62 +288,107 @@
     <p>Starting and stopping location simulation is always available from the bar at the top of every screen, so it isn't one of the configurable features above.</p>
 
     <h3 id="speed-cycle-settings">Speed cycle</h3>
-    <p>Choose which speeds the widget's Speed cycle button goes through. See <a href="#speed-profiles-list">Speed profiles</a>.</p>
+    <p>Choose which speeds the widget's Speed cycle button cycles through.</p>
 
     <h3 id="tap-to-walk-settings">Tap to Walk</h3>
-    <p>Turns on the crosshair overlay and sets its map scale and compass. See <a href="overlays.html#tap-to-walk">Overlays</a> for every option.</p>
+    <p>Turns on the crosshair overlay and sets its map scale and compass. See <a href="overlays.html#tap-to-walk">Overlays</a>.</p>
 
     <h3 id="privacy-menus">Privacy</h3>
-    <p>Options that hide app features or shorten the steps to move.</p>
+    <p>Options that hide features or shorten steps to move.</p>
 
-    <h4 id="hide-teleport">Hide teleport features</h4>
-    <p>One switch that removes every "jump to a location" option: on the map, in favorites, when starting a route (including Teleport between waypoints), in Group Sync, in the paste box, and in the widget. Routes and pasted points then walk to the first stop instead of jumping. Use it if you only want to move by walking. Off by default.</p>
-
-    <h4 id="hide-widget">Hide floating widget</h4>
-    <p>Keeps the floating widget button off the screen while spoofing is on. Your other overlays keep working. Off by default.</p>
-
-    <h4 id="hide-notification">Hide notification icon</h4>
-    <p>Removes the "Mock location active" icon from the status bar. Android requires the notification, so it stays in the notification shade. Off by default.</p>
-
-    <h4 id="route-jump-buttons">Show route jump buttons</h4>
-    <p>Adds "Previous stop" and "Next stop" buttons while a route plays. Use them to skip the walk between stops. Off by default. Hidden when Hide teleport features is on.</p>
-
-    <h4 id="quick-walk-setting">Floating map quick walk</h4>
-    <p>A tap on the floating map walks there at once, with no popup. Off by default. See <a href="overlays.html#floating-map-quick-walk">Overlays</a>.</p>
-
-    <h4 id="altitude-override-setting">Show altitude override button</h4>
-    <p>Adds a widget button to type in a fixed height. Off by default. See <a href="#gps-realism">GPS realism</a>.</p>
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr id="hide-teleport">
+          <td>Hide teleport features</td>
+          <td class="default-cell">Off</td>
+          <td>Removes all "jump to location" options (map, favorites, routes, Group Sync, paste). Routes walk to the first stop instead.</td>
+        </tr>
+        <tr id="hide-widget">
+          <td>Hide floating widget</td>
+          <td class="default-cell">Off</td>
+          <td>Keeps the floating widget button off the screen while spoofing is on. Other overlays keep working.</td>
+        </tr>
+        <tr id="hide-notification">
+          <td>Hide notification icon</td>
+          <td class="default-cell">Off</td>
+          <td>Removes the "Mock location active" icon from the status bar. The notification stays in the notification shade (Android requires it).</td>
+        </tr>
+        <tr id="route-jump-buttons">
+          <td>Show route jump buttons</td>
+          <td class="default-cell">Off</td>
+          <td>Adds "Previous stop" and "Next stop" buttons while a route plays. Hidden when Hide teleport features is on.</td>
+        </tr>
+        <tr id="quick-walk-setting">
+          <td>Floating map quick walk</td>
+          <td class="default-cell">Off</td>
+          <td>A tap on the floating map walks there at once, with no popup. See <a href="overlays.html#floating-map-quick-walk">Overlays</a>.</td>
+        </tr>
+        <tr id="altitude-override-setting">
+          <td>Show altitude override button</td>
+          <td class="default-cell">Off</td>
+          <td>Adds a widget button to type in a fixed height. See <a href="#gps-realism">GPS realism</a>.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
 
     <h3 id="capture">Capture</h3>
-    <p>The same Capture switch, List and Jump checkboxes, and browser choice as the <a href="location-links.html#set-up-capture">Location Links</a> page. You can turn Capture on or off without leaving Settings. Setting this app as your default browser is a one-time step on the Location Links page. Shared links and "navigate" buttons in map apps always work without setup.</p>
+    <p>Turn Capture on or off and set the browser here. See <a href="location-links.html#set-up-capture">Location Links</a>.</p>
 
     <h3 id="debug-stats">Debug stats</h3>
     <div class="feature-section" id="debug-stats-shot">
       <img class="phone-shot" src="screenshots/18_debug_stats.png" alt="Debug stats shown in the floating widget panel">
-      <p>Shows your coordinates, speed, altitude, accuracy, heading, and update rate in the expanded widget. Use it to check that spoofing works. Off by default.</p>
+      <p>Shows coordinates, speed, altitude, accuracy, heading, and update rate in the expanded widget.</p>
+      <p>Off by default.</p>
     </div>
 
-    <h2 id="favorites-routes">Favorites & Routes</h2>
-    <p>Add ready-made locations and routes with one tap.</p>
+    <h2 id="language">Language</h2>
+    <p>locationjoystick supports English, Simplified Chinese (CN), and Traditional Chinese (TW).</p>
 
     <div class="table-wrap">
     <table class="option-table">
-      <thead><tr><th>Option</th><th>Description</th></tr></thead>
+      <thead><tr><th>Android version</th><th>How to change</th></tr></thead>
       <tbody>
         <tr>
-          <td><strong>Show hot locations</strong></td>
-          <td>Adds well-known city centers, parks, and landmarks to your favorites. Off by default. Turning it off removes only those entries. Your own favorites stay. See <a href="routes.html#hot-locations">Routes &amp; Favorites → Hot locations</a>.</td>
+          <td>Android 13 and newer</td>
+          <td>Phone Settings → Apps → locationjoystick → Language. The app switches immediately.</td>
         </tr>
         <tr>
-          <td><strong>Show hot routes</strong></td>
-          <td>Adds ready-made routes for popular event locations to your routes. Off by default. Turning it off removes only those routes. Your own routes stay. See <a href="routes.html#hot-routes">Routes &amp; Favorites → Hot routes</a>.</td>
+          <td>Android 9 to 12</td>
+          <td>Open the app, go to Settings → Menus, pick a language from the menu in the top bar. The app restarts to apply the change.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>On Android 9 to 12, the language change applies to overlays and the notification the next time a session starts.</p>
+
+    <p>Want to help translate? See the <a href="https://github.com/shortcuts/locationjoystick/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing guide</a> or ask in the <a href="https://discord.gg/r9DRnkwbMf" target="_blank" rel="noopener">Discord</a>.</p>
+
+    <h2 id="favorites-routes">Favorites & Routes</h2>
+
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Option</th><th>Default</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Show hot locations</td>
+          <td class="default-cell">Off</td>
+          <td>Adds well-known city centers, parks, and landmarks to your favorites. Your own favorites stay. See <a href="routes.html#hot-locations">Routes &amp; Favorites</a>.</td>
+        </tr>
+        <tr>
+          <td>Show hot routes</td>
+          <td class="default-cell">Off</td>
+          <td>Adds ready-made routes for popular event locations. Your own routes stay. See <a href="routes.html#hot-routes">Routes &amp; Favorites</a>.</td>
         </tr>
       </tbody>
     </table>
     </div>
 
     <h2 id="roaming">Roaming</h2>
-    <p>Set defaults for Walk around the block and Planting. Only one can run at a time.</p>
+    <p>Set defaults for Walk around the block and Planting.</p>
 
     <div class="table-wrap">
     <table class="option-table">
@@ -357,7 +435,7 @@
     </div>
 
     <h2 id="external-services">External services</h2>
-    <p>The app works offline and needs no account. It sends no usage data or tracking. Three features use the internet:</p>
+    <p>The app is offline-first and needs no account. Three features use the internet:</p>
 
     <div class="table-wrap">
     <table class="option-table">
@@ -381,80 +459,23 @@
       </tbody>
     </table>
     </div>
-    <p>
-      Each service is used only while its feature is in use. To avoid all of them, skip road following, place search, and the map. You can still enter coordinates directly in Favorites.
-    </p>
-
-    <h2 id="qr-transfer">QR transfer</h2>
-    <p>
-      Copy your whole setup to another device by scanning a QR code. No cable, account, or cloud is needed.
-    </p>
-
-    <div class="feature-section" id="qr-share">
-      <img class="phone-shot" src="screenshots/12_qr_share.png" alt="QR share dialog">
-      <ul class="section-bullets">
-        <li>Both devices must be on the same Wi-Fi network.</li>
-        <li>The sending device shows a QR code and a short backup code. The receiving device scans the QR code or types the backup code.</li>
-        <li>The data goes directly between the two devices. See the <a href="privacy.html#no-cloud">privacy policy</a>.</li>
-      </ul>
-    </div>
-
-    <h2 id="export-import">Export / import</h2>
-    <p>Back up or restore your routes, favorites, speeds, widget setup, location randomness settings, and roaming defaults.</p>
-
-    <div class="table-wrap">
-    <table class="option-table">
-      <thead><tr><th>Action</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><strong>Export via QR code</strong></td>
-          <td>Shows a QR code. Another device on the same Wi-Fi network scans it to receive your setup.</td>
-        </tr>
-        <tr>
-          <td><strong>Export settings</strong></td>
-          <td>Saves a backup file. Keep it or share it.</td>
-        </tr>
-        <tr>
-          <td><strong>Import from QR code</strong></td>
-          <td>Scans a QR code shown on another device on the same Wi-Fi network. You choose to add to your data or replace it.</td>
-        </tr>
-        <tr>
-          <td><strong>Import via code</strong></td>
-          <td>Type the short code from the sending device instead of scanning. Both devices must be on the same Wi-Fi network.</td>
-        </tr>
-        <tr>
-          <td><strong>Import from file</strong></td>
-          <td>Choose a backup file you exported earlier. You choose to add to your data or replace it.</td>
-        </tr>
-        <tr>
-          <td><strong>Import from GPS Joystick</strong></td>
-          <td>Choose a GPX file exported from GPS Joystick. Named places become favorites. Each route becomes a set of straight lines. Routes with thousands of points are skipped, and a message shows how many. Backup files from that app do not work. Export GPX instead.</td>
-        </tr>
-        <tr>
-          <td><strong>Import from YAMLA</strong></td>
-          <td>Imports favorites and speeds from a YAMLA export file.</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-
-    <p>The <strong>Reset all data</strong> button is next to the export and import buttons. After you confirm, it permanently deletes all your favorites, routes, and settings. Your permissions stay, so you do not repeat setup.</p>
+    <p>Each service is used only while its feature is active.</p>
 
     <h2 id="home-screen-badges">Home screen badges</h2>
-    <p>The Home screen shows two optional badges about updates and changes.</p>
+
     <div class="table-wrap">
     <table class="option-table">
-      <thead><tr><th>Badge</th><th>Shows</th><th>How to dismiss</th></tr></thead>
+      <thead><tr><th>Badge</th><th>Shows when</th><th>Dismiss by</th></tr></thead>
       <tbody>
         <tr>
-          <td><strong>Update available</strong></td>
-          <td>When GitHub has a newer release (for example, <em>v1.2.3 available</em>). The app checks about once a day and needs internet. Tap to open the release page.</td>
-          <td>Tap <strong>X</strong>. Hidden until a newer version comes out. Cannot be turned off.</td>
+          <td>Update available</td>
+          <td>GitHub has a newer release. The app checks once a day and needs internet.</td>
+          <td>Tap <strong>X</strong>. Hidden until a newer version comes out.</td>
         </tr>
         <tr>
-          <td><strong>What's new</strong></td>
-          <td>After an update, showing what changed. Tap to read the new features and fixes. Works offline.</td>
-          <td>Tap <strong>X</strong>. Hidden until the next version. See the <a href="changelog.html">changelog</a> for the full history.</td>
+          <td>What's new</td>
+          <td>After an update, showing what changed. Works offline.</td>
+          <td>Tap <strong>X</strong>. Hidden until the next version. See the <a href="changelog.html">changelog</a>.</td>
         </tr>
       </tbody>
     </table>
