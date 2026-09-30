@@ -5,7 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Backup &amp; Transfer — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="robots" content="noindex">
+  <meta name="description" content="Back up your routes and favorites to a file, restore them, or copy everything to another phone with a QR code.">
+  <link rel="canonical" href="https://locationjoystick.shrtcts.fr/backup-transfer.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="locationjoystick">
+  <meta property="og:title" content="Backup &amp; Transfer — locationjoystick">
+  <meta property="og:description" content="Back up your routes and favorites to a file, restore them, or copy everything to another phone with a QR code.">
+  <meta property="og:url" content="https://locationjoystick.shrtcts.fr/backup-transfer.html">
+  <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Backup &amp; Transfer — locationjoystick">
+  <meta name="twitter:description" content="Back up your routes and favorites to a file, restore them, or copy everything to another phone with a QR code.">
+  <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
 </head>
@@ -14,7 +25,76 @@
 
   <main>
     <h1 id="backup-transfer">Backup &amp; Transfer</h1>
-    <p>This page is being written.</p>
+    <p>Save your routes, favorites, and settings to keep them safe or move them to another phone. All actions are in the menu at the top right of <a href="settings.html">Settings</a>.</p>
+
+    <h2 id="what-is-included">What is included</h2>
+    <p>Backups contain your routes, favorites, speed profiles, widget setup, location randomness settings, and roaming defaults.</p>
+    <p>Captured location lists are not backed up. Permissions stay on your phone, so you don't need to repeat setup after a reset.</p>
+
+    <h2 id="back-up-to-a-file">Back up to a file</h2>
+    <ol class="quickstart">
+      <li>Open <a href="settings.html">Settings</a> and tap the menu at the top right.</li>
+      <li>Under <strong>Export</strong>, tap <strong>Export settings</strong>.</li>
+      <li>Your backup file opens in your file manager. Save it or share it.</li>
+    </ol>
+
+    <h2 id="restore-from-a-file">Restore from a file</h2>
+    <ol class="quickstart">
+      <li>Open <a href="settings.html">Settings</a> and tap the menu at the top right.</li>
+      <li>Under <strong>Import</strong>, tap <strong>Import from file</strong>.</li>
+      <li>Choose your backup file.</li>
+      <li>Choose <strong>Add to my data</strong> to keep what you have. Or choose <strong>Replace all data</strong> to use only the backup.</li>
+    </ol>
+
+    <h2 id="transfer-to-another-phone">Transfer to another phone</h2>
+    <p>Send your entire setup to another phone with a QR code or short code. Both phones must be on the same Wi-Fi network.</p>
+
+    <h3 id="send-with-a-qr-code">Send with a QR code</h3>
+    <ol class="quickstart">
+      <li>Open <a href="settings.html">Settings</a> and tap the menu at the top right.</li>
+      <li>Under <strong>Export</strong>, tap <strong>Export via QR code</strong>.</li>
+      <li>A dialog shows your QR code and short backup code. Share these with the other phone.</li>
+    </ol>
+    <div class="feature-section" id="qr-share">
+      <img class="phone-shot" src="screenshots/12_qr_share.png" alt="QR share dialog">
+    </div>
+
+    <h3 id="receive-on-the-other-phone">Receive on the other phone</h3>
+    <ol class="quickstart">
+      <li>Open <a href="settings.html">Settings</a> and tap the menu at the top right.</li>
+      <li>Under <strong>Import</strong>, tap <strong>Import from QR code</strong> or <strong>Import via code</strong>.</li>
+      <li>Scan the QR code or type the short code from the other phone.</li>
+      <li>Choose <strong>Add to my data</strong> or <strong>Replace all data</strong>.</li>
+    </ol>
+    <p>Data goes directly between the two devices. See the <a href="privacy.html#no-cloud">privacy policy</a>.</p>
+    <p>If phone hotspots block typed codes, scan the QR code instead.</p>
+
+    <h2 id="import-from-other-apps">Import from other apps</h2>
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Source</th><th>What imports</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>GPS Joystick</strong></td>
+          <td>Routes and favorites from a GPS Joystick export. GPX files also work: named places become favorites, and each track stays separate. Routes with thousands of points are skipped. Backup files from that app do not work — export GPX instead.</td>
+        </tr>
+        <tr>
+          <td><strong>YAMLA</strong></td>
+          <td>Favorites and speed profiles from a YAMLA export file.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2 id="reset-all-data">Reset all data</h2>
+    <p>Permanently delete all your favorites, routes, and settings without needing Android's system settings.</p>
+    <ol class="quickstart">
+      <li>Open <a href="settings.html">Settings</a> and tap the menu at the top right.</li>
+      <li>Under <strong>Danger</strong>, tap <strong>Reset all data</strong>.</li>
+      <li>Confirm the action. It cannot be undone.</li>
+    </ol>
+    <p>Permissions stay on your phone, so you don't need to repeat setup.</p>
+
   </main>
 
 </div>
