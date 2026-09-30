@@ -156,6 +156,7 @@ Every real page (not a redirect stub) must have:
 - **Description:** A unique `<meta name="description">` containing one sentence under 160 characters in plain language. Describes what the page covers. Example: "Move your spoofed GPS location on the map: tap to teleport, long-press to walk, and control real-time position changes from one screen."
 - **Open Graph and Twitter:** Match title and description to `og:title`, `og:description`, `twitter:title`, `twitter:description` for social sharing.
 - **Canonical and URL:** `<link rel="canonical">` pointing to `https://locationjoystick.shrtcts.fr/<page>.html`. Set `og:url` to the same canonical URL.
+- **Stubs:** Stub canonicals and `og:image`/`twitter:image` also use `https://locationjoystick.shrtcts.fr`; `robots.txt` and `sitemap.xml` list real pages only.
 
 ### Headings and IDs
 
