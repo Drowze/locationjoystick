@@ -18,14 +18,6 @@ class RouteInterpolatorTest {
     // advancePosition
 
     @Test
-    fun `advancePosition zero distance returns same point`() {
-        val from = LatLng(51.5, 0.0)
-        val result = interpolator.advancePosition(from, 0.0, 0.0)
-        assertEquals(from.latitude, result.latitude, 0.0001)
-        assertEquals(from.longitude, result.longitude, 0.0001)
-    }
-
-    @Test
     fun `advancePosition 100m north increases latitude only`() {
         val from = LatLng(0.0, 0.0)
         val result = interpolator.advancePosition(from, 0.0, 100.0)
