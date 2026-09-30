@@ -78,9 +78,13 @@ class BuildLocationTest {
     }
 
     @Test
-    fun `not suspended returns a fix`() {
-        val snapshot = baseSnapshot(isSuspendedPhase = false)
-        assertNotNull(buildLocation(snapshot, 1000L, Random(42)))
+    fun `not suspended passes through speed and position`() {
+        val snapshot = baseSnapshot(isSuspendedPhase = false, speedMs = 3.0f)
+        val fix = buildLocation(snapshot, 1000L, Random(42))
+        assertNotNull(fix)
+        assertEquals(3.0f, fix!!.speedMs)
+        assertEquals(48.8566, fix.latitude, 0.0)
+        assertEquals(2.3522, fix.longitude, 0.0)
     }
 
     @Test
