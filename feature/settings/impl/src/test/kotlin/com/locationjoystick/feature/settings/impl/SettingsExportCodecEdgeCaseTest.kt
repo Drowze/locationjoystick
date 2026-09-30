@@ -366,4 +366,16 @@ class SettingsExportCodecEdgeCaseTest {
         assertEquals(4, roaming.plantingLoopCount)
         assertEquals("run", roaming.plantingSpeedProfileId)
     }
+
+    @Test
+    fun `round-trip preserves MPH speedUnit`() {
+        val data =
+            baseData().copy(
+                settings = baseData().settings.copy(speedUnit = SpeedUnit.MPH),
+            )
+
+        val restored = SettingsExportCodec.parseExportData(SettingsExportCodec.serializeExportData(data))
+
+        assertEquals(SpeedUnit.MPH, restored.settings.speedUnit)
+    }
 }
