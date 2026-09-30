@@ -1,19 +1,28 @@
 (function () {
   var NAV_ITEMS = [
-    { href: 'index.html', label: 'Getting Started' },
-    { href: 'map.html', label: 'Map' },
-    { href: 'location-links.html', label: 'Location Links' },
-    { href: 'routes.html', label: 'Routes' },
-    { href: 'favorites.html', label: 'Favorites' },
-    { href: 'group.html', label: 'Group Sync' },
-    { href: 'tap-to-walk.html', label: 'Tap to Walk' },
-    { href: 'settings.html', label: 'Settings' },
-    { href: 'language.html', label: 'Language' },
-    { href: 'overlays.html', label: 'Overlays' },
-    { href: 'troubleshooting.html', label: 'Troubleshooting' },
-    { href: 'changelog.html', label: 'Changelog' },
-    { href: 'privacy.html', label: 'Privacy' },
-    { href: 'acknowledgements.html', label: 'Acknowledgements' },
+    { group: 'Start', items: [
+      { href: 'index.html', label: 'Getting Started' },
+    ] },
+    { group: 'Use', items: [
+      { href: 'map.html', label: 'Map' },
+      { href: 'overlays.html', label: 'Overlays' },
+      { href: 'routes.html', label: 'Routes &amp; Favorites' },
+      { href: 'location-links.html', label: 'Location Links' },
+      { href: 'group.html', label: 'Group Sync' },
+    ] },
+    { group: 'Configure', items: [
+      { href: 'settings.html', label: 'Settings' },
+      { href: 'backup-transfer.html', label: 'Backup &amp; Transfer' },
+    ] },
+    { group: 'Help', items: [
+      { href: 'troubleshooting.html', label: 'Troubleshooting' },
+      { href: 'control-api.html', label: 'Control API' },
+    ] },
+    { group: 'About', items: [
+      { href: 'changelog.html', label: 'Changelog' },
+      { href: 'privacy.html', label: 'Privacy' },
+      { href: 'acknowledgements.html', label: 'Acknowledgements' },
+    ] },
   ];
 
   var EXT_ITEMS = [
@@ -25,9 +34,11 @@
 
   var currentFile = location.pathname.split('/').pop() || 'index.html';
 
-  var navHtml = NAV_ITEMS.map(function (item) {
-    var cls = item.href === currentFile ? ' class="active"' : '';
-    return '<a href="' + item.href + '"' + cls + '>' + item.label + '</a>';
+  var navHtml = NAV_ITEMS.map(function (g) {
+    return '<span class="nav-group">' + g.group + '</span>' + g.items.map(function (item) {
+      var cls = item.href === currentFile ? ' class="active"' : '';
+      return '<a href="' + item.href + '"' + cls + '>' + item.label + '</a>';
+    }).join('');
   }).join('');
 
   navHtml += '<span class="nav-sep"></span>';

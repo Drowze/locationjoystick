@@ -205,14 +205,15 @@ make wiki-serve   # http://localhost:8080
 |------|---------|
 | `docs/wiki/index.html` | Overview + install + first-run setup quick start |
 | `docs/wiki/map.html` | Map screen + bottom sheets |
-| `docs/wiki/routes.html` | Routes list + creator + detail |
-| `docs/wiki/favorites.html` | Favorites list + map picker |
+| `docs/wiki/routes.html` | Routes + Favorites (lists, creator, detail, map picker) |
 | `docs/wiki/location-links.html` | Location links: sharing, deep links, Capture mode |
 | `docs/wiki/group.html` | Group Sync (leader/follower Wi-Fi sync) |
-| `docs/wiki/tap-to-walk.html` | Tap to Walk (quick-walk + screen overlay) |
-| `docs/wiki/settings.html` | Settings + QR transfer |
-| `docs/wiki/overlays.html` | Joystick + widget overlays |
+| `docs/wiki/settings.html` | Settings + language |
+| `docs/wiki/backup-transfer.html` | Export/import + QR transfer |
+| `docs/wiki/overlays.html` | Joystick + widget overlays + Tap to Walk |
 | `docs/wiki/troubleshooting.html` | First-run setup + troubleshooting |
+| `docs/wiki/control-api.html` | Control API reference for developers |
+| `docs/wiki/favorites.html`, `tap-to-walk.html`, `language.html` | Redirect stubs (canonical + noindex), like `share.html` and `capture-coordinates.html` |
 | `docs/wiki/changelog.html` | Curated, user-facing release notes — **generated**, not hand-edited (see "Regenerating the changelog" below) |
 | `docs/wiki/changelog/<version>.json` | Per-version changelog source — feeds both `changelog.html` (via `make wiki-changelog`) and the in-app What's New popup |
 | `docs/wiki/privacy.html` | Privacy policy |
@@ -221,7 +222,7 @@ make wiki-serve   # http://localhost:8080
 | `docs/wiki/screenshots/` | Phone screenshots (PNG, numbered 01–17) |
 | `docs/wiki/screenshots/marketing/` | 8 curated 1024×500 Play Store marketing images (white bg, catch-phrase + phone screenshot) — **generated**, not hand-edited |
 
-Nav order/labels are the single source of truth in `NAV_ITEMS` (`docs/wiki/wiki-init.js`) — every HTML page's sidebar renders from that script, so a new page needs an entry there, not a hand-edited `<nav>` block per file.
+Nav groups (Start / Use / Configure / Help / About), order and labels are the single source of truth in the grouped `NAV_ITEMS` (`docs/wiki/wiki-init.js`) — every HTML page's sidebar renders from that script, so a new page needs an entry there, not a hand-edited `<nav>` block per file.
 
 ### Regenerating screenshots
 
