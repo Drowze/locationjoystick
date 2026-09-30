@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Floating Joystick & Widget — locationjoystick</title>
+  <title>Overlays — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="description" content="Control your spoofed GPS location from a floating joystick or widget that stays on screen over any app.">
+  <meta name="description" content="Control your fake location from a floating joystick, widget or Tap to Walk screen overlay that stays on top of any app.">
   <link rel="canonical" href="https://locationjoystick.shrtcts.fr/overlays.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="locationjoystick">
-  <meta property="og:title" content="Floating Joystick & Widget — locationjoystick">
-  <meta property="og:description" content="Control your spoofed GPS location from a floating joystick or widget that stays on screen over any app.">
+  <meta property="og:title" content="Overlays — locationjoystick">
+  <meta property="og:description" content="Control your fake location from a floating joystick, widget or Tap to Walk screen overlay that stays on top of any app.">
   <meta property="og:url" content="https://locationjoystick.shrtcts.fr/overlays.html">
   <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Floating Joystick & Widget — locationjoystick">
-  <meta name="twitter:description" content="Control your spoofed GPS location from a floating joystick or widget that stays on screen over any app.">
+  <meta name="twitter:title" content="Overlays — locationjoystick">
+  <meta name="twitter:description" content="Control your fake location from a floating joystick, widget or Tap to Walk screen overlay that stays on top of any app.">
   <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
@@ -34,13 +34,18 @@
     <div class="feature-section" id="joystick-overlay">
       <img class="phone-shot" src="screenshots/14_joystick_overlay.png" alt="Floating joystick overlay">
       <ul class="section-bullets">
-        <li>Drag the center dial in any direction. Pull farther from the center to move faster, up to your selected speed.</li>
-        <li>When unlocked, let go to stop. The stick returns to the center. Your position stays where you stopped.</li>
-        <li>Drag the outer ring to move the joystick anywhere on the screen.</li>
-        <li>Lock mode keeps you moving in the same direction after you let go. Drag back to the center to stop while keeping lock on. Pull outward to move again. Tap the widget's lock button to unlock.</li>
-        <li>Change speed with the widget's speed cycle button. You do not need to lift your finger off the joystick.</li>
-        <li>Moving the stick pauses your walk, route, roam, or planting so you can steer. Your destination and progress are kept, even while the app finds a path along roads. Letting go leaves the activity paused. Tap Resume to continue, or choose another destination to start a new walk. If you follow a group leader, following turns off and you stay in the group.</li>
-        <li>Touching the very center of the stick or dragging the outer ring does not pause an activity.</li>
+        <li>Drag the center dial to move. Pull farther out to move faster, up to your selected speed.</li>
+        <li>When unlocked, let go to stop. The stick returns to center; your position stays put.</li>
+        <li>Drag the outer ring to move the joystick anywhere on screen.</li>
+        <li>Lock mode keeps moving in the same direction after you let go.</li>
+        <li>Drag to center to stop while keeping lock on. Pull outward to move again.</li>
+        <li>Tap the widget lock button to unlock.</li>
+        <li>Change speed with the widget speed cycle button without lifting your finger.</li>
+        <li>Moving the stick pauses walk, route, roam, or planting so you can steer.</li>
+        <li>Destination and progress are kept. Letting go leaves the activity paused.</li>
+        <li>Tap Resume to continue or choose a new destination to start over.</li>
+        <li>If you follow a leader, following turns off and you stay in the group.</li>
+        <li>Touching the very center or dragging the outer ring does not pause anything.</li>
       </ul>
     </div>
 
@@ -54,12 +59,16 @@
       <img class="phone-shot" src="screenshots/15_widget_overlay.png" alt="Floating widget overlay">
       <ul class="section-bullets">
         <li>Tap the button again to collapse the panel.</li>
-        <li>Press and hold the app icon to show Pause and Stop. Pause turns spoofing off and keeps the widget. The other buttons fade until spoofing is on again, and Pause becomes Start. Stop ends spoofing and removes the widget. A short tap still expands or collapses the panel. Drag still moves the widget.</li>
-        <li>Lists and route options follow Light or Dark mode from Settings &rarr; Menus &rarr; Appearance. The round buttons stay dark so you can see them over other apps.</li>
+        <li>Press and hold the app icon to show Pause and Stop.</li>
+        <li>Pause turns spoofing off and keeps the widget. Other buttons fade until spoofing is on again, then Pause becomes Start.</li>
+        <li>Stop ends spoofing and removes the widget. A short tap expands or collapses. Dragging moves the widget.</li>
+        <li>Lists and route options follow Light or Dark mode from Settings → Menus → Appearance.</li>
+        <li>Round buttons stay dark so you see them over other apps.</li>
         <li>The route start sheet has the same options as <a href="routes.html#replay-options">Replay options</a>.</li>
-        <li>Choose which controls appear, and their order, in Settings &rarr; Menus &rarr; App Features. Changes apply the next time you open the widget.</li>
-        <li>While a route plays, pause and stop appear in the widget. A count such as <code>3/12</code> at the bottom of the list shows your current stop.</li>
-        <li>After you turn on the paste button, press and hold it to show a Capture shortcut. The shortcut opens the Capture page. A short tap opens the paste box.</li>
+        <li>Choose which controls appear and their order in Settings → Menus → App Features.</li>
+        <li>Changes apply the next time you open the widget.</li>
+        <li>While a route plays, pause and stop appear in the widget. A count such as <code>3/12</code> shows your current stop.</li>
+        <li>Press and hold the paste button to show a Capture shortcut. The shortcut opens Capture. A short tap opens the paste box.</li>
         <li>To hide the widget button, use <a href="settings.html#hide-widget">Hide floating widget</a> in Settings.</li>
       </ul>
     </div>
@@ -103,7 +112,7 @@
         </tr>
         <tr>
           <td><strong>Tap to Walk crosshair</strong></td>
-          <td>Places a clear layer over your app. Your next tap becomes your walk destination. Appears only when Tap to Walk is on. See <a href="tap-to-walk.html#screen-overlay">Tap to Walk</a>.</td>
+          <td>Places a clear layer over your app. Your next tap becomes your walk destination. Appears only when Tap to Walk is on. See <a href="#screen-overlay">Tap to Walk</a>.</td>
         </tr>
         <tr>
           <td><strong>Speed cycle</strong></td>
@@ -112,6 +121,112 @@
       </tbody>
     </table>
     </div>
+
+    <h2 id="tap-to-walk">Tap to Walk</h2>
+    <p>
+      Tap to Walk gives you two shortcuts to move your fake location with one tap, without opening the app.
+      Both are off by default. Turn them on in Settings → Menus → Tap to Walk.
+    </p>
+
+    <h3 id="tap-to-walk-settings">Settings</h3>
+    <div class="table-wrap">
+    <table class="option-table">
+      <thead><tr><th>Setting</th><th>What it does</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Scale</strong></td>
+          <td>Meters per pixel on your screen. Match it to how far the game is zoomed in. Higher for zoomed-out maps, lower for zoomed-in.</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td><strong>Compass orientation</strong></td>
+          <td>Keeps taps accurate when the game map rotates. Uses an Android accessibility feature.</td>
+          <td>Off</td>
+        </tr>
+        <tr>
+          <td><strong>Game app</strong></td>
+          <td>Pick your game from the list, then tap Test to check detection on your phone.</td>
+          <td>Select app</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 id="floating-map-quick-walk">Floating map quick walk</h3>
+    <p>
+      Turn it on in Settings → Menus → Privacy. Then a tap on the floating map walks to that spot at once.
+      It skips the popup that asks whether to walk, teleport, or use roads.
+    </p>
+
+    <h3 id="screen-overlay">Screen overlay</h3>
+    <p>
+      This adds a crosshair button to the floating widget. Tap it once to place a clear layer over your current app.
+      Your next tap anywhere becomes your walk destination. The layer then disappears.
+      To cancel, tap the close button in the bottom-right corner.
+    </p>
+
+    <div class="feature-section">
+      <img class="phone-shot" src="screenshots/25_compass_disclosure.png" alt="Enable Tap to Walk confirmation screen">
+      <ul class="section-bullets">
+        <li>Turning the overlay on opens a confirmation screen first.</li>
+        <li>It explains the detection risk and that accuracy depends on the scale setting.</li>
+        <li>If your phone supports compass orientation, it explains the accessibility permission.</li>
+        <li>Nothing turns on until you tap Agree.</li>
+      </ul>
+    </div>
+
+    <p>
+      The overlay uses the Scale value to turn your tap into a real-world location.
+      A higher number suits a zoomed-out game map. A lower number suits a zoomed-in map.
+    </p>
+
+    <p>
+      The overlay assumes north is at the top of the map.
+      If the game rotates the map to follow your character, taps may land in the wrong place.
+      Compass orientation can correct this.
+    </p>
+
+    <ul class="section-bullets">
+      <li>Some apps can detect a fake location and act on your account. Use this feature only in apps where you accept that risk.</li>
+      <li>Some apps can notice the compass helper. If your game limits features, turn off the locationjoystick compass entry in your phone's accessibility settings.</li>
+    </ul>
+
+    <h3 id="compass-orientation">Compass orientation</h3>
+    <p>
+      When the overlay opens, the app takes a picture of the screen and looks for your game's compass icon in the top-right corner.
+      It uses the compass direction to rotate the walk target, so it lands correctly on a turned map.
+      There is no separate switch. It runs once you turn on the accessibility feature below.
+    </p>
+
+    <p><strong>Setup</strong></p>
+    <p>
+      Compass orientation uses Android's Accessibility permission. Before Accessibility settings open,
+      a full-screen message explains what the app looks at and why. The picture of your screen never leaves your phone.
+      Tap Agree to continue, or Not now to keep it off.
+    </p>
+    <p>
+      You see this message during first-run setup (the optional Compass orientation step; skip it if you don't plan to use Tap to Walk, and Tap to Walk will ask again when you turn it on),
+      when you first turn Tap to Walk on, and the first time you tap the crosshair button.
+    </p>
+    <ol>
+      <li>Tap Agree on the message.</li>
+      <li>Find locationjoystick compass in the list and turn it on.</li>
+      <li>Return to locationjoystick. Compass detection is now on.</li>
+    </ol>
+    <p>
+      To see the message again, go to Settings → Menus → Tap to Walk → Compass orientation and tap Open Settings.
+    </p>
+
+    <p><strong>Check that it works</strong></p>
+    <ol>
+      <li>Pick your game from the Game app list.</li>
+      <li>Tap Test. The app switches to your game, reads its compass, and returns.</li>
+      <li>The app shows the detected direction. If it finds nothing, make sure the compass is visible in the game.</li>
+    </ol>
+    <p>
+      If you do not pick a game, leave the list on Select app. Switch to your game, switch back to locationjoystick, and tap Test.
+      The app briefly minimizes to read what is on screen.
+    </p>
 
     <h2 id="requirements">Requirements</h2>
     <p>
