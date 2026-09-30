@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fake GPS Joystick Setup Guide — locationjoystick</title>
+  <title>Getting Started — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="description" content="Install locationjoystick, a free Android fake GPS app. Enable Developer Options, pick it as your mock location app, and start spoofing your location in minutes.">
+  <meta name="description" content="Install locationjoystick on Android, grant the three permissions, and start your first fake GPS walk in a few minutes.">
   <link rel="canonical" href="https://locationjoystick.shrtcts.fr/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="locationjoystick">
-  <meta property="og:title" content="Fake GPS Joystick Setup Guide — locationjoystick">
-  <meta property="og:description" content="Install locationjoystick, a free Android fake GPS app. Enable Developer Options, pick it as your mock location app, and start spoofing your location in minutes.">
+  <meta property="og:title" content="Getting Started — locationjoystick">
+  <meta property="og:description" content="Install locationjoystick on Android, grant the three permissions, and start your first fake GPS walk in a few minutes.">
   <meta property="og:url" content="https://locationjoystick.shrtcts.fr/">
   <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Fake GPS Joystick Setup Guide — locationjoystick">
-  <meta name="twitter:description" content="Install locationjoystick, a free Android fake GPS app. Enable Developer Options, pick it as your mock location app, and start spoofing your location in minutes.">
+  <meta name="twitter:title" content="Getting Started — locationjoystick">
+  <meta name="twitter:description" content="Install locationjoystick on Android, grant the three permissions, and start your first fake GPS walk in a few minutes.">
   <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <script type="application/ld+json">
   {
@@ -24,7 +24,7 @@
     "name": "locationjoystick",
     "operatingSystem": "Android",
     "applicationCategory": "UtilitiesApplication",
-    "description": "Install locationjoystick, a free Android fake GPS app. Enable Developer Options, pick it as your mock location app, and start spoofing your location in minutes.",
+    "description": "Install locationjoystick on Android, grant the three permissions, and start your first fake GPS walk in a few minutes.",
     "url": "https://locationjoystick.shrtcts.fr/",
     "downloadUrl": "https://github.com/shortcuts/locationjoystick/releases",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -37,23 +37,8 @@
 <div class="layout">
 
   <main>
-    <h1 class="page-title">locationjoystick</h1>
-    <p>
-      Change the location your phone reports. Move a floating joystick, play a saved route,
-      or let the app wander for you. Your other apps see the new location.
-    </p>
-    <p>
-      The app uses a location setting built into Android. Turn on Developer Options and pick
-      locationjoystick as the mock location app. Every app on your phone then sees the position you choose.
-    </p>
-
-    <div class="feature-section" id="home-screen">
-      <img class="phone-shot" src="screenshots/01_idle.png" alt="Home screen with feature cards">
-      <ul class="section-bullets">
-        <li>The Home screen links to every part of the app: Map, Routes, Favorites, Capture, Group Sync, and Settings.</li>
-        <li>The button at the top starts and stops spoofing from any screen. When spoofing is off, it names the place you will start from.</li>
-      </ul>
-    </div>
+    <h1 id="getting-started">Getting Started</h1>
+    <p>Install locationjoystick, grant three permissions, and start your first fake GPS walk.</p>
 
     <h2 id="install">Install</h2>
     <ol class="quickstart">
@@ -63,88 +48,53 @@
     </ol>
 
     <h2 id="first-run-setup">First-run setup</h2>
-    <p>
-      The first time you open the app, it guides you through the setup below.
-    </p>
+    <p>When you open the app for the first time, it guides you through five setup steps:</p>
 
     <ul class="step-list">
       <li>
         <div>
           <strong>Location permission</strong>
-          <p>
-            Grant <strong>Precise location</strong>. The map uses it to center on you, and route recording needs it.
-          </p>
+          <p>Grant <strong>Precise location</strong>.</p>
         </div>
       </li>
       <li>
         <div>
           <strong>Overlay permission</strong>
-          <p>
-            Grant <strong>Display over other apps</strong> for the floating joystick and widget.
-            The app opens the settings page. Turn on locationjoystick in the list, then go back to the app.
-          </p>
+          <p>Grant <strong>Display over other apps</strong>. The app opens Settings; turn on locationjoystick in the list.</p>
         </div>
       </li>
       <li>
         <div>
           <strong>Mock location provider</strong>
-          <p>
-            First, turn on <strong>Developer Options</strong>: go to Settings &rarr; About phone and tap Build number seven times.
-            Then go to Settings &rarr; Developer Options &rarr; <strong>Select mock location app</strong> and choose locationjoystick.
-            Tap <strong>Check again</strong> in the app. It moves on when the setting is correct.
-          </p>
+          <p>Turn on <strong>Developer Options</strong>: go to Settings &rarr; About phone and tap Build number seven times. Then go to Settings &rarr; Developer Options &rarr; <strong>Select mock location app</strong> and choose locationjoystick. Tap <strong>Check again</strong> in the app. See <a href="troubleshooting.html#another-app-holds-slot">Troubleshooting</a> if this step fails.</p>
         </div>
       </li>
       <li>
         <div>
           <strong>Compass orientation (optional)</strong>
-          <p>
-            <a href="tap-to-walk.html">Tap to Walk</a> can read your game's compass so each tap walks the right way.
-            Skip this step if you don't want to use Tap to Walk. It uses Android's Accessibility permission. Tap <strong>Review and turn on</strong> to read the message.
-            Nothing leaves your phone. Tap <strong>Agree</strong>, then turn on <strong>locationjoystick compass</strong> in Android's Accessibility settings.
-            Or tap <strong>Not now</strong> to skip it. Everything else works without it.
-          </p>
+          <p><a href="tap-to-walk.html">Tap to Walk</a> reads your game's compass direction. Turn it on in Accessibility settings, or skip it. Everything works without it.</p>
         </div>
       </li>
       <li>
         <div>
           <strong>All done</strong>
-          <p>
-            Setup ends and the Map screen opens. You see setup again only if you clear the app's data.
-          </p>
+          <p>Setup ends and the Map screen opens.</p>
         </div>
       </li>
     </ul>
 
-    <h2 id="start-spoofing">Start changing your location</h2>
-    <p>Tap <strong>Map</strong>, tap the start button, then long-press the map to walk or teleport there. Use the floating widget or joystick to control your location from other apps.</p>
-
-    <h2 id="updating">Updating</h2>
-    <p>Open the new APK file. Android asks <em>"Replace app?"</em>. Your data stays.</p>
-
-    <h3 id="switching-from-the-play-store-version">Switching from the Play Store version</h3>
-    <p>
-      Android cannot update directly between the Play Store version and the GitHub version. To switch:
-    </p>
-    <ol>
-      <li>Export your data: <strong>Settings &rarr; Export</strong>.</li>
-      <li>Uninstall the Play Store version.</li>
-      <li>Install the GitHub APK.</li>
-      <li>Import your data.</li>
-    </ol>
-
-    <h2 id="home-badges">Home screen badges</h2>
-    <p><strong>Update available.</strong> When GitHub has a newer release, a badge such as <em>v1.2.3 available</em> appears on the Home screen. The app checks about once a day and needs internet. Tap the badge to open the release page. Tap <strong>X</strong> to hide it. The badge stays hidden until a newer version comes out. You cannot turn the check off.</p>
-    <p><strong>What's new.</strong> After an update, a second badge shows what changed. Tap it to read the new features and fixes. It works offline. Tap <strong>X</strong> to dismiss it until the next version. See the <a href="changelog.html">changelog</a> for the full history.</p>
+    <h2 id="start-spoofing">Start spoofing</h2>
+    <p>Tap <strong>Map</strong>, tap the start button, then tap or long-press the map to move.</p>
+    <div class="feature-section" id="home-screen">
+      <img class="phone-shot" src="screenshots/01_idle.png" alt="Home screen with feature cards">
+      <ul class="section-bullets">
+        <li>The Home screen links to Map, Routes, Favorites, Capture, Group Sync, and Settings.</li>
+        <li>The button at the top starts and stops spoofing. When off, it shows where you will start.</li>
+      </ul>
+    </div>
 
     <h2 id="source">Source</h2>
-    <p>
-      <a href="https://github.com/shortcuts/locationjoystick">github.com/shortcuts/locationjoystick</a>.
-      Free, open source, under the MIT license.
-    </p>
-    <p>
-      See <a href="acknowledgements.html">Acknowledgements</a> for the open-source projects and data sources the app uses.
-    </p>
+    <p><a href="https://github.com/shortcuts/locationjoystick">github.com/shortcuts/locationjoystick</a>. Free, open source, MIT license. See <a href="acknowledgements.html">Acknowledgements</a> for third-party credits.</p>
   </main>
 
 </div>
