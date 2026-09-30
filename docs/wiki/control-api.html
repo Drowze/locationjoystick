@@ -3,9 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control API — locationjoystick</title>
+  <title>Control API (for developers) — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="robots" content="noindex">
+  <meta name="description" content="HTTP API on the Group Sync leader for teleport, walk and route commands, plus favorites, routes and speed profiles, over your local Wi-Fi.">
+  <link rel="canonical" href="https://locationjoystick.shrtcts.fr/control-api.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="locationjoystick">
+  <meta property="og:title" content="Control API (for developers) — locationjoystick">
+  <meta property="og:description" content="HTTP API on the Group Sync leader for teleport, walk and route commands, plus favorites, routes and speed profiles, over your local Wi-Fi.">
+  <meta property="og:url" content="https://locationjoystick.shrtcts.fr/control-api.html">
+  <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Control API (for developers) — locationjoystick">
+  <meta name="twitter:description" content="HTTP API on the Group Sync leader for teleport, walk and route commands, plus favorites, routes and speed profiles, over your local Wi-Fi.">
+  <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
 </head>
@@ -13,8 +24,312 @@
 <div class="layout">
 
   <main>
-    <h1 id="control-api">Control API</h1>
-    <p>This page is being written.</p>
+    <h1 id="control-api">Control API (for developers)</h1>
+    <p>
+      To use the Control API, turn on the <strong>Control API</strong> toggle in the <a href="group.html#leader">Group Sync leader</a> section.
+      It shows the host, port, and API key that your code needs to send commands like teleport, walk, or route playback.
+      Your commands will control this device the same way taps and swipes do — followers see the same movement signals.
+      See the reference below for endpoints and authentication.
+    </p>
+
+    <h2 id="overview">Overview</h2>
+    <p>
+      The Control API is a local HTTP server running only on the group leader. It listens on the host and port shown in the app.
+      All requests must include <code>Authorization: Bearer &lt;api-key&gt;</code> (from the Control API toggle).
+      Request and response bodies are JSON.
+      The base URL is <code>http://&lt;host&gt;:&lt;port&gt;/api/v1/</code>.
+    </p>
+
+    <h2 id="authentication">Authentication</h2>
+    <p>
+      Every request requires an <code>Authorization</code> header:
+    </p>
+    <div class="code-block"><pre>Authorization: Bearer &lt;api-key&gt;</pre></div>
+    <p>
+      If the key is incorrect or missing, the server responds with <code>401 Unauthorized</code> and the header <code>WWW-Authenticate: Bearer</code>.
+      If the Control API is off, all <code>/api/v1/</code> paths return <code>404 Not Found</code>.
+    </p>
+
+    <p>Example request:</p>
+    <pre><code>curl -H "Authorization: Bearer abcdef123456..." \
+  http://192.168.1.100:8080/api/v1/status</code></pre>
+
+    <h2 id="errors">Errors</h2>
+    <p>
+      All error responses use the same structure: a JSON object with an <code>error</code> object containing <code>code</code> (machine-readable identifier) and <code>message</code> (human-readable description).
+      Example:
+    </p>
+    <pre><code>{ "error": { "code": "bad_request", "message": "lat must be -90..90 and lon -180..180" } }</code></pre>
+    <p>
+      Status codes and their meanings:
+    </p>
+    <ul class="section-bullets">
+      <li><code>400 Bad Request</code> — Invalid input or malformed JSON body.</li>
+      <li><code>401 Unauthorized</code> — Missing or incorrect API key.</li>
+      <li><code>404 Not Found</code> — Endpoint or resource does not exist, or Control API is off.</li>
+      <li><code>405 Method Not Allowed</code> — Wrong HTTP method (e.g., <code>GET</code> instead of <code>POST</code>).</li>
+      <li><code>409 Conflict</code> — State conflict (e.g., a route is playing when you try to start roaming, or the route you are trying to edit is currently playing).</li>
+      <li><code>413 Payload Too Large</code> — Request body exceeds 64 KiB.</li>
+      <li><code>500 Internal Error</code> — Server error; try again later.</li>
+    </ul>
+
+    <h2 id="state-and-status">State and Status</h2>
+    <div class="endpoint" id="ep-get-status">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/status</code></div>
+      <p>Returns the API version, the device's role (always <code>"leader"</code>), and the number of active followers.</p>
+      <p class="endpoint-returns">Returns <code>{"apiVersion":1,"role":"leader","followers":N}</code>.</p>
+    </div>
+    <div class="endpoint" id="ep-get-state">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/state</code></div>
+      <p>Full state snapshot: spoofing state, movement mode, current position, bearing, speed, active route, walk target, roaming status, and active speed profile.</p>
+      <p class="endpoint-returns">Returns a JSON object with keys <code>spoofState</code>, <code>mode</code>, <code>position</code>, <code>bearing</code>, <code>speedMs</code>, <code>activeRouteId</code>, <code>walk</code>, <code>roaming</code>, <code>speedProfileId</code>. Null fields use JSON <code>null</code>.</p>
+    </div>
+    <div class="endpoint" id="ep-get-position">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/position</code></div>
+      <p>Current position only.</p>
+      <p class="endpoint-returns">Returns <code>{"lat":double,"lon":double}</code>. Returns <code>409 Conflict</code> if spoofing is not running.</p>
+    </div>
+    <h2 id="movement-commands">Movement Commands</h2>
+    <div class="endpoint" id="ep-post-teleport">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/teleport</code></div>
+      <p>Teleport to the given coordinates. Followers will follow or walk there depending on their <strong>Follow leader teleports</strong> setting. Cooldown is advisory only — the request succeeds and returns a <code>warning</code> field (see example below) if you are within the suggested teleport cooldown, but the teleport runs anyway.</p>
+      <dl class="params">
+        <div class="param"><dt><code>lat</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>lon</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>409 Conflict</code> if spoofing is not running.</p>
+    </div>
+    <div class="endpoint" id="ep-post-walk">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/walk</code></div>
+      <p>Walk to the given coordinates. Followers walk toward the same target at their own speed.</p>
+      <dl class="params">
+        <div class="param"><dt><code>lat</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>lon</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>viaRoads</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span> Set to <code>true</code> to follow roads (Guided routing) or omit it / leave it <code>false</code> for a straight line.</dd></div>
+      </dl>
+    </div>
+    <div class="endpoint" id="ep-post-walk-pause">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/walk/pause</code></div>
+      <p>Pause the current walk without stopping it. The position is frozen.</p>
+    </div>
+    <div class="endpoint" id="ep-post-walk-resume">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/walk/resume</code></div>
+      <p>Resume a paused walk.</p>
+    </div>
+    <div class="endpoint" id="ep-post-walk-stop">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/walk/stop</code></div>
+      <p>Stop the walk and clear the target.</p>
+    </div>
+    <div class="endpoint" id="ep-post-route-start">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/route/start</code></div>
+      <p>Start playing a route. All options are optional and default to the route's saved settings. Followers walk or snap to waypoints depending on their teleport setting.</p>
+      <dl class="params">
+        <div class="param"><dt><code>routeId</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>loop</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>reverse</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>returnToLocation</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>followRoadsToStart</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>planting</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>teleportBetweenWaypoints</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>teleportBetweenDelaySeconds</code></dt><dd><span class="param-type">integer</span> <span class="param-flag">optional</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if the route does not exist.</p>
+    </div>
+    <div class="endpoint" id="ep-post-route-pause">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/route/pause</code></div>
+      <p>Pause the current route replay.</p>
+    </div>
+    <div class="endpoint" id="ep-post-route-resume">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/route/resume</code></div>
+      <p>Resume a paused route replay.</p>
+    </div>
+    <div class="endpoint" id="ep-post-route-stop">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/route/stop</code></div>
+      <p>Stop route replay and clear the active route.</p>
+    </div>
+    <div class="endpoint" id="ep-post-roam-start">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/roam/start</code></div>
+      <p>Start roaming with optional overrides. All other fields default to the app's saved roaming defaults.</p>
+      <dl class="params">
+        <div class="param"><dt><code>lat</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span> If <code>lat</code> and <code>lon</code> are omitted, roaming starts from the current position.</dd></div>
+        <div class="param"><dt><code>lon</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>radiusMeters</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>distanceMeters</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>speedProfileId</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>followRoads</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>returnToInitialLocation</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>kind</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span> Can be <code>WAYPOINT</code> (random points) or <code>PLANTING</code> (grid pattern).</dd></div>
+        <div class="param"><dt><code>plantingStartRadiusMeters</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>plantingEndRadiusMeters</code></dt><dd><span class="param-type">double</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>plantingInfiniteLoops</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>plantingLoopCount</code></dt><dd><span class="param-type">integer</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>plantingSpeedProfileId</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>409 Conflict</code> if a route is currently playing.</p>
+    </div>
+    <div class="endpoint" id="ep-post-roam-pause">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/roam/pause</code></div>
+      <p>Pause roaming.</p>
+    </div>
+    <div class="endpoint" id="ep-post-roam-resume">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/roam/resume</code></div>
+      <p>Resume roaming.</p>
+    </div>
+    <div class="endpoint" id="ep-post-roam-stop">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/roam/stop</code></div>
+      <p>Stop roaming.</p>
+    </div>
+    <div class="endpoint" id="ep-post-spoofing-start">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/spoofing/start</code></div>
+      <p>Start spoofing a fake location. Does nothing if spoofing is already running.</p>
+    </div>
+    <div class="endpoint" id="ep-post-spoofing-stop">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/spoofing/stop</code></div>
+      <p>Stop spoofing. The foreground service continues running if any automated movement (walk, route, or roam) is active.</p>
+    </div>
+    <div class="endpoint" id="ep-post-speed-profile">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/speed-profile</code></div>
+      <p>Set the active speed profile (e.g. <code>"slow_walk"</code>, <code>"walk"</code>, <code>"run"</code>, <code>"bike"</code>, <code>"drive"</code>).</p>
+      <dl class="params">
+        <div class="param"><dt><code>id</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>400 Bad Request</code> if the profile ID is unknown.</p>
+    </div>
+    <div class="endpoint" id="ep-post-joystick">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/joystick</code></div>
+      <p>Simulate a joystick hold: move in the given direction at the given force (0–1) for the given duration (milliseconds). To release immediately, send <code>force</code> 0 or <code>durationMs</code> 0. A new request replaces any running hold.</p>
+      <dl class="params">
+        <div class="param"><dt><code>bearingDegrees</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>force</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span> 0–1.</dd></div>
+        <div class="param"><dt><code>durationMs</code></dt><dd><span class="param-type">long</span> <span class="param-flag">required</span> Milliseconds. The maximum duration is 10 seconds.</dd></div>
+      </dl>
+    </div>
+    <h2 id="content-api">Content API (Favorites, Routes, Speed Profiles)</h2>
+    <div class="endpoint" id="ep-get-favorites">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/favorites</code></div>
+      <p>List all favorites.</p>
+      <p class="endpoint-returns">Response: array of objects with <code>id</code>, <code>name</code>, <code>lat</code>, <code>lon</code>, <code>createdAt</code> (milliseconds since epoch), and <code>category</code> (string or null).</p>
+    </div>
+    <div class="endpoint" id="ep-post-favorites">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/favorites</code></div>
+      <p>Create a new favorite.</p>
+      <dl class="params">
+        <div class="param"><dt><code>name</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span> Required and cannot be empty.</dd></div>
+        <div class="param"><dt><code>lat</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>lon</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>category</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>201 Created</code> with the new favorite object (includes <code>id</code> and <code>createdAt</code>).</p>
+    </div>
+    <div class="endpoint" id="ep-get-favorites-id">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/favorites/{id}</code></div>
+      <p>Get a single favorite by ID.</p>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if not found.</p>
+    </div>
+    <div class="endpoint" id="ep-put-favorites-id">
+      <div class="endpoint-head"><span class="method method-put">PUT</span><code class="endpoint-path">/favorites/{id}</code></div>
+      <p>Update a favorite. Preserves <code>id</code> and <code>createdAt</code>.</p>
+      <dl class="params">
+        <div class="param"><dt><code>name</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span> Required and cannot be empty.</dd></div>
+        <div class="param"><dt><code>lat</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>lon</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span></dd></div>
+        <div class="param"><dt><code>category</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>200 OK</code>. Returns <code>404 Not Found</code> if not found.</p>
+    </div>
+    <div class="endpoint" id="ep-delete-favorites-id">
+      <div class="endpoint-head"><span class="method method-delete">DELETE</span><code class="endpoint-path">/favorites/{id}</code></div>
+      <p>Delete a favorite.</p>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if not found.</p>
+    </div>
+    <div class="endpoint" id="ep-get-routes">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/routes</code></div>
+      <p>List all routes (excludes the internal paste-temp scratch route).</p>
+      <p class="endpoint-returns">Response: array of route objects with <code>id</code>, <code>name</code>, <code>routeType</code>, <code>isLooping</code>, <code>speedProfileId</code> (string or null), <code>randomizeTeleportOrder</code>, <code>createdAt</code>, <code>updatedAt</code>, and <code>waypoints</code> (array of <code>{id,lat,lon,orderIndex,waitSeconds}</code>).</p>
+    </div>
+    <div class="endpoint" id="ep-post-routes">
+      <div class="endpoint-head"><span class="method method-post">POST</span><code class="endpoint-path">/routes</code></div>
+      <p>Create a new route.</p>
+      <dl class="params">
+        <div class="param"><dt><code>name</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span> Required.</dd></div>
+        <div class="param"><dt><code>routeType</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span> One of <code>STRAIGHT</code>, <code>GUIDED</code>, <code>TELEPORT</code>.</dd></div>
+        <div class="param"><dt><code>isLooping</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>speedProfileId</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>randomizeTeleportOrder</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>waypoints</code></dt><dd><span class="param-type">array of objects</span> <span class="param-flag">required</span> Each item is <code>{lat,lon,waitSeconds?}</code>. At least 2 waypoints required.</dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>201 Created</code> with the new route object.</p>
+    </div>
+    <div class="endpoint" id="ep-get-routes-id">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/routes/{id}</code></div>
+      <p>Get a single route by ID.</p>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if not found or if it is the internal scratch route.</p>
+    </div>
+    <div class="endpoint" id="ep-put-routes-id">
+      <div class="endpoint-head"><span class="method method-put">PUT</span><code class="endpoint-path">/routes/{id}</code></div>
+      <p>Update a route (entire waypoint list). Body: same as <code>POST /routes</code>. Preserves <code>id</code> and <code>createdAt</code>, updates <code>updatedAt</code>.</p>
+      <dl class="params">
+        <div class="param"><dt><code>name</code></dt><dd><span class="param-type">string</span> <span class="param-flag">required</span> Required.</dd></div>
+        <div class="param"><dt><code>routeType</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span> One of <code>STRAIGHT</code>, <code>GUIDED</code>, <code>TELEPORT</code>.</dd></div>
+        <div class="param"><dt><code>isLooping</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>speedProfileId</code></dt><dd><span class="param-type">string</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>randomizeTeleportOrder</code></dt><dd><span class="param-type">boolean</span> <span class="param-flag">optional</span></dd></div>
+        <div class="param"><dt><code>waypoints</code></dt><dd><span class="param-type">array of objects</span> <span class="param-flag">required</span> Each item is <code>{lat,lon,waitSeconds?}</code>. At least 2 waypoints required.</dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>200 OK</code>. Returns <code>404 Not Found</code> if not found, or <code>409 Conflict</code> if the route is currently playing.</p>
+    </div>
+    <div class="endpoint" id="ep-delete-routes-id">
+      <div class="endpoint-head"><span class="method method-delete">DELETE</span><code class="endpoint-path">/routes/{id}</code></div>
+      <p>Delete a route.</p>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if not found, or <code>409 Conflict</code> if the route is currently playing.</p>
+    </div>
+    <div class="endpoint" id="ep-get-speed-profiles">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/speed-profiles</code></div>
+      <p>List the five built-in speed profiles.</p>
+      <p class="endpoint-returns">Response: array of objects with <code>id</code>, <code>name</code>, <code>speedMetersPerSecond</code>, <code>builtIn</code> (always <code>true</code>), <code>active</code> (boolean flag), and <code>enabled</code> (boolean flag).</p>
+    </div>
+    <div class="endpoint" id="ep-get-speed-profiles-id">
+      <div class="endpoint-head"><span class="method method-get">GET</span><code class="endpoint-path">/speed-profiles/{id}</code></div>
+      <p>Get a single profile by ID. Profile IDs: <code>slow_walk</code>, <code>walk</code>, <code>run</code>, <code>bike</code>, <code>drive</code>.</p>
+      <p class="endpoint-returns">Returns <code>404 Not Found</code> if not found.</p>
+    </div>
+    <div class="endpoint" id="ep-put-speed-profiles-id">
+      <div class="endpoint-head"><span class="method method-put">PUT</span><code class="endpoint-path">/speed-profiles/{id}</code></div>
+      <p>Update a speed profile's speed. Profile ID, name, and <code>builtIn</code> flag cannot be changed.</p>
+      <dl class="params">
+        <div class="param"><dt><code>speedMetersPerSecond</code></dt><dd><span class="param-type">double</span> <span class="param-flag">required</span> Must be between 0.01 and 15.0.</dd></div>
+      </dl>
+      <p class="endpoint-returns">Returns <code>200 OK</code> with the updated profile. Returns <code>400 Bad Request</code> if the speed is out of range, or <code>404 Not Found</code> if the profile does not exist.</p>
+    </div>
+
+    <h2 id="security-limits">Security Limits</h2>
+    <ul class="section-bullets">
+      <li><strong>Local network only:</strong> The API is accessible only over the same Wi-Fi network. It does not work over the internet or mobile data.</li>
+      <li><strong>Plain HTTP, no encryption:</strong> Requests travel in clear text. Do not send the API key over an untrusted network.</li>
+      <li><strong>API key in clear:</strong> The key must be sent in the <code>Authorization</code> header with each request. Treat it like a password.</li>
+      <li><strong>Off by default:</strong> The Control API is disabled when you create or join a group. Turn it on explicitly in the Control API section to allow other apps to connect.</li>
+      <li><strong>Resets on exit:</strong> Leaving the group or restarting the app turns the Control API off. The key persists; you can turn the API back on next time.</li>
+      <li><strong>Key rotation:</strong> Tap <strong>Regenerate key</strong> in the Control API section to create a new key. The old key stops working immediately.</li>
+      <li><strong>Hide Teleport is bypassed:</strong> The Control API ignores the <strong>Hide Teleport</strong> setting. Routes and manual teleports through the API work regardless. You are responsible for the security implications of enabling the API.</li>
+      <li><strong>Cooldown is advisory:</strong> Teleport requests that violate the suggested cooldown still execute; they return a <code>warning</code> field but do not fail.</li>
+    </ul>
+
+    <h3 id="example-teleport-via-curl">Example: Teleport via curl</h3>
+    <p>
+      Here is a complete example using <code>curl</code> to teleport the leader to Times Square in New York:
+    </p>
+    <pre><code>curl -X POST http://192.168.1.100:8080/api/v1/teleport \
+  -H "Authorization: Bearer abcdef123456..." \
+  -H "Content-Type: application/json" \
+  -d '{"lat":40.758,"lon":-73.9855}'</code></pre>
+    <p>
+      If successful, the response is:
+    </p>
+    <pre><code>{"ok":true}</code></pre>
+    <p>
+      If the device has moved recently and is in a cooldown period, the response includes a warning:
+    </p>
+    <pre><code>{"ok":true,"warning":{"code":"teleport_cooldown","message":"Suggested teleport cooldown has not elapsed","remainingSeconds":45,"totalSeconds":120,"distanceMeters":5280}}</code></pre>
   </main>
 
 </div>

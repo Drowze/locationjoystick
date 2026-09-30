@@ -5,6 +5,7 @@
   <url><loc>https://shortcuts.github.io/locationjoystick/routes.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://shortcuts.github.io/locationjoystick/location-links.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shortcuts.github.io/locationjoystick/group.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://shortcuts.github.io/locationjoystick/control-api.html</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://shortcuts.github.io/locationjoystick/settings.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://shortcuts.github.io/locationjoystick/overlays.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://shortcuts.github.io/locationjoystick/troubleshooting.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>

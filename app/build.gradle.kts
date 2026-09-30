@@ -32,7 +32,7 @@ android {
 }
 
 val copyApiDocs by tasks.registering(Copy::class) {
-    from(rootProject.file("docs/wiki/group.html"))
+    from(rootProject.file("docs/wiki/control-api.html"))
     into(layout.buildDirectory.dir("generated/docsAssets"))
 }
 tasks.matching { it.name.endsWith("AndroidTestAssets") }.configureEach { dependsOn(copyApiDocs) }

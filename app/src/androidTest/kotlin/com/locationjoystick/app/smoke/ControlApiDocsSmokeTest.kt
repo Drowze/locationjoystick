@@ -25,7 +25,7 @@ import java.net.URL
 import javax.inject.Inject
 
 /**
- * Checks that the leader exposes exactly the endpoints documented in `docs/wiki/group.html`, not what they do.
+ * Checks that the leader exposes exactly the endpoints documented in `docs/wiki/control-api.html`, not what they do.
  * Method OPTIONS is registered nowhere, so each documented path answers 405 with an `Allow` header listing
  * its real methods. No handler runs, so the probe has no side effects.
  */
@@ -42,12 +42,12 @@ class ControlApiDocsSmokeTest : BaseSmokeTest() {
             InstrumentationRegistry
                 .getInstrumentation()
                 .context.assets
-                .open("group.html")
+                .open("control-api.html")
                 .bufferedReader()
                 .readText()
         val byPath = mutableMapOf<String, MutableSet<String>>()
         endpointRegex.findAll(html).forEach { byPath.getOrPut(it.groupValues[2]) { mutableSetOf() }.add(it.groupValues[1]) }
-        assertTrue("no endpoints parsed from group.html", byPath.isNotEmpty())
+        assertTrue("no endpoints parsed from control-api.html", byPath.isNotEmpty())
         return byPath
     }
 
