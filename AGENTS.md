@@ -211,7 +211,7 @@ make wiki-serve   # http://localhost:8080
 | `docs/wiki/settings.html` | Settings + language |
 | `docs/wiki/backup-transfer.html` | Export/import + QR transfer |
 | `docs/wiki/overlays.html` | Joystick + widget overlays + Tap to Walk |
-| `docs/wiki/troubleshooting.html` | First-run setup + troubleshooting |
+| `docs/wiki/troubleshooting.html` | Troubleshooting (permissions, mock location, map, crash report) |
 | `docs/wiki/control-api.html` | Control API reference for developers |
 | `docs/wiki/favorites.html`, `tap-to-walk.html`, `language.html` | Redirect stubs (canonical + noindex), like `share.html` and `capture-coordinates.html` |
 | `docs/wiki/changelog.html` | Curated, user-facing release notes — **generated**, not hand-edited (see "Regenerating the changelog" below) |
