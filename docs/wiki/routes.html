@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPS Routes — locationjoystick</title>
+  <title>Routes &amp; Favorites — locationjoystick</title>
   <link rel="icon" href="icon.png" type="image/png">
-  <meta name="description" content="Create, save, and replay GPS routes on Android. Walk a path automatically at any speed, loop it, or import routes from GPX files.">
+  <meta name="description" content="Create, save and replay GPS routes and save favorite places to walk or teleport to. Import routes from GPX files.">
   <link rel="canonical" href="https://locationjoystick.shrtcts.fr/routes.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="locationjoystick">
-  <meta property="og:title" content="GPS Routes — locationjoystick">
-  <meta property="og:description" content="Create, save, and replay GPS routes on Android. Walk a path automatically at any speed, loop it, or import routes from GPX files.">
+  <meta property="og:title" content="Routes &amp; Favorites — locationjoystick">
+  <meta property="og:description" content="Create, save and replay GPS routes and save favorite places to walk or teleport to. Import routes from GPX files.">
   <meta property="og:url" content="https://locationjoystick.shrtcts.fr/routes.html">
   <meta property="og:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GPS Routes — locationjoystick">
-  <meta name="twitter:description" content="Create, save, and replay GPS routes on Android. Walk a path automatically at any speed, loop it, or import routes from GPX files.">
+  <meta name="twitter:title" content="Routes &amp; Favorites — locationjoystick">
+  <meta name="twitter:description" content="Create, save and replay GPS routes and save favorite places to walk or teleport to. Import routes from GPX files.">
   <meta name="twitter:image" content="https://locationjoystick.shrtcts.fr/screenshots/01_idle_playstore.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@4">
@@ -25,12 +25,14 @@
 
 
   <main>
-    <h1 id="routes">Routes</h1>
+    <h1 id="routes-favorites">Routes &amp; Favorites</h1>
     <p>
-      A route is a list of stops on the map. Play it back at the speed you choose.
-      Routes move in straight lines between stops or follow real roads.
-      Your routes stay on your device. See the <a href="privacy.html#no-cloud">privacy policy</a>.
+      Routes are lists of stops you replay at your chosen speed.
+      Favorites are named places you walk or teleport to.
+      Both stay on your device. See the <a href="privacy.html#no-cloud">privacy policy</a>.
     </p>
+
+    <h2 id="routes">Routes</h2>
 
     <div class="feature-section" id="routes-list">
       <img class="phone-shot" src="screenshots/03_routes.png" alt="Routes list screen">
@@ -45,7 +47,7 @@
       </ul>
     </div>
 
-    <h2 id="how-to-add-a-route">How to add a route</h2>
+    <h3 id="how-to-add-a-route">How to add a route</h3>
     <p>Tap the add button at the bottom right of the Routes screen.</p>
 
     <div class="feature-section" id="routes-add-button">
@@ -63,7 +65,7 @@
       Routes with thousands of points are skipped, and a message shows how many.
     </p>
 
-    <h2 id="route-types">Route types</h2>
+    <h3 id="route-types">Route types</h3>
     <div class="table-wrap">
     <table class="option-table">
       <thead><tr><th>Type</th><th>How it works</th></tr></thead>
@@ -84,7 +86,7 @@
     </table>
     </div>
 
-    <h2 id="replay-options">Replay options</h2>
+    <h3 id="replay-options">Replay options</h3>
     <p>
       Tap play on a saved route to open a sheet with these options. Cancel and Start are at the bottom of the sheet.
     </p>
@@ -136,7 +138,7 @@
     </table>
     </div>
 
-    <h2 id="paste-coordinates">Paste coordinates</h2>
+    <h3 id="paste-coordinates">Paste coordinates</h3>
     <p>
       Paste a list of coordinates to make a saved route. The app ignores lines it does not recognize, so you can keep headings and notes.
       Check <strong>Swap lat / lon order</strong> when the first number is longitude.
@@ -150,7 +152,7 @@
     </ul>
     <p>One paste makes one route. A route started without saving appears as <code>Temp Route from Paste</code>. The next start replaces it. Routes you saved under your own name stay.</p>
 
-    <h2 id="route-creator">Route creator</h2>
+    <h3 id="route-creator">Route creator</h3>
     <p>Tap the map to place stops. A line draws between them.</p>
 
     <div class="feature-section" id="route-creator-shot">
@@ -158,14 +160,14 @@
       <ul class="section-bullets">
         <li>Search for a place by name with the search button. Search uses <a href="https://nominatim.openstreetmap.org" target="_blank" rel="noopener">nominatim.openstreetmap.org</a>.</li>
         <li>Use the heart button to pick a favorite. The map moves there so you can place a stop. Use the target button to center the map on your position.</li>
-      <li>Undo the last stop with the undo button.</li>
+        <li>Undo the last stop with the undo button.</li>
         <li>Before you save, choose straight, road-following, or teleport.</li>
         <li>On a teleport route, each stop asks how many seconds to stay. The default is 5. The minimum is 1.</li>
         <li>Record mode: tap record to save your phone's real movement as a route while you walk.</li>
       </ul>
     </div>
 
-    <h2 id="route-detail">Route detail</h2>
+    <h3 id="route-detail">Route detail</h3>
     <p>Rename a route, reorder or remove stops, or change how it moves between stops.</p>
 
     <div class="feature-section" id="route-detail-shot">
@@ -181,7 +183,7 @@
       </ul>
     </div>
 
-    <h2 id="hot-routes">Hot routes</h2>
+    <h3 id="hot-routes">Hot routes</h3>
     <p>
       In Settings, turn on <strong>Show hot routes</strong> to add ready-made routes for popular event locations around the world.
       They include large walking areas, parks, and landmarks. This is off by default.
@@ -191,7 +193,7 @@
       <li>The setting is kept when you restart the app. Export and import include it.</li>
     </ul>
 
-    <h2 id="import-formats">Import formats</h2>
+    <h3 id="import-formats">Import formats</h3>
     <div class="table-wrap">
     <table class="option-table">
       <thead><tr><th>Format</th><th>Notes</th></tr></thead>
@@ -214,6 +216,65 @@
         </tr>
       </tbody>
     </table>
+    </div>
+
+    <h2 id="favorites">Favorites</h2>
+
+    <div class="feature-section" id="favorites-list">
+      <img class="phone-shot" src="screenshots/04_favorites.png" alt="Favorites screen">
+      <ul class="section-bullets">
+        <li>Tap a favorite to walk there (straight line or via roads) or teleport there.</li>
+        <li>The share button next to Sort sends your current location as decimal degrees (e.g., <code>11.012777, 79.480650</code>). The widget has the same button.</li>
+        <li>Sort favorites A–Z, Z–A, newest, or oldest. The widget's favorites lists use the same order.</li>
+        <li>The three-dot menu on a favorite lets you edit it, copy coordinates, send them as a message, or delete it.</li>
+      </ul>
+    </div>
+
+    <h3 id="search-and-categories">Search and categories</h3>
+    <ul class="section-bullets">
+      <li>The search box at the top of the Favorites screen finds favorites by name or area as you type.</li>
+      <li>Favorites with an area are grouped under the area name. Favorites without an area are listed at the bottom.</li>
+      <li>The map sheet and widget have the same search. Closing the list clears it.</li>
+    </ul>
+
+    <h3 id="how-to-add-a-favorite">How to add a favorite</h3>
+    <p>Tap the add button at the bottom right of the Favorites screen.</p>
+
+    <div class="feature-section" id="favorites-add-button">
+      <img class="phone-shot" src="screenshots/17_favorites_add_button.png" alt="Favorites screen with add button visible">
+      <ul class="section-bullets">
+        <li><strong>From coordinates</strong>: type latitude and longitude in separate boxes.</li>
+        <li><strong>Paste coordinates</strong>: paste a pair such as <code>11.0127769, 79.48065</code> or <code>37°34'11.4"N 127°00'17.9"E</code>.</li>
+        <li><strong>From map</strong>: pick a point on the map.</li>
+        <li><strong>Use current location</strong>: save where you are now.</li>
+      </ul>
+    </div>
+    <p>The <a href="map.html#paste-coordinates">paste box on the map</a> can also save a pasted pair as a favorite.</p>
+
+    <h3 id="hot-locations">Hot locations</h3>
+    <p>
+      In Settings, turn on <strong>Show hot locations</strong> to add popular places around the world to your favorites.
+      They include cities, parks, and landmarks. This is off by default.
+    </p>
+    <ul class="section-bullets">
+      <li>Turning it off removes only the entries this feature added. Your own favorites stay.</li>
+      <li>The setting persists when you restart. Export and import include it.</li>
+      <li>Each hot location uses its country as its area name.</li>
+    </ul>
+
+    <h3 id="map-picker">Map picker</h3>
+    <p>
+      "From map" opens a full-screen map. Tap to place a pin, or search for a place by name.
+      See <a href="settings.html#search-privacy">Settings → External services</a> for what the search service receives.
+    </p>
+
+    <div class="feature-section" id="map-picker-shot">
+      <img class="phone-shot" src="screenshots/11_map_picker.png" alt="Map picker screen">
+      <ul class="section-bullets">
+        <li>Search by place name to move the map to an address or landmark.</li>
+        <li>Tap the map to move the pin to an exact spot.</li>
+        <li>Confirm to save the pin with a name.</li>
+      </ul>
     </div>
   </main>
 
