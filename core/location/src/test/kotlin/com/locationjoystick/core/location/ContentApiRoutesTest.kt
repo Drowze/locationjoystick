@@ -175,7 +175,7 @@ class ContentApiRoutesTest {
     @Test
     fun `speed profile create and delete are 405 and pattern routes need auth`() {
         assertEquals(405, call("POST", "speed-profiles", "{}", validateRequest = false).first)
-        assertEquals(405, call("DELETE", "speed-profiles/walk").first)
+        assertEquals(405, call("DELETE", "speed-profiles/walk", validateRequest = false).first)
         assertEquals(401, call("GET", "favorites/f1", auth = false, validateRequest = false).first)
     }
 }
