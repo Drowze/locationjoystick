@@ -13,6 +13,9 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+        unitTests.all {
+            it.systemProperty("openapi.spec", rootProject.file("docs/openapi.yaml").absolutePath)
+        }
     }
 }
 
@@ -34,4 +37,5 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.orgjson)
+    testImplementation(libs.swagger.request.validator.core)
 }

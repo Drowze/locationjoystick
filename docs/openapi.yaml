@@ -1,0 +1,1362 @@
+openapi: 3.0.3
+info:
+  title: locationjoystick Control API
+  version: "1.0"
+  description: |
+    Local HTTP API exposed by the locationjoystick Group Sync leader.
+    The API supports movement commands, route playback, roaming, spoofing,
+    favorites, routes, and speed profiles.
+    The API is available only when the Control API toggle is enabled in the app.
+    Requests and responses use JSON. The API uses plain HTTP and is intended for
+    trusted local networks only.
+
+servers:
+  - url: http://{host}:{port}/api/v1
+    description: Control API server shown in the application
+    variables:
+      host:
+        default: localhost
+        description: Hostname or IP address of the Group Sync leader
+      port:
+        default: "8080"
+        description: TCP port shown in the application
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: State and status
+  - name: Movement commands
+  - name: Favorites
+  - name: Routes
+  - name: Speed profiles
+
+paths:
+  /status:
+    get:
+      tags:
+        - State and status
+      summary: Get API status
+      description: Returns the API version, device role, and active follower count.
+      operationId: getStatus
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: API status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /state:
+    get:
+      tags:
+        - State and status
+      summary: Get the full device state
+      description: |
+        Returns a full state snapshot including spoofing state, movement mode,
+        current position, bearing, speed, active route, walk target, roaming
+        status, and active speed profile.
+      operationId: getState
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Full state snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/State"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /position:
+    get:
+      tags:
+        - State and status
+      summary: Get the current position
+      operationId: getPosition
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current position
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Coordinates"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Spoofing is not running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /teleport:
+    post:
+      tags:
+        - Movement commands
+      summary: Teleport to coordinates
+      description: |
+        Teleports the leader to the specified coordinates. Followers follow or
+        walk there according to their Follow leader teleports setting.
+        Teleport cooldown is advisory only. A request may succeed while returning
+        a warning object.
+      operationId: teleport
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Coordinates"
+      responses:
+        "200":
+          description: Teleport accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Spoofing is not running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /walk:
+    post:
+      tags:
+        - Movement commands
+      summary: Walk to coordinates
+      description: |
+        Walks to the specified coordinates. Followers walk toward the same
+        target at their own speed.
+      operationId: walk
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalkRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Spoofing is not running or another movement operation conflicts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /walk/pause:
+    post:
+      tags:
+        - Movement commands
+      summary: Pause the current walk
+      description: Pauses the current walk without stopping it. The position is frozen.
+      operationId: pauseWalk
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /walk/resume:
+    post:
+      tags:
+        - Movement commands
+      summary: Resume a paused walk
+      operationId: resumeWalk
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /walk/stop:
+    post:
+      tags:
+        - Movement commands
+      summary: Stop walking
+      description: Stops the walk and clears the walk target.
+      operationId: stopWalk
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /route/start:
+    post:
+      tags:
+        - Movement commands
+      summary: Start route playback
+      description: |
+        Starts playing a saved route. Omitted options use the route's saved
+        settings.
+      operationId: startRoute
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartRouteRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /route/pause:
+    post:
+      tags:
+        - Movement commands
+      summary: Pause route playback
+      operationId: pauseRoute
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /route/resume:
+    post:
+      tags:
+        - Movement commands
+      summary: Resume route playback
+      operationId: resumeRoute
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /route/stop:
+    post:
+      tags:
+        - Movement commands
+      summary: Stop route playback
+      description: Stops route playback and clears the active route.
+      operationId: stopRoute
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /roam/start:
+    post:
+      tags:
+        - Movement commands
+      summary: Start roaming
+      description: |
+        Starts roaming with optional overrides. Omitted fields use the app's
+        saved roaming defaults. If lat and lon are omitted, roaming starts
+        around the current location.
+      operationId: startRoam
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartRoamRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: A route is currently playing or no current position
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roam/pause:
+    post:
+      tags:
+        - Movement commands
+      summary: Pause roaming
+      operationId: pauseRoam
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /roam/resume:
+    post:
+      tags:
+        - Movement commands
+      summary: Resume roaming
+      operationId: resumeRoam
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /roam/stop:
+    post:
+      tags:
+        - Movement commands
+      summary: Stop roaming
+      operationId: stopRoam
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /spoofing/start:
+    post:
+      tags:
+        - Movement commands
+      summary: Start spoofing
+      description: Starts spoofing a fake location. Does nothing if already running.
+      operationId: startSpoofing
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /spoofing/stop:
+    post:
+      tags:
+        - Movement commands
+      summary: Stop spoofing
+      description: |
+        Stops spoofing. The foreground service continues running if automated
+        movement such as walking, route playback, or roaming is active.
+      operationId: stopSpoofing
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /speed-profile:
+    post:
+      tags:
+        - Movement commands
+      summary: Set the active speed profile
+      operationId: setSpeedProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetSpeedProfileRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /joystick:
+    post:
+      tags:
+        - Movement commands
+      summary: Simulate a joystick hold
+      description: |
+        Moves in the specified direction at the specified force for the given
+        duration. Bearing is expressed in degrees. Force must be between 0 and
+        1. The maximum duration is 10 seconds. To release immediately, send
+        force 0 or durationMs 0.
+      operationId: joystick
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoystickRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /favorites:
+    get:
+      tags:
+        - Favorites
+      summary: List favorites
+      operationId: listFavorites
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Favorite objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Favorite"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Favorites
+      summary: Create a favorite
+      operationId: createFavorite
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteInput"
+      responses:
+        "201":
+          description: Favorite created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Favorite"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /favorites/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
+
+    get:
+      tags:
+        - Favorites
+      summary: Get a favorite
+      operationId: getFavorite
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Favorite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Favorite"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Favorites
+      summary: Update a favorite
+      description: Preserves the favorite ID and creation timestamp.
+      operationId: updateFavorite
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FavoriteInput"
+      responses:
+        "200":
+          description: Updated favorite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Favorite"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags:
+        - Favorites
+      summary: Delete a favorite
+      operationId: deleteFavorite
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /routes:
+    get:
+      tags:
+        - Routes
+      summary: List routes
+      description: Excludes the internal paste-temp scratch route.
+      operationId: listRoutes
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Route objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Route"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Routes
+      summary: Create a route
+      operationId: createRoute
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteInput"
+      responses:
+        "201":
+          description: Route created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /routes/{id}:
+    parameters:
+      - $ref: "#/components/parameters/ResourceId"
+
+    get:
+      tags:
+        - Routes
+      summary: Get a route
+      description: Returns 404 for the internal scratch route.
+      operationId: getRoute
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Route
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Routes
+      summary: Update a route
+      description: |
+        Replaces the entire waypoint list. Preserves the route ID and creation
+        timestamp and updates the modification timestamp.
+      operationId: updateRoute
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RouteInput"
+      responses:
+        "200":
+          description: Updated route
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Route"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The route is currently playing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Routes
+      summary: Delete a route
+      operationId: deleteRoute
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CommandAccepted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The route is currently playing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /speed-profiles:
+    get:
+      tags:
+        - Speed profiles
+      summary: List speed profiles
+      description: Lists the five built-in speed profiles.
+      operationId: listSpeedProfiles
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Speed profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpeedProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /speed-profiles/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Speed profile ID
+        schema:
+          type: string
+          enum:
+            - slow_walk
+            - walk
+            - run
+            - bike
+            - drive
+
+    get:
+      tags:
+        - Speed profiles
+      summary: Get a speed profile
+      operationId: getSpeedProfile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Speed profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeedProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Speed profiles
+      summary: Update a speed profile's speed
+      description: |
+        Updates only the speed. The profile ID, name, and builtIn flag cannot be
+        changed. The speed must be between 0.01 and 15.0 meters per second.
+      operationId: updateSpeedProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpeedProfileUpdate"
+      responses:
+        "200":
+          description: Updated speed profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpeedProfile"
+        "400":
+          description: Speed is out of range
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key obtained from the Control API toggle in the app.
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      description: Resource identifier
+      schema:
+        type: string
+
+  responses:
+    CommandAccepted:
+      description: Command accepted
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CommandResponse"
+
+    BadRequest:
+      description: Invalid input or malformed JSON body
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    Unauthorized:
+      description: Missing or incorrect API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    NotFound:
+      description: Endpoint or resource does not exist, or the Control API is disabled
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    Conflict:
+      description: State conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    Coordinates:
+      type: object
+      required:
+        - lat
+        - lon
+      additionalProperties: false
+      properties:
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          description: Latitude in decimal degrees
+        lon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          description: Longitude in decimal degrees
+
+    Status:
+      type: object
+      required:
+        - apiVersion
+        - role
+        - followers
+      additionalProperties: false
+      properties:
+        apiVersion:
+          type: integer
+        role:
+          type: string
+          enum:
+            - leader
+        followers:
+          type: integer
+          minimum: 0
+
+    State:
+      type: object
+      required:
+        - spoofState
+        - mode
+        - bearing
+        - speedMs
+        - activeRouteId
+        - walk
+        - roaming
+        - speedProfileId
+      properties:
+        spoofState:
+          type: string
+          description: Current spoofing state
+        mode:
+          type: string
+          description: Current movement mode
+        position:
+          allOf:
+            - $ref: "#/components/schemas/Coordinates"
+          nullable: true
+        bearing:
+          type: number
+          format: double
+          nullable: true
+        speedMs:
+          type: number
+          format: double
+          nullable: true
+        activeRouteId:
+          type: string
+          nullable: true
+        walk:
+          type: object
+          required:
+            - target
+            - paused
+          additionalProperties: false
+          properties:
+            target:
+              allOf:
+                - $ref: "#/components/schemas/Coordinates"
+              nullable: true
+            paused:
+              type: boolean
+        roaming:
+          type: object
+          required:
+            - active
+            - paused
+          additionalProperties: false
+          properties:
+            active:
+              type: boolean
+            paused:
+              type: boolean
+        speedProfileId:
+          type: string
+
+    WalkRequest:
+      allOf:
+        - $ref: "#/components/schemas/Coordinates"
+        - type: object
+          properties:
+            viaRoads:
+              type: boolean
+              default: false
+              description: Follow roads using guided routing
+
+    StartRouteRequest:
+      type: object
+      required:
+        - routeId
+      additionalProperties: false
+      properties:
+        routeId:
+          type: string
+        loop:
+          type: boolean
+        reverse:
+          type: boolean
+        returnToLocation:
+          type: boolean
+        followRoadsToStart:
+          type: boolean
+        planting:
+          type: boolean
+        teleportBetweenWaypoints:
+          type: boolean
+        teleportBetweenDelaySeconds:
+          type: integer
+          minimum: 0
+
+    StartRoamRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        lon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        radiusMeters:
+          type: number
+          format: double
+          minimum: 0
+        distanceMeters:
+          type: number
+          format: double
+          minimum: 0
+        speedProfileId:
+          type: string
+        followRoads:
+          type: boolean
+        returnToInitialLocation:
+          type: boolean
+        kind:
+          type: string
+          enum:
+            - WAYPOINT
+            - PLANTING
+        plantingStartRadiusMeters:
+          type: number
+          format: double
+          minimum: 0
+        plantingEndRadiusMeters:
+          type: number
+          format: double
+          minimum: 0
+        plantingInfiniteLoops:
+          type: boolean
+        plantingLoopCount:
+          type: integer
+          minimum: 0
+        plantingSpeedProfileId:
+          type: string
+
+    SetSpeedProfileRequest:
+      type: object
+      required:
+        - id
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Built-in speed profile ID
+          enum:
+            - slow_walk
+            - walk
+            - run
+            - bike
+            - drive
+
+    JoystickRequest:
+      type: object
+      required:
+        - bearingDegrees
+        - force
+        - durationMs
+      additionalProperties: false
+      properties:
+        bearingDegrees:
+          type: number
+          format: double
+          description: Direction in degrees
+        force:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        durationMs:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 10000
+          description: Hold duration in milliseconds
+
+    FavoriteInput:
+      type: object
+      required:
+        - name
+        - lat
+        - lon
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        lon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        category:
+          type: string
+          nullable: true
+
+    Favorite:
+      type: object
+      required:
+        - id
+        - name
+        - lat
+        - lon
+        - createdAt
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          minLength: 1
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        lon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation time in milliseconds since Unix epoch
+        category:
+          type: string
+          nullable: true
+
+    Waypoint:
+      type: object
+      required:
+        - id
+        - lat
+        - lon
+        - orderIndex
+        - waitSeconds
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        lat:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        lon:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        orderIndex:
+          type: integer
+        waitSeconds:
+          type: integer
+          minimum: 0
+
+    RouteInput:
+      type: object
+      required:
+        - name
+        - waypoints
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        routeType:
+          type: string
+          enum:
+            - STRAIGHT
+            - GUIDED
+            - TELEPORT
+        isLooping:
+          type: boolean
+        speedProfileId:
+          type: string
+          nullable: true
+        randomizeTeleportOrder:
+          type: boolean
+        waypoints:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required:
+              - lat
+              - lon
+            additionalProperties: false
+            properties:
+              lat:
+                type: number
+                format: double
+                minimum: -90
+                maximum: 90
+              lon:
+                type: number
+                format: double
+                minimum: -180
+                maximum: 180
+              waitSeconds:
+                type: integer
+                minimum: 0
+
+    Route:
+      type: object
+      required:
+        - id
+        - name
+        - routeType
+        - isLooping
+        - speedProfileId
+        - randomizeTeleportOrder
+        - waypoints
+        - createdAt
+        - updatedAt
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          minLength: 1
+        routeType:
+          type: string
+          enum:
+            - STRAIGHT
+            - GUIDED
+            - TELEPORT
+        isLooping:
+          type: boolean
+        speedProfileId:
+          type: string
+          nullable: true
+        randomizeTeleportOrder:
+          type: boolean
+        waypoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/Waypoint"
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation time in milliseconds since Unix epoch
+        updatedAt:
+          type: integer
+          format: int64
+          description: Last update time in milliseconds since Unix epoch
+
+    SpeedProfile:
+      type: object
+      required:
+        - id
+        - name
+        - speedMetersPerSecond
+        - builtIn
+        - active
+        - enabled
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          enum:
+            - slow_walk
+            - walk
+            - run
+            - bike
+            - drive
+        name:
+          type: string
+        speedMetersPerSecond:
+          type: number
+          format: double
+          minimum: 0.01
+          maximum: 15
+        builtIn:
+          type: boolean
+          enum:
+            - true
+        active:
+          type: boolean
+          description: Whether this is the currently active profile
+        enabled:
+          type: boolean
+          description: Whether this profile is enabled in the app settings
+
+    SpeedProfileUpdate:
+      type: object
+      required:
+        - speedMetersPerSecond
+      additionalProperties: false
+      properties:
+        speedMetersPerSecond:
+          type: number
+          format: double
+          minimum: 0.01
+          maximum: 15
+
+    CommandResponse:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+          enum:
+            - true
+        warning:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            remainingSeconds:
+              type: integer
+            totalSeconds:
+              type: integer
+            distanceMeters:
+              type: number
+              format: double
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      additionalProperties: false
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error identifier
+            message:
+              type: string
+              description: Human-readable error message
