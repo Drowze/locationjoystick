@@ -22,8 +22,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.net.HttpURLConnection
-import java.net.URL
 
 class ContentApiRoutesTest {
     private val server = LeaderSyncServer()
@@ -72,21 +70,8 @@ class ContentApiRoutesTest {
         path: String,
         body: String? = null,
         auth: Boolean = true,
-    ): Pair<Int, String> {
-        val conn = URL("http://localhost:$port/api/v1/$path").openConnection() as HttpURLConnection
-        conn.requestMethod = method
-        if (auth) conn.setRequestProperty("Authorization", "Bearer k")
-        if (body != null) {
-            conn.doOutput = true
-            val bytes = body.toByteArray()
-            conn.setFixedLengthStreamingMode(bytes.size)
-            conn.outputStream.use { it.write(bytes) }
-        }
-        val code = conn.responseCode
-        val text = (if (code < 400) conn.inputStream else conn.errorStream).bufferedReader().readText()
-        conn.disconnect()
-        return code to text
-    }
+        validateRequest: Boolean = true,
+    ) = ApiContract.call(port, method, path, body, auth, validateRequest).let { it.code to it.body }
 
     private fun errorCode(body: String) = JSONObject(body).getJSONObject("error").getString("code")
 
