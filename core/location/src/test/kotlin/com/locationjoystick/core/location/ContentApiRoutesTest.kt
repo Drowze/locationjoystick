@@ -98,9 +98,9 @@ class ContentApiRoutesTest {
 
     @Test
     fun `favorite create rejects empty name bad coords and malformed json`() {
-        assertEquals(400, call("POST", "favorites", """{"name":" ","lat":3,"lon":4}""").first)
-        assertEquals(400, call("POST", "favorites", """{"name":"a","lat":91,"lon":4}""").first)
-        assertEquals(400, call("POST", "favorites", "{nope").first)
+        assertEquals(400, call("POST", "favorites", """{"name":" ","lat":3,"lon":4}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "favorites", """{"name":"a","lat":91,"lon":4}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "favorites", "{nope", validateRequest = false).first)
     }
 
     @Test
@@ -133,12 +133,12 @@ class ContentApiRoutesTest {
         assertEquals(1, ws.getJSONObject(1).getInt("orderIndex"))
         assertEquals(4, ws.getJSONObject(1).getInt("waitSeconds"))
         coVerify { routeRepository.insertRoute(match { it.name == "N" && it.speedProfileId == "run" }) }
-        assertEquals(400, call("POST", "routes", """{"name":"","waypoints":$wp}""").first)
-        assertEquals(400, call("POST", "routes", """{"name":"N","waypoints":[{"lat":1,"lon":1}]}""").first)
-        assertEquals(400, call("POST", "routes", """{"name":"N","waypoints":[{"lat":1,"lon":1},{"lat":95,"lon":1}]}""").first)
-        assertEquals(400, call("POST", "routes", """{"name":"N","routeType":"FLY","waypoints":$wp}""").first)
-        assertEquals(400, call("POST", "routes", """{"name":"N","speedProfileId":"warp","waypoints":$wp}""").first)
-        assertEquals(400, call("POST", "routes", "{nope").first)
+        assertEquals(400, call("POST", "routes", """{"name":"","waypoints":$wp}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "routes", """{"name":"N","waypoints":[{"lat":1,"lon":1}]}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "routes", """{"name":"N","waypoints":[{"lat":1,"lon":1},{"lat":95,"lon":1}]}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "routes", """{"name":"N","routeType":"FLY","waypoints":$wp}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "routes", """{"name":"N","speedProfileId":"warp","waypoints":$wp}""", validateRequest = false).first)
+        assertEquals(400, call("POST", "routes", "{nope", validateRequest = false).first)
     }
 
     @Test
@@ -165,7 +165,7 @@ class ContentApiRoutesTest {
     @Test
     fun `speed update validates range and calls matching setter`() {
         for (bad in listOf("0", "15.5", "\"NaN\"", "\"x\"")) {
-            assertEquals(bad, 400, call("PUT", "speed-profiles/run", """{"speedMetersPerSecond":$bad}""").first)
+            assertEquals(bad, 400, call("PUT", "speed-profiles/run", """{"speedMetersPerSecond":$bad}""", validateRequest = false).first)
         }
         assertEquals(200, call("PUT", "speed-profiles/run", """{"speedMetersPerSecond":3.5}""").first)
         coVerify(exactly = 1) { settingsRepository.setRunSpeed(3.5) }
@@ -174,8 +174,8 @@ class ContentApiRoutesTest {
 
     @Test
     fun `speed profile create and delete are 405 and pattern routes need auth`() {
-        assertEquals(405, call("POST", "speed-profiles", "{}").first)
+        assertEquals(405, call("POST", "speed-profiles", "{}", validateRequest = false).first)
         assertEquals(405, call("DELETE", "speed-profiles/walk").first)
-        assertEquals(401, call("GET", "favorites/f1", auth = false).first)
+        assertEquals(401, call("GET", "favorites/f1", auth = false, validateRequest = false).first)
     }
 }
